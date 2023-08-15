@@ -6,9 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
 const fs_1 = __importDefault(require("fs"));
 const crypto_1 = __importDefault(require("crypto"));
-let lines = ("" + fs_1.default.readFileSync("tests/first-test/index.md"))
-    .split("\n")
-    .map((x) => x.trimEnd());
 let inCode = false;
 let lastSh = ``;
 function processLine(str) {
@@ -28,10 +25,11 @@ function processLine(str) {
         let hash = crypto_1.default.createHash("md5").update(lastSh).digest("hex");
         if (fs_1.default.existsSync("tmp/prevRuns/" + hash)) {
             let prevOutput = fs_1.default.readFileSync("tmp/prevRuns/" + hash);
-            if (prevOutput !== output)
+            if (!prevOutput.equals(output)) {
                 console.log(`Output changed for command: \x1B[0;93m${lastSh}\x1B[0m`);
-            console.log(`Output expected:\n\x1B[0;34m${prevOutput}\x1B[0m`);
-            console.log(`Output was:\n\x1B[0;31m${output}\x1B[0m`);
+                console.log(`Output expected:\n\x1B[0;34m${prevOutput}\x1B[0m`);
+                console.log(`Output was:\n\x1B[0;31m${output}\x1B[0m`);
+            }
         }
         else {
             fs_1.default.writeFileSync("tmp/prevRuns/" + hash, output);
@@ -49,4 +47,34 @@ const HEAD = `<html lang="en">
 <body>`;
 const FOOT = `</body>
 </html>`;
-fs_1.default.writeFileSync("output/index.html", HEAD + lines.map(processLine).join("\n") + FOOT);
+function processFile(root, path) {
+    let pathWithoutExtension = path.substring(0, path.lastIndexOf("."));
+    console.log(`Processing ${pathWithoutExtension}`);
+    let filename = path.substring(path.lastIndexOf("/") + 1);
+    let filenameWithoutExtension = filename.substring(0, filename.lastIndexOf("."));
+    let lines = ("" + fs_1.default.readFileSync(`${root}/${pathWithoutExtension}.md`))
+        .split("\n")
+        .map((x) => x.trimEnd());
+    let pathWithoutFile = path.substring(0, path.lastIndexOf("/"));
+    fs_1.default.mkdirSync(`output/${pathWithoutFile}`, { recursive: true });
+    fs_1.default.writeFileSync(`output/${pathWithoutExtension}.html`, HEAD + lines.map(processLine).join("\n") + FOOT);
+}
+function processPath(root, path) {
+    if (fs_1.default.lstatSync(`${root}/${path}`).isFile()) {
+        let extension = path.substring(path.lastIndexOf(".") + 1);
+        if (!["md", "png"].includes(extension))
+            console.log(`Warning. Unknown extension: ${root}${path}`);
+        if (extension === "md")
+            processFile(root, path);
+        else
+            fs_1.default.copyFileSync(`${root}/${path}`, `output/${path}`);
+    }
+    else {
+        fs_1.default.readdirSync(`${root}/${path}`).forEach((f) => {
+            processPath(root, `${path}/${f}`);
+        });
+    }
+}
+fs_1.default.rmSync("output", { recursive: true, force: true });
+fs_1.default.mkdirSync("output");
+processPath(process.argv[2] || "tests/first-test", "");

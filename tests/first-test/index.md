@@ -88,6 +88,7 @@ Next button
 Prev button
 
 
+[Next ->](chapter1/index.md)
 
 
 
