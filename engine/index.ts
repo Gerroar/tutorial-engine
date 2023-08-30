@@ -2,6 +2,9 @@ import { execFileSync, execSync, spawnSync } from "child_process";
 import fs from "fs";
 import crypto from "crypto";
 
+const buildFolder = "../frontend/src/output";
+var arrDirectories: string[] = [];
+
 let inCode = false;
 let lastSh = ``;
 
@@ -44,9 +47,16 @@ const HEAD = `<html lang="en">
 const FOOT = `</body>
 </html>`;
 
+/**Why arrDirectories inside this function ? 
+ * 
+ * In order to generate a menu with all the directories and files that they are being created,
+ * we store the path as a string in the array 
+ */
+
 function processFile(root: string, path: string) {
   let pathWithoutExtension = path.substring(0, path.lastIndexOf("."));
   console.log(`Processing ${pathWithoutExtension}`);
+  arrDirectories.push(path);
   let filename = path.substring(path.lastIndexOf("/") + 1);
   let filenameWithoutExtension = filename.substring(
     0,
@@ -56,9 +66,9 @@ function processFile(root: string, path: string) {
     .split("\n")
     .map((x) => x.trimEnd());
   let pathWithoutFile = path.substring(0, path.lastIndexOf("/"));
-  fs.mkdirSync(`output/${pathWithoutFile}`, { recursive: true });
+  fs.mkdirSync(`${buildFolder}/${pathWithoutFile}`, { recursive: true });
   fs.writeFileSync(
-    `output/${pathWithoutExtension}.html`,
+    `${buildFolder}/${pathWithoutExtension}.html`,
     HEAD + lines.map(processLine).join("\n") + FOOT
   );
 }
@@ -69,13 +79,23 @@ function processPath(root: string, path: string) {
     if (!["md", "png"].includes(extension))
       console.log(`Warning. Unknown extension: ${root}${path}`);
     if (extension === "md") processFile(root, path);
-    else fs.copyFileSync(`${root}/${path}`, `output/${path}`);
+    else fs.copyFileSync(`${root}/${path}`, `${buildFolder}/${path}`);
   } else {
     fs.readdirSync(`${root}/${path}`).forEach((f) => {
       processPath(root, `${path}/${f}`);
     });
   }
 }
-fs.rmSync("output", { recursive: true, force: true });
-fs.mkdirSync("output");
+fs.rmSync(buildFolder, { recursive: true, force: true });
+fs.mkdirSync(buildFolder);
 processPath(process.argv[2] || "tests/first-test", "");
+
+/** Same as creating files for every page, each time that a new directory or file its created 
+ * the array will be updated so will the menu do, the array it's being mapped to transform 
+ * the contents into strings 
+ */
+fs.writeFileSync(
+  `../frontend/src/output/directoriesList.ts`,
+  `export const arrDirectories = [\n${arrDirectories.map(x => `"${x}"`).join(",\n")}\n];`
+)
+

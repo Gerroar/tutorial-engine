@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#root {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+
+
+nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 300px;
+}
+
+#menu-path {
+    stroke: hsl(0, 0%, 18%);
+}
+
+
+
+.ul-menu,
+.li-menu {
+    margin: 0;
+    padding: 0;
+}
+
+.ul-menu {
+
+    position: absolute;
+    left: -40px;
+    top: 100px;
+    width: 230px;
+
+}
+
+.li-menu {
+    list-style: none;
+    margin-bottom: 30px;
+    margin-left: 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    text-align: left;
+    user-select: none;
+}
+
+.li-menu.hidden {
+
+    visibility: hidden;
+}
+
+.li-menu:hover {
+    color: blue;
+}
+
+/* Dark mode */
+
+/*@media (prefers-color-scheme: dark) {
+    #menu-path {
+        stroke: white;
+    }
+}*/
+
+/* Dark mode */
