@@ -52,7 +52,7 @@ nav {
     user-select: none;
 }
 
-.li-menu.hidden {
+.hidden {
 
     visibility: hidden;
 }

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-const Path = (props:any) => (
+const Path = (props: any) => (
   <motion.path
     fill="transparent"
     strokeWidth="3"
@@ -10,8 +10,16 @@ const Path = (props:any) => (
   />
 );
 
-export const MenuToggle = ({ toggle } : {toggle:any}) => (
-  <button onClick={toggle} className="absolute border-none cursor-pointer top-[0.85rem] left-[1.85rem] w-14 h-14 border-r-8 bg-transparent select-none">
+function hideElements(toggle: any) {
+
+
+
+  return toggle;
+
+}
+
+export const MenuToggle = ({ toggle }: { toggle: any }) => (
+  <button onClick={hideElements(toggle)} className="absolute border-none cursor-pointer top-[0.85rem] left-[1.85rem] w-14 h-14 border-r-8 bg-transparent select-none">
     <svg width="23" height="23" viewBox="0 0 23 23">
       <Path
         variants={{
