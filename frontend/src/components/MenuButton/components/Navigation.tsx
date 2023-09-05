@@ -176,36 +176,6 @@ export const Navigation = () => {
         }
       </motion.ul>
     )
-    /**flattenOutput.forEach(value => {
 
-      let index = value.substring(0, value.indexOf(" "));
-      let name = value.substring(value.indexOf(" "));
-
-      let hasDocsInside = docsInside(name);
-
-      if (index.length === depth) {
-
-        return generateTsx(marginL, marginR, name, index, hasDocsInside, isMenuOpen)
-      } else if (index.length > depth) {
-
-        depth = index.length;
-        marginL += 2;
-        marginR++;
-        return generateTsx(marginL, marginR, name, index, hasDocsInside, isMenuOpen)
-      } else if (index.length < depth) {
-
-        let oldDepth = depth;
-        depth = index.length;
-
-        while (oldDepth !== depth) {
-
-          oldDepth -= 2;
-          marginL -= 2;
-          marginR--;
-        }
-
-        return generateTsx(marginL, marginR, name, index, hasDocsInside, isMenuOpen)
-      }
-    }) */
   }
 };

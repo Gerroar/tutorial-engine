@@ -10,8 +10,166 @@ const buildFolder = "../frontend/src/output";
 var arrDirectories = [];
 let inCode = false;
 let lastSh = ``;
+/**DONT FORGET ABOUT tsc -w WHEN WORKING WITH THE ENGINE PART IF NOT THEY WONT APPEAR ANY CHANGES FROM THE index.ts */
+/**Iterates the string looking for more than one of the character type passed,
+ * doesn't matter if it's * , ** or *** ( for example, it could be any type accepted
+ * for italics, bold or both (***x***, ___x___)), it will check if there is a pair of
+ * that amount of symbols.
+ */
+function moreThanOne(str, charType) {
+    let charTypeLength = charType.length;
+    let hasMoreThanOne = false;
+    let howManyChars = 0;
+    switch (charTypeLength) {
+        case 1:
+            for (const chr of str) {
+                if (chr === charType) {
+                    howManyChars++;
+                }
+            }
+            if (howManyChars > 1) {
+                hasMoreThanOne = true;
+            }
+            return hasMoreThanOne;
+        case 2:
+            for (let i = 0; i < str.length; i++) {
+                const chr = str[i];
+                if ((i + 1) !== str.length) {
+                    let twoChars = chr + str[i + 1];
+                    if (twoChars === charType) {
+                        i++;
+                        howManyChars += 2;
+                    }
+                }
+            }
+            if (howManyChars > 2) {
+                hasMoreThanOne = true;
+            }
+            return hasMoreThanOne;
+        case 3:
+            for (let i = 0; i < str.length; i++) {
+                const chr = str[i];
+                if ((i + 1) !== str.length) {
+                    let twoChars = chr + str[i + 1];
+                    if (twoChars === charType) {
+                        i++;
+                        howManyChars += 2;
+                    }
+                }
+            }
+            if (howManyChars > 3) {
+                hasMoreThanOne = true;
+            }
+            return hasMoreThanOne;
+    }
+}
+function replaceTheWordBetweenSymbols(str, charType) {
+    let charTypeLength = charType.length;
+    let fullWord = "";
+    let wordBetweenSymbols = "";
+    let startAdding = false;
+    switch (charTypeLength) {
+        case 1:
+            for (const chr of str) {
+                if (chr === charType) {
+                    fullWord += chr;
+                    startAdding = !startAdding;
+                }
+                else if (startAdding) {
+                    fullWord += chr;
+                    wordBetweenSymbols += chr;
+                }
+            }
+            if (!startAdding) {
+                return (str.replace(fullWord, "<em>" + wordBetweenSymbols + "</em>"));
+            }
+            else {
+                break;
+            }
+        case 2:
+            for (let i = 0; i < str.length; i++) {
+                const chr = str[i];
+                if ((i + 1) !== str.length) {
+                    let twoChars = chr + str[i + 1];
+                    if (twoChars === charType) {
+                        fullWord += twoChars;
+                        startAdding = !startAdding;
+                        i++;
+                    }
+                    else if (startAdding) {
+                        fullWord += chr;
+                        wordBetweenSymbols += chr;
+                    }
+                }
+            }
+            if (!startAdding) {
+                return (str.replace(fullWord, "<strong>" + wordBetweenSymbols + "</strong>"));
+            }
+            else {
+                break;
+            }
+        case 3:
+            for (let i = 0; i < str.length; i++) {
+                const chr = str[i];
+                if ((i + 2) !== str.length) {
+                    let threeChars = chr + str[i + 1] + str[i + 2];
+                    if (threeChars === charType) {
+                        fullWord += threeChars;
+                        startAdding = !startAdding;
+                        i += 2;
+                    }
+                    else if (startAdding) {
+                        fullWord += chr;
+                        wordBetweenSymbols += chr;
+                    }
+                }
+            }
+            if (!startAdding) {
+                return (str.replace(fullWord, "<em><strong>" + wordBetweenSymbols + "</em></strong>"));
+            }
+    }
+}
 function processLine(str) {
-    if (str.startsWith("```")) {
+    if (str.startsWith("# ")) {
+        return "<h1>" + str.substring(2) + "</h1>";
+    }
+    else if (str.startsWith("## ")) {
+        return "<h2>" + str.substring(2) + "</h2>";
+    }
+    else if (str.startsWith("### ")) {
+        return "<h3>" + str.substring(2) + "</h3>";
+    }
+    else if (str.startsWith("#### ")) {
+        return "<h4>" + str.substring(2) + "</h4>";
+    }
+    else if (str.startsWith("##### ")) {
+        return "<h5>" + str.substring(2) + "</h5>";
+    }
+    else if (str.startsWith("###### ")) {
+        return "<h6>" + str.substring(2) + "</h6>";
+    }
+    else if (str.includes("*")) {
+        if (moreThanOne(str, "*")) {
+        }
+        else {
+            //It's an unordered list
+        }
+    }
+    else if (str.startsWith("-")) {
+        //unordened list
+    }
+    else if (str.includes("--")) {
+    }
+    else if (str.includes("_") && !moreThanOne(str, "_")) {
+        return replaceTheWordBetweenSymbols(str, "_");
+    }
+    else if (str.startsWith("**") && str.endsWith("**")) {
+        return "<strong>" + str.substring(1, str.lastIndexOf("**")) + "</strong>";
+    }
+    else if (str.startsWith("__") && str.endsWith("__")) {
+        return "<strong>" + str.substring(1, str.lastIndexOf("__")) + "</strong>";
+    }
+    else if (str.startsWith("```")) {
         if (str.endsWith(`sh`))
             lastSh = ``;
         inCode = !inCode;
