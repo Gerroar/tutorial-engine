@@ -11,6 +11,36 @@ var arrDirectories = [];
 let inCode = false;
 let lastSh = ``;
 /**DONT FORGET ABOUT tsc -w WHEN WORKING WITH THE ENGINE PART IF NOT THEY WONT APPEAR ANY CHANGES FROM THE index.ts */
+/**Checks if the character is a blank space */
+function hasSpaceAfterChar(str, index) {
+    let isSpace = false;
+    if (str[index] === " ") {
+        isSpace = true;
+    }
+    return isSpace;
+}
+/**Check if the character of the index and the next index are blank spaces what in .md files
+ * is considered a tab
+*/
+function hasTab(str, index) {
+    let isTab = false;
+    if (str[index] === " " && str[index + 1] === " ") {
+        isTab = true;
+    }
+    return isTab;
+}
+/**Get how many tabs are in the line, this will give us the layer of an
+ * unordened list
+ */
+function getListLayerFromTabs(str) {
+    let tabCount = 0;
+    for (let i = 0; i < str.length; i++) {
+        if (hasTab(str, i) && i + 1 !== str.length) {
+            tabCount++;
+            i++;
+        }
+    }
+}
 /**Iterates the string looking for more than one of the character type passed,
  * doesn't matter if it's * , ** or *** ( for example, it could be any type accepted
  * for italics, bold or both (***x***, ___x___)), it will check if there is a pair of
@@ -129,7 +159,7 @@ function replaceTheWordBetweenSymbols(str, charType) {
             }
     }
 }
-function processLine(str) {
+function processLine(str, listLayer, listNumber) {
     if (str.startsWith("# ")) {
         return "<h1>" + str.substring(2) + "</h1>";
     }
@@ -148,17 +178,23 @@ function processLine(str) {
     else if (str.startsWith("###### ")) {
         return "<h6>" + str.substring(2) + "</h6>";
     }
-    else if (str.includes("*")) {
-        if (moreThanOne(str, "*")) {
+    else if (str.includes("-")) {
+        if (str.startsWith("-") && hasSpaceAfterChar(str, 1)) {
+            if (listLayer === 0) {
+                listLayer = 1;
+                listNumber++;
+                //Finish this for tomorrow
+                return `<ul id=list-number${listNumber}>`;
+            }
+            else {
+                listLayer = 1;
+            }
         }
-        else {
-            //It's an unordered list
-        }
-    }
-    else if (str.startsWith("-")) {
-        //unordened list
     }
     else if (str.includes("--")) {
+    }
+    else if (str.includes("*")) {
+        if (moreThanOne(str, "*")) { }
     }
     else if (str.includes("_") && !moreThanOne(str, "_")) {
         return replaceTheWordBetweenSymbols(str, "_");
@@ -213,6 +249,8 @@ const FOOT = `</body>
  * we store the path as a string in the array
  */
 function processFile(root, path) {
+    let listLayer = 0;
+    let listNumber = 0;
     let pathWithoutExtension = path.substring(0, path.lastIndexOf("."));
     console.log(`Processing ${pathWithoutExtension}`);
     arrDirectories.push(path);
@@ -223,7 +261,7 @@ function processFile(root, path) {
         .map((x) => x.trimEnd());
     let pathWithoutFile = path.substring(0, path.lastIndexOf("/"));
     fs_1.default.mkdirSync(`${buildFolder}/${pathWithoutFile}`, { recursive: true });
-    fs_1.default.writeFileSync(`${buildFolder}/${pathWithoutExtension}.html`, HEAD + lines.map(processLine).join("\n") + FOOT);
+    fs_1.default.writeFileSync(`${buildFolder}/${pathWithoutExtension}.html`, HEAD + lines.map((line) => processLine(line, listLayer, listNumber)).join("\n") + FOOT);
 }
 function processPath(root, path) {
     if (fs_1.default.lstatSync(`${root}/${path}`).isFile()) {

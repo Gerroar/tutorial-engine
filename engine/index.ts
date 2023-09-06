@@ -11,6 +11,55 @@ let lastSh = ``;
 /**DONT FORGET ABOUT tsc -w WHEN WORKING WITH THE ENGINE PART IF NOT THEY WONT APPEAR ANY CHANGES FROM THE index.ts */
 
 
+/**Checks if the character is a blank space */
+
+function hasSpaceAfterChar(str: string, index: number) {
+
+  let isSpace: boolean = false;
+
+  if (str[index] === " ") {
+
+    isSpace = true;
+  }
+
+  return isSpace;
+}
+
+/**Check if the character of the index and the next index are blank spaces what in .md files
+ * is considered a tab
+*/
+
+function hasTab(str: string, index: number) {
+
+  let isTab: boolean = false;
+  if (str[index] === " " && str[index + 1] === " ") {
+
+    isTab = true;
+  }
+
+  return isTab;
+}
+
+/**Get how many tabs are in the line, this will give us the layer of an
+ * unordened list
+ */
+
+function getListLayerFromTabs(str: string) {
+
+  let tabCount: number = 0;
+
+  for (let i = 0; i < str.length; i++) {
+    if (hasTab(str, i) && i + 1 !== str.length) {
+
+      tabCount++;
+      i++;
+    }
+
+  }
+}
+
+
+
 /**Iterates the string looking for more than one of the character type passed, 
  * doesn't matter if it's * , ** or *** ( for example, it could be any type accepted
  * for italics, bold or both (***x***, ___x___)), it will check if there is a pair of
@@ -175,7 +224,7 @@ function replaceTheWordBetweenSymbols(str: string, charType: string) {
 
 }
 
-function processLine(str: string) {
+function processLine(str: string, listLayer: number, listNumber: number) {
   if (str.startsWith("# ")) {
 
     return "<h1>" + str.substring(2) + "</h1>";
@@ -194,17 +243,23 @@ function processLine(str: string) {
   } else if (str.startsWith("###### ")) {
 
     return "<h6>" + str.substring(2) + "</h6>";
-  } else if (str.includes("*")) {
-    if (moreThanOne(str, "*")) {
+  } else if (str.includes("-")) {
+    if (str.startsWith("-") && hasSpaceAfterChar(str, 1)) {
+      if (listLayer === 0) {
 
-    } else {
+        listLayer = 1;
+        listNumber++;
 
-      //It's an unordered list
+        //Finish this for tomorrow
+        return `<ul id=list-number${listNumber}>`
+      } else {
+
+        listLayer = 1;
+      }
     }
-  } else if (str.startsWith("-")) {
-
-    //unordened list
   } else if (str.includes("--")) {
+  } else if (str.includes("*")) {
+    if (moreThanOne(str, "*")) { }
   } else if (str.includes("_") && !moreThanOne(str, "_")) {
 
     return replaceTheWordBetweenSymbols(str, "_");
@@ -247,6 +302,7 @@ function processLine(str: string) {
   return str;
 }
 
+
 const HEAD = `<html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -264,6 +320,9 @@ const FOOT = `</body>
  */
 
 function processFile(root: string, path: string) {
+
+  let listLayer: number = 0;
+  let listNumber: number = 0;
   let pathWithoutExtension = path.substring(0, path.lastIndexOf("."));
   console.log(`Processing ${pathWithoutExtension}`);
   arrDirectories.push(path);
@@ -279,7 +338,7 @@ function processFile(root: string, path: string) {
   fs.mkdirSync(`${buildFolder}/${pathWithoutFile}`, { recursive: true });
   fs.writeFileSync(
     `${buildFolder}/${pathWithoutExtension}.html`,
-    HEAD + lines.map(processLine).join("\n") + FOOT
+    HEAD + lines.map((line) => processLine(line, listLayer, listNumber)).join("\n") + FOOT
   );
 }
 
