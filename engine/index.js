@@ -11,6 +11,46 @@ var arrDirectories = [];
 let inCode = false;
 let lastSh = ``;
 /**DONT FORGET ABOUT tsc -w WHEN WORKING WITH THE ENGINE PART IF NOT THEY WONT APPEAR ANY CHANGES FROM THE index.ts */
+function nextCharactersAreEquals(str, character, charIndex, indexesToLook) {
+    let theyAre = false;
+    switch (indexesToLook) {
+        case 1:
+            //For two characters
+            if (str[charIndex] === str[charIndex + 1]) {
+                theyAre = true;
+            }
+            break;
+        case 2:
+            if (str.length !== charIndex + 2) {
+                if (str[charIndex] === str[charIndex + 1] && str[charIndex + 1] === str[charIndex + 2]) {
+                    theyAre = true;
+                }
+            }
+            break;
+    }
+    return theyAre;
+}
+function wordBetweenCharacters(str, character, arrOfWords) {
+    let word = "";
+}
+/**Get all the items from the layer stack as a string with dots between them */
+function getStringFromLayerStack(listLayerStack) {
+}
+/**Removes the spaces to check if the first character is the one that was passed, this function it's used for detecting
+ * if the line it's part of a nested list or just a line that concides with the characters used for lists
+*/
+function characterIsFirstWithoutSpaces(str, character) {
+    let isFirstCharacter = false;
+    let whiteSpaceRemoved = str.replace(/\s/g, '');
+    if (whiteSpaceRemoved[0] === character) {
+        isFirstCharacter = true;
+    }
+    return isFirstCharacter;
+}
+/**Removes the first spaces and the list character to get the text*/
+function removeFirstSpacesAndListCharacter(str, character) {
+    return str.substring(str.indexOf(" "), str.indexOf(character));
+}
 /**Checks if the character is a blank space */
 function hasSpaceAfterChar(str, index) {
     let isSpace = false;
@@ -33,13 +73,18 @@ function hasTab(str, index) {
  * unordened list
  */
 function getListLayerFromTabs(str) {
-    let tabCount = 0;
+    /**Starts with one becuase when layer it's 0 means that no list was created
+     * or the list before its done already, this funcion will triggered always when
+     * the layer it's 1 , that means that a new list it's created already
+     */
+    let tabCount = 1;
     for (let i = 0; i < str.length; i++) {
         if (hasTab(str, i) && i + 1 !== str.length) {
             tabCount++;
             i++;
         }
     }
+    return tabCount;
 }
 /**Iterates the string looking for more than one of the character type passed,
  * doesn't matter if it's * , ** or *** ( for example, it could be any type accepted
@@ -93,117 +138,150 @@ function moreThanOne(str, charType) {
             return hasMoreThanOne;
     }
 }
-function replaceTheWordBetweenSymbols(str, charType) {
-    let charTypeLength = charType.length;
+function replaceTheWordWithSymbols(str, arrOfWords) {
     let fullWord = "";
     let wordBetweenSymbols = "";
     let startAdding = false;
-    switch (charTypeLength) {
-        case 1:
-            for (const chr of str) {
-                if (chr === charType) {
-                    fullWord += chr;
-                    startAdding = !startAdding;
-                }
-                else if (startAdding) {
-                    fullWord += chr;
-                    wordBetweenSymbols += chr;
-                }
+    for (const word of arrOfWords) {
+        let charExpressionLength = 0;
+        let charToAnalyze = "";
+        let keepAdding = true;
+        for (let i = 0; i < word.length; i++) {
+            const element = word[i];
+            if (i === 0) {
+                charToAnalyze += element;
+                console.log(element);
             }
-            if (!startAdding) {
-                return (str.replace(fullWord, "<em>" + wordBetweenSymbols + "</em>"));
+            else if (element === word[0] && keepAdding === true) {
+                charToAnalyze += element;
+                console.log(charToAnalyze);
             }
-            else {
-                break;
+            else if (element !== word[0]) {
+                keepAdding = false;
             }
-        case 2:
-            for (let i = 0; i < str.length; i++) {
-                const chr = str[i];
-                if ((i + 1) !== str.length) {
-                    let twoChars = chr + str[i + 1];
-                    if (twoChars === charType) {
-                        fullWord += twoChars;
-                        startAdding = !startAdding;
-                        i++;
-                    }
-                    else if (startAdding) {
-                        fullWord += chr;
-                        wordBetweenSymbols += chr;
-                    }
-                }
-            }
-            if (!startAdding) {
-                return (str.replace(fullWord, "<strong>" + wordBetweenSymbols + "</strong>"));
-            }
-            else {
-                break;
-            }
-        case 3:
-            for (let i = 0; i < str.length; i++) {
-                const chr = str[i];
-                if ((i + 2) !== str.length) {
-                    let threeChars = chr + str[i + 1] + str[i + 2];
-                    if (threeChars === charType) {
-                        fullWord += threeChars;
-                        startAdding = !startAdding;
-                        i += 2;
-                    }
-                    else if (startAdding) {
-                        fullWord += chr;
-                        wordBetweenSymbols += chr;
+        }
+        charExpressionLength = charToAnalyze.length;
+        switch (charExpressionLength) {
+            case 1:
+            case 2:
+                console.log("Its a 2 type character");
+                for (let i = 0; i < str.length; i++) {
+                    const chr = str[i];
+                    if ((i + 1) !== str.length) {
+                        let twoChars = chr + str[i + 1];
+                        if (twoChars === charToAnalyze) {
+                            fullWord += twoChars;
+                            startAdding = !startAdding;
+                            i++;
+                        }
+                        else if (startAdding) {
+                            fullWord += chr;
+                            wordBetweenSymbols += chr;
+                        }
                     }
                 }
-            }
-            if (!startAdding) {
-                return (str.replace(fullWord, "<em><strong>" + wordBetweenSymbols + "</em></strong>"));
-            }
+                if (!startAdding) {
+                    return (str.replace(fullWord, "<strong>" + wordBetweenSymbols + "</strong>"));
+                }
+                else {
+                    break;
+                }
+            case 3:
+                for (let i = 0; i < str.length; i++) {
+                    const chr = str[i];
+                    if ((i + 2) !== str.length) {
+                        let threeChars = chr + str[i + 1] + str[i + 2];
+                        if (threeChars === charToAnalyze) {
+                            fullWord += threeChars;
+                            startAdding = !startAdding;
+                            i += 2;
+                        }
+                        else if (startAdding) {
+                            fullWord += chr;
+                            wordBetweenSymbols += chr;
+                        }
+                    }
+                }
+                if (!startAdding) {
+                    return (str.replace(fullWord, "<em><strong>" + wordBetweenSymbols + "</em></strong>"));
+                }
+        }
     }
 }
-function processLine(str, listLayer, listNumber) {
+function generateList(listLayer, listNumber, listLayerStack, str, character) {
+    if (listLayer === 0) {
+        listNumber++;
+        listLayer = 1;
+        listLayerStack.push(1);
+        return `<ul id=list-number-${listNumber}>` + `<li>` + str.substring(2) + `</li>` + `</ul>`;
+    }
+    else {
+        let stringLayer = getListLayerFromTabs(str);
+        let list = document.getElementById(`list-number-${listNumber}`);
+        let nodeLi = document.createElement("li");
+        let textLi = document.createTextNode(removeFirstSpacesAndListCharacter(str, character));
+        nodeLi.appendChild(textLi);
+        if (list) {
+            if (stringLayer > listLayer) {
+                listLayerStack.push(1);
+                let nodeUl = document.createElement("ul");
+                nodeUl.setAttribute("id", `list-number-${listNumber}.${getStringFromLayerStack(listLayerStack)}`);
+                nodeUl.appendChild(nodeLi);
+                list.appendChild(nodeUl);
+            }
+            else if (stringLayer < listLayer) {
+                let stackValue = listLayerStack[stringLayer - 1];
+                listLayerStack.splice(stackValue, 1, stackValue++);
+                let manipulatedArray = listLayerStack.slice(0, stringLayer);
+                listLayerStack = manipulatedArray;
+                let subList = document.getElementById(`list-number-${listNumber}.${getStringFromLayerStack(listLayerStack)}`);
+                if (subList) {
+                    subList.appendChild(nodeLi);
+                }
+            }
+            else {
+                let stackValue = listLayerStack[stringLayer - 1];
+                listLayerStack.splice(stackValue, 1, stackValue++);
+                let subList = document.getElementById(`list-number-${listNumber}.${getStringFromLayerStack(listLayerStack)}`);
+                if (subList) {
+                    subList.appendChild(nodeLi);
+                }
+            }
+            listLayer = stringLayer;
+        }
+    }
+}
+function processLine(str, listLayer, listLayerStack, listNumber) {
     if (str.startsWith("# ")) {
         return "<h1>" + str.substring(2) + "</h1>";
     }
     else if (str.startsWith("## ")) {
-        return "<h2>" + str.substring(2) + "</h2>";
+        return "<h2>" + str.substring(3) + "</h2>";
     }
     else if (str.startsWith("### ")) {
-        return "<h3>" + str.substring(2) + "</h3>";
+        return "<h3>" + str.substring(4) + "</h3>";
     }
     else if (str.startsWith("#### ")) {
-        return "<h4>" + str.substring(2) + "</h4>";
+        return "<h4>" + str.substring(5) + "</h4>";
     }
     else if (str.startsWith("##### ")) {
-        return "<h5>" + str.substring(2) + "</h5>";
+        return "<h5>" + str.substring(6) + "</h5>";
     }
     else if (str.startsWith("###### ")) {
-        return "<h6>" + str.substring(2) + "</h6>";
+        return "<h6>" + str.substring(7) + "</h6>";
     }
-    else if (str.includes("-")) {
-        if (str.startsWith("-") && hasSpaceAfterChar(str, 1)) {
-            if (listLayer === 0) {
-                listLayer = 1;
-                listNumber++;
-                //Finish this for tomorrow
-                return `<ul id=list-number${listNumber}>`;
-            }
-            else {
-                listLayer = 1;
-            }
+    else if (str.includes("-")) { //This part is for controlling the undordened lists
+        if ((str.startsWith("-") && hasSpaceAfterChar(str, 1)) || (characterIsFirstWithoutSpaces(str, "-") && hasSpaceAfterChar(str, str.indexOf("-") + 1))) {
+            generateList(listLayer, listNumber, listLayerStack, str, "-");
         }
     }
-    else if (str.includes("--")) {
-    }
-    else if (str.includes("*")) {
-        if (moreThanOne(str, "*")) { }
-    }
-    else if (str.includes("_") && !moreThanOne(str, "_")) {
-        return replaceTheWordBetweenSymbols(str, "_");
-    }
-    else if (str.startsWith("**") && str.endsWith("**")) {
-        return "<strong>" + str.substring(1, str.lastIndexOf("**")) + "</strong>";
-    }
-    else if (str.startsWith("__") && str.endsWith("__")) {
-        return "<strong>" + str.substring(1, str.lastIndexOf("__")) + "</strong>";
+    else if (str.includes("_") || str.includes("*") || str.includes("^")) { //This part is for controlling the italics and bold
+        if (moreThanOne(str, "*") || moreThanOne(str, "_")) {
+            str = str.replace(/\^([^\^]+)\^/g, "<sup>$1</sup>");
+            str = str.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+            str = str.replace(/\*(.*?)\*/g, "<i>$1</i>");
+            str = str.replace(/_([^_]+)_/g, "<sub>$1</sub>");
+        }
     }
     else if (str.startsWith("```")) {
         if (str.endsWith(`sh`))
@@ -250,6 +328,7 @@ const FOOT = `</body>
  */
 function processFile(root, path) {
     let listLayer = 0;
+    let listLayerStack = [];
     let listNumber = 0;
     let pathWithoutExtension = path.substring(0, path.lastIndexOf("."));
     console.log(`Processing ${pathWithoutExtension}`);
@@ -261,7 +340,7 @@ function processFile(root, path) {
         .map((x) => x.trimEnd());
     let pathWithoutFile = path.substring(0, path.lastIndexOf("/"));
     fs_1.default.mkdirSync(`${buildFolder}/${pathWithoutFile}`, { recursive: true });
-    fs_1.default.writeFileSync(`${buildFolder}/${pathWithoutExtension}.html`, HEAD + lines.map((line) => processLine(line, listLayer, listNumber)).join("\n") + FOOT);
+    fs_1.default.writeFileSync(`${buildFolder}/${pathWithoutExtension}.html`, HEAD + lines.map((line) => processLine(line, listLayer, listLayerStack, listNumber)).join("\n") + FOOT);
 }
 function processPath(root, path) {
     if (fs_1.default.lstatSync(`${root}/${path}`).isFile()) {

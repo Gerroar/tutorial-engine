@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { motion, useCycle } from "framer-motion";
 import { useDimensions } from "./components/use-dimensions";
 import { Navigation } from "./components/Navigation";

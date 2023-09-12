@@ -1,14 +1,5 @@
-import { animate, color, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState } from "react";
-
-const variants = {
-    rotate90: {
-        rotate: "90deg"
-    },
-    rotate0: {
-        rotate: "0deg"
-    }
-}
 
 export const TriangleToggle = ({ isActive, indexLength }: { isActive: boolean, indexLength: number }) => {
 

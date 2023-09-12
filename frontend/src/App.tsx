@@ -1,6 +1,5 @@
-import './index.css'
-import { MenuButton } from './components/MenuButton/MenuButton'
-
+import './index.css';
+import { MenuButton } from './components/MenuButton/MenuButton';
 export default function App() {
   return (
     <>

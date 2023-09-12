@@ -1,6 +1,6 @@
 import { Variants, motion } from "framer-motion";
 import { TriangleToggle } from "./TriangleToggle";
-import { useRef, useState, useEffect } from "react"
+import { useState } from "react"
 
 
 const variants: Variants = {

@@ -1,4 +1,4 @@
-import React, { FC, ReactElement, ReactDOM, useState, useEffect } from "react";
+import { ReactElement } from "react";
 import { motion } from "framer-motion";
 import { MenuItem } from "./MenuItem";
 import { arrDirectories } from "../../../output/directoriesList";
@@ -34,7 +34,6 @@ let flattenOutput: string[] = [];
 
 /**Array of tsx */
 const arrTsxContainerElm: ReactElement[] = [];
-const mapTsxFileElm = new Map<string, ReactElement>()
 
 //Arrays & Maps
 
@@ -117,11 +116,6 @@ let directoryTree = parseArrayDirectories(arrSplitDir)
 
 flatten(directoryTree, "");
 console.log(arrTsxContainerElm)
-
-
-type NavigationProps = {
-  isSectionActive: boolean, setIsSectionActive: any
-}
 
 export const Navigation = () => {
 

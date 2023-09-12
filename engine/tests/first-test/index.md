@@ -39,6 +39,8 @@ class Main {
 }
 ```
 
+### Besides that
+
 ## Tabs Have Memory
 
 file2.ts
@@ -60,7 +62,10 @@ Other java
 >
 > -- _Socrates_
 
+
 Em--dash
+
+Line *Hello* of *Goodbye*
 
 Text formatting *italics* and **bold**.
 
@@ -76,10 +81,20 @@ Unordered list
     * Deeply
         * In your hearth
 
+More tests
+* a
+* b
+* c
+
+
 
 More tests
 - This
   - Is
+- A
+  - Nested
+    - List
+      - okay
 
 Todo list
 \todo One 
