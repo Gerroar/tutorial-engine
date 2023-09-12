@@ -67,6 +67,8 @@ Em--dash
 
 Line *Hello* of *Goodbye*
 
+2^3^
+
 Text formatting *italics* and **bold**.
 
 Numbered list

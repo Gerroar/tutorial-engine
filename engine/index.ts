@@ -373,7 +373,7 @@ function processLine(str: string, listLayer: number, listLayerStack: Array<numbe
       generateList(listLayer, listNumber, listLayerStack, str, "-");
     }
   } else if (str.includes("_") || str.includes("*") || str.includes("^")) { //This part is for controlling the italics and bold
-    if (moreThanOne(str, "*") || moreThanOne(str, "_")) {
+    if (moreThanOne(str, "*") || moreThanOne(str, "_") || str.includes("^")) {
 
       str = str.replace(/\^([^\^]+)\^/g, "<sup>$1</sup>");
       str = str.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
