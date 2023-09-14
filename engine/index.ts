@@ -7,46 +7,12 @@ var arrDirectories: string[] = [];
 
 let inCode = false;
 let lastSh = ``;
+let listLayer: number = 0;
+let listNumber: number = 0;
 
 /**DONT FORGET ABOUT tsc -w WHEN WORKING WITH THE ENGINE PART IF NOT THEY WONT APPEAR ANY CHANGES FROM THE index.ts */
 
 
-function nextCharactersAreEquals(str: string, character: string, charIndex: number, indexesToLook: number) {
-
-  let theyAre: boolean = false;
-
-  switch (indexesToLook) {
-    case 1:
-
-      //For two characters
-      if (str[charIndex] === str[charIndex + 1]) {
-        theyAre = true;
-      }
-      break;
-    case 2:
-
-      if (str.length !== charIndex + 2) {
-        if (str[charIndex] === str[charIndex + 1] && str[charIndex + 1] === str[charIndex + 2]) {
-          theyAre = true;
-        }
-      }
-      break;
-  }
-
-  return theyAre
-}
-
-function wordBetweenCharacters(str: string, character: string, arrOfWords: Array<string>) {
-
-  let word: string = "";
-
-
-}
-
-/**Get all the items from the layer stack as a string with dots between them */
-function getStringFromLayerStack(listLayerStack: Array<number>) {
-
-}
 
 /**Removes the spaces to check if the first character is the one that was passed, this function it's used for detecting
  * if the line it's part of a nested list or just a line that concides with the characters used for lists
@@ -64,67 +30,22 @@ function characterIsFirstWithoutSpaces(str: string, character: string) {
   return isFirstCharacter;
 }
 
-/**Removes the first spaces and the list character to get the text*/
 
-function removeFirstSpacesAndListCharacter(str: string, character: string) {
-
-  return str.substring(str.indexOf(" "), str.indexOf(character));
-}
-
-/**Checks if the character is a blank space */
-
-function hasSpaceAfterChar(str: string, index: number) {
-
-  let isSpace: boolean = false;
-
-  if (str[index] === " ") {
-
-    isSpace = true;
-  }
-
-  return isSpace;
-}
-
-/**Check if the character of the index and the next index are blank spaces what in .md files
- * is considered a tab
-*/
-
-function hasTab(str: string, index: number) {
-
-  let isTab: boolean = false;
-  if (str[index] === " " && str[index + 1] === " ") {
-
-    isTab = true;
-  }
-
-  return isTab;
-}
-
-/**Get how many tabs are in the line, this will give us the layer of an
- * unordened list
+/**Function used for adding close tag ul in case that the next line doesn't have
+ * * or - , checking the listLayer
  */
 
-function getListLayerFromTabs(str: string) {
+function checkIfNeedClosingUlandAdd() {
 
-  /**Starts with one becuase when layer it's 0 means that no list was created
-   * or the list before its done already, this funcion will triggered always when 
-   * the layer it's 1 , that means that a new list it's created already
-   */
-  let tabCount: number = 1;
+  let addClosingUl = "";
+  if (listLayer != 0) {
 
-  for (let i = 0; i < str.length; i++) {
-    if (hasTab(str, i) && i + 1 !== str.length) {
-
-      tabCount++;
-      i++;
-    }
-
+    while (listLayer-- != 0) addClosingUl += "</ul>"
+    listLayer = 0;
   }
 
-  return tabCount;
+  return addClosingUl;
 }
-
-
 
 /**Iterates the string looking for more than one of the character type passed, 
  * doesn't matter if it's * , ** or *** ( for example, it could be any type accepted
@@ -200,191 +121,81 @@ function moreThanOne(str: string, charType: string) {
   }
 }
 
-function replaceTheWordWithSymbols(str: string, arrOfWords: Array<string>) {
-
-
-  let fullWord: string = "";
-  let wordBetweenSymbols: string = "";
-  let startAdding: boolean = false;
-
-  for (const word of arrOfWords) {
-    let charExpressionLength: number = 0;
-
-    let charToAnalyze: string = "";
-    let keepAdding: boolean = true;
-
-    for (let i = 0; i < word.length; i++) {
-
-      const element = word[i];
-
-
-      if (i === 0) {
-
-        charToAnalyze += element
-        console.log(element);
-
-      } else if (element === word[0] && keepAdding === true) {
-
-        charToAnalyze += element
-        console.log(charToAnalyze)
-
-      } else if (element !== word[0]) {
-
-        keepAdding = false;
-      }
-    }
-
-    charExpressionLength = charToAnalyze.length;
-
-    switch (charExpressionLength) {
-      case 1:
-
-
-      case 2:
-
-        console.log("Its a 2 type character")
-        for (let i = 0; i < str.length; i++) {
-          const chr = str[i];
-
-          if ((i + 1) !== str.length) {
-
-            let twoChars = chr + str[i + 1]
-            if (twoChars === charToAnalyze) {
-
-              fullWord += twoChars;
-              startAdding = !startAdding;
-              i++;
-            } else if (startAdding) {
-              fullWord += chr;
-              wordBetweenSymbols += chr;
-            }
-          }
-        }
-
-        if (!startAdding) {
-
-          return (str.replace(fullWord, "<strong>" + wordBetweenSymbols + "</strong>"))
-        } else {
-
-          break;
-        }
-
-      case 3:
-
-        for (let i = 0; i < str.length; i++) {
-          const chr = str[i];
-
-          if ((i + 2) !== str.length) {
-
-            let threeChars = chr + str[i + 1] + str[i + 2]
-            if (threeChars === charToAnalyze) {
-
-              fullWord += threeChars;
-              startAdding = !startAdding;
-              i += 2;
-            } else if (startAdding) {
-              fullWord += chr;
-              wordBetweenSymbols += chr;
-            }
-          }
-        }
-
-        if (!startAdding) {
-
-          return (str.replace(fullWord, "<em><strong>" + wordBetweenSymbols + "</em></strong>"));
-        }
-    }
-  }
-
-
-
-
-
-}
-
-function generateList(listLayer: number, listNumber: number, listLayerStack: Array<number>, str: string, character: string) {
-  if (listLayer === 0) {
-
-    listNumber++;
-    listLayer = 1;
-    listLayerStack.push(1);
-    return `<ul id=list-number-${listNumber}>` + `<li>` + str.substring(2) + `</li>` + `</ul>`;
-  } else {
-
-    let stringLayer = getListLayerFromTabs(str);
-    let list = document.getElementById(`list-number-${listNumber}`);
-    let nodeLi = document.createElement("li");
-    let textLi = document.createTextNode(removeFirstSpacesAndListCharacter(str, character));
-    nodeLi.appendChild(textLi);
-
-    if (list) {
-      if (stringLayer > listLayer) {
-
-        listLayerStack.push(1);
-        let nodeUl = document.createElement("ul");
-        nodeUl.setAttribute("id", `list-number-${listNumber}.${getStringFromLayerStack(listLayerStack)}`);
-        nodeUl.appendChild(nodeLi);
-        list.appendChild(nodeUl);
-      } else if (stringLayer < listLayer) {
-
-        let stackValue = listLayerStack[stringLayer - 1];
-        listLayerStack.splice(stackValue, 1, stackValue++);
-        let manipulatedArray = listLayerStack.slice(0, stringLayer)
-        listLayerStack = manipulatedArray;
-
-        let subList = document.getElementById(`list-number-${listNumber}.${getStringFromLayerStack(listLayerStack)}`);
-        if (subList) { subList.appendChild(nodeLi) }
-      } else {
-
-        let stackValue = listLayerStack[stringLayer - 1];
-        listLayerStack.splice(stackValue, 1, stackValue++);
-
-        let subList = document.getElementById(`list-number-${listNumber}.${getStringFromLayerStack(listLayerStack)}`);
-        if (subList) { subList.appendChild(nodeLi) }
-      }
-
-      listLayer = stringLayer;
-    }
-  }
-}
-
-function processLine(str: string, listLayer: number, listLayerStack: Array<number>, listNumber: number) {
+function processLine(str: string) {
   if (str.startsWith("# ")) {
 
-    return "<h1>" + str.substring(2) + "</h1>";
+    return checkIfNeedClosingUlandAdd() + "<h1>" + str.substring(2) + "</h1>";
   } else if (str.startsWith("## ")) {
 
-    return "<h2>" + str.substring(3) + "</h2>";
+    return checkIfNeedClosingUlandAdd() + "<h2>" + str.substring(3) + "</h2>";
   } else if (str.startsWith("### ")) {
 
-    return "<h3>" + str.substring(4) + "</h3>";
+    return checkIfNeedClosingUlandAdd() + "<h3>" + str.substring(4) + "</h3>";
   } else if (str.startsWith("#### ")) {
 
-    return "<h4>" + str.substring(5) + "</h4>";
+    return checkIfNeedClosingUlandAdd() + "<h4>" + str.substring(5) + "</h4>";
   } else if (str.startsWith("##### ")) {
 
-    return "<h5>" + str.substring(6) + "</h5>";
+    return checkIfNeedClosingUlandAdd() + "<h5>" + str.substring(6) + "</h5>";
   } else if (str.startsWith("###### ")) {
 
-    return "<h6>" + str.substring(7) + "</h6>";
-  } else if (str.includes("-")) { //This part is for controlling the undordened lists
-    if ((str.startsWith("-") && hasSpaceAfterChar(str, 1)) || (characterIsFirstWithoutSpaces(str, "-") && hasSpaceAfterChar(str, str.indexOf("-") + 1))) {
+    return checkIfNeedClosingUlandAdd() + "<h6>" + str.substring(7) + "</h6>";
+  } else if (str.includes("_") || str.includes("*") || str.includes("^") || str.includes("-")) {
 
-      generateList(listLayer, listNumber, listLayerStack, str, "-");
-    }
-  } else if (str.includes("_") || str.includes("*") || str.includes("^")) { //This part is for controlling the italics and bold
-    if (moreThanOne(str, "*") || moreThanOne(str, "_") || str.includes("^")) {
+    str = str.replace(/\^([^\^]+)\^/g, "<sup>$1</sup>");
+    if (moreThanOne(str, "*") || moreThanOne(str, "_") || moreThanOne(str, "-")) { //This part is for controlling the italics, bold and emdash
 
-      str = str.replace(/\^([^\^]+)\^/g, "<sup>$1</sup>");
       str = str.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
       str = str.replace(/\*(.*?)\*/g, "<i>$1</i>");
       str = str.replace(/_([^_]+)_/g, "<sub>$1</sub>");
+      str = str.replace(/--(\w+)/g, "&mdash; $1");
+    } else if (str.startsWith("*") || str.startsWith("-") || characterIsFirstWithoutSpaces(str, "*") || characterIsFirstWithoutSpaces(str, "-")) { //This part is for controlling the unordened lists
+
+      if (listLayer === 0) {
+
+        str = str.replace(/^\* (.*)/gm, `<ul id="ul-${listNumber}"><li>$1</li>`);
+        str = str.replace(/^\- (.*)/gm, `<ul id="ul-${listNumber}"><li>$1</li>`);
+        listLayer = 1;
+        listNumber++;
+      } else {
+
+        let layer = 0;
+        let c = 0;
+
+        while (/ |\t/.test(str.charAt(c++))) layer++;
+        layer = (layer / 2) + 1;
+
+        console.log(str, "layer", layer, "listLayer", listLayer)
+        if (layer === listLayer) {
+          console.log("Checking the layer", listLayer)
+          if (listLayer === 1) {
+
+            str = str.replace(/^\* (.*)/gm, `<li>$1</li>`).trim();
+            str = str.replace(/^\- (.*)/gm, `<li>$1</li>`).trim();
+          } else {
+
+            console.log("I enter ", str, listLayer)
+            str = str.replace(/\* (.*)/gm, `</ul><li>$1</li>`).trim();
+            str = str.replace(/\- (.*)/gm, `</ul><li>$1</li>`).trim();
+          }
+        } else if (listLayer < layer) {
+
+          str = str.replace(/\* (.*)/gm, `<ul><li>$1</li>`);
+          str = str.replace(/\- (.*)/gm, `<ul><li>$1</li>`);
+          listLayer = layer;
+        } else {
+
+          str = str.replace(/\* (.*)/gm, `</ul><li>$1</li>`);
+          str = str.replace(/\- (.*)/gm, `</ul><li>$1</li>`);
+          listLayer = layer;
+        }
+      }
     }
   } else if (str.startsWith("```")) {
 
     if (str.endsWith(`sh`)) lastSh = ``;
     inCode = !inCode;
-    return inCode ? "<pre>" : "</pre>";
+    return inCode ? checkIfNeedClosingUlandAdd() + "<pre>" : "</pre>";
   } else if (inCode) {
 
     lastSh += str + "\n";
@@ -407,7 +218,10 @@ function processLine(str: string, listLayer: number, listLayerStack: Array<numbe
 
       fs.writeFileSync("tmp/prevRuns/" + hash, output);
     }
-    return `<pre>${output}</pre>`;
+    return checkIfNeedClosingUlandAdd() + `<pre>${output}</pre>`;
+  } else if (!/(^(^([0-9]\.\s)|^\-\s|^\*\s|^\>\s|^(\!\s))|\n)/g.test(str)) {
+
+    return checkIfNeedClosingUlandAdd() + str
   }
 
   return str;
@@ -432,10 +246,6 @@ const FOOT = `</body>
 
 function processFile(root: string, path: string) {
 
-  let listLayer: number = 0;
-  let listLayerStack: Array<number> = [];
-  let listNumber: number = 0;
-
   let pathWithoutExtension = path.substring(0, path.lastIndexOf("."));
   console.log(`Processing ${pathWithoutExtension}`);
   arrDirectories.push(path);
@@ -451,7 +261,7 @@ function processFile(root: string, path: string) {
   fs.mkdirSync(`${buildFolder}/${pathWithoutFile}`, { recursive: true });
   fs.writeFileSync(
     `${buildFolder}/${pathWithoutExtension}.html`,
-    HEAD + lines.map((line) => processLine(line, listLayer, listLayerStack, listNumber)).join("\n") + FOOT
+    HEAD + lines.map((line) => processLine(line)).join("\n") + FOOT
   );
 }
 

@@ -63,7 +63,7 @@ Other java
 > -- _Socrates_
 
 
-Em--dash
+Em --dash
 
 Line *Hello* of *Goodbye*
 
@@ -71,7 +71,7 @@ Line *Hello* of *Goodbye*
 
 Text formatting *italics* and **bold**.
 
-Numbered list
+
 1. Hello
     1. Bye
 1. there,
@@ -81,14 +81,24 @@ Unordered list
 * What is up
   * Nested
     * Deeply
-        * In your hearth
+      * In your hearth
+        - Hello
 
 More tests
-* a
+* a 
 * b
 * c
 
+Test of going back in nested lists
+* a
+* b
+  * c
+    * d
+  * e
 
+List with tab
+- Hi
+# Good news everyone
 
 More tests
 - This
