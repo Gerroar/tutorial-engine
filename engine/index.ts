@@ -9,6 +9,9 @@ let inCode = false;
 let lastSh = ``;
 let listLayer: number = 0;
 let listNumber: number = 0;
+let todoListLayer: number = 0;
+let todoListNumber: number = 0;
+
 
 /**DONT FORGET ABOUT tsc -w WHEN WORKING WITH THE ENGINE PART IF NOT THEY WONT APPEAR ANY CHANGES FROM THE index.ts */
 
@@ -35,16 +38,22 @@ function characterIsFirstWithoutSpaces(str: string, character: string) {
  * * or - , checking the listLayer
  */
 
-function checkIfNeedClosingUlandAdd() {
+function checkIfNeedClosingListandAdd() {
 
-  let addClosingUl = "";
+  let addClosingListTag = "";
   if (listLayer != 0) {
 
-    while (listLayer-- != 0) addClosingUl += "</ul>"
+    while (listLayer-- != 0) addClosingListTag += "</ul>"
     listLayer = 0;
   }
 
-  return addClosingUl;
+  if (todoListLayer != 0) {
+
+    addClosingListTag = "</div></br>"
+    todoListLayer = 0;
+  }
+
+  return addClosingListTag;
 }
 
 /**Iterates the string looking for more than one of the character type passed, 
@@ -121,25 +130,34 @@ function moreThanOne(str: string, charType: string) {
   }
 }
 
+function generateCheckBoxAndLabel(id: string, value: string) {
+
+
+  let checkbox = `<input type="checkbox" id="${id}" name="${id}" value="${value}">`;
+  let label = `<label for="${value}">${value}</label><br>`
+
+  return checkbox + label
+}
+
 function processLine(str: string) {
   if (str.startsWith("# ")) {
 
-    return checkIfNeedClosingUlandAdd() + "<h1>" + str.substring(2) + "</h1>";
+    return checkIfNeedClosingListandAdd() + "<h1>" + str.substring(2) + "</h1>";
   } else if (str.startsWith("## ")) {
 
-    return checkIfNeedClosingUlandAdd() + "<h2>" + str.substring(3) + "</h2>";
+    return checkIfNeedClosingListandAdd() + "<h2>" + str.substring(3) + "</h2>";
   } else if (str.startsWith("### ")) {
 
-    return checkIfNeedClosingUlandAdd() + "<h3>" + str.substring(4) + "</h3>";
+    return checkIfNeedClosingListandAdd() + "<h3>" + str.substring(4) + "</h3>";
   } else if (str.startsWith("#### ")) {
 
-    return checkIfNeedClosingUlandAdd() + "<h4>" + str.substring(5) + "</h4>";
+    return checkIfNeedClosingListandAdd() + "<h4>" + str.substring(5) + "</h4>";
   } else if (str.startsWith("##### ")) {
 
-    return checkIfNeedClosingUlandAdd() + "<h5>" + str.substring(6) + "</h5>";
+    return checkIfNeedClosingListandAdd() + "<h5>" + str.substring(6) + "</h5>";
   } else if (str.startsWith("###### ")) {
 
-    return checkIfNeedClosingUlandAdd() + "<h6>" + str.substring(7) + "</h6>";
+    return checkIfNeedClosingListandAdd() + "<h6>" + str.substring(7) + "</h6>";
   } else if (str.includes("_") || str.includes("*") || str.includes("^") || str.includes("-")) {
 
     str = str.replace(/\^([^\^]+)\^/g, "<sup>$1</sup>");
@@ -191,11 +209,28 @@ function processLine(str: string) {
         }
       }
     }
+  } else if (characterIsFirstWithoutSpaces(str, "\\")) {
+
+    str = str.replace(/^\s*(?!\\)/, "");
+    if (/^\\todo\s[\w|\s]+/g.test(str)) {
+
+      let todoContent = str.replace(/^\\todo\s/g, "");
+      if (todoListLayer === 0) {
+
+        todoListNumber++;
+        todoListLayer = 1;
+        str = str.replace(/^\\todo\s[\w|\s]+/g, `<div id="todo-${todoListNumber}">${generateCheckBoxAndLabel(`todo-component-${todoListNumber}.${todoListLayer}`, todoContent)}`);
+      } else {
+
+        todoListLayer++;
+        str = str.replace(/^\\todo\s[\w|\s]+/g, `${generateCheckBoxAndLabel(`todo-component-${todoListNumber}.${todoListLayer}`, todoContent)}`);
+      }
+    }
   } else if (str.startsWith("```")) {
 
     if (str.endsWith(`sh`)) lastSh = ``;
     inCode = !inCode;
-    return inCode ? checkIfNeedClosingUlandAdd() + "<pre>" : "</pre>";
+    return inCode ? checkIfNeedClosingListandAdd() + "<pre>" : "</pre>";
   } else if (inCode) {
 
     lastSh += str + "\n";
@@ -218,10 +253,10 @@ function processLine(str: string) {
 
       fs.writeFileSync("tmp/prevRuns/" + hash, output);
     }
-    return checkIfNeedClosingUlandAdd() + `<pre>${output}</pre>`;
-  } else if (!/(^(^([0-9]\.\s)|^\-\s|^\*\s|^\>\s|^(\!\s))|\n)/g.test(str)) {
+    return checkIfNeedClosingListandAdd() + `<pre>${output}</pre>`;
+  } else if (!/(^(^([0-9]\.\s)|^\-\s|^\*\s|^\>\s|^(\!\s))|\n)/g.test(str) || !characterIsFirstWithoutSpaces(str, "\\")) {
 
-    return checkIfNeedClosingUlandAdd() + str
+    return checkIfNeedClosingListandAdd() + str
   }
 
   return str;

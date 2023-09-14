@@ -59,6 +59,10 @@ nav {
     color: blue;
 }
 
+h1 {
+    background-color: yellow;
+}
+
 /* Dark mode */
 
 /*@media (prefers-color-scheme: dark) {
