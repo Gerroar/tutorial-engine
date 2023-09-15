@@ -7,8 +7,10 @@ var arrDirectories: string[] = [];
 
 let inCode = false;
 let lastSh = ``;
-let listLayer: number = 0;
-let listNumber: number = 0;
+let olLayer: number = 0;
+let olNumber: number = 0;
+let ulLayer: number = 0;
+let ulNumber: number = 0;
 let todoListLayer: number = 0;
 let todoListNumber: number = 0;
 
@@ -41,10 +43,16 @@ function characterIsFirstWithoutSpaces(str: string, character: string) {
 function checkIfNeedClosingListandAdd() {
 
   let addClosingListTag = "";
-  if (listLayer != 0) {
+  if (ulLayer != 0) {
 
-    while (listLayer-- != 0) addClosingListTag += "</ul>"
-    listLayer = 0;
+    while (ulLayer-- != 0) addClosingListTag += "</ul>"
+    ulLayer = 0;
+  }
+
+  if (olLayer != 0) {
+
+    while (olLayer-- != 0) addClosingListTag += "</ol>"
+    olLayer = 0;
   }
 
   if (todoListLayer != 0) {
@@ -52,6 +60,8 @@ function checkIfNeedClosingListandAdd() {
     addClosingListTag = "</div></br>"
     todoListLayer = 0;
   }
+
+
 
   return addClosingListTag;
 }
@@ -158,6 +168,47 @@ function processLine(str: string) {
   } else if (str.startsWith("###### ")) {
 
     return checkIfNeedClosingListandAdd() + "<h6>" + str.substring(7) + "</h6>";
+  } else if (/([0-9]\.\s)/.test(str)) {
+
+    let startingRegex = /^[0-9]+\.[ ](.*)/;
+    let normalRegex = /^[0-9]+\.[ ](.*)/;
+    if (/^([0-9]\.\s)/.test(str.trim())) {
+
+      let layer = 0;
+      let c = 0;
+
+      while (/ |\t/.test(str.charAt(c++))) layer++;
+      layer = (layer / 2) + 1;
+      str = str.trim();
+
+      if (olLayer === 0) {
+
+        olLayer = 1;
+        str = str.replace(startingRegex, `<ol id="ol-${olNumber}"><li>$1</li>`);
+        olNumber++;
+      } else {
+        console.log(str, "ollayer", olLayer, "layer", layer)
+        if (layer === olLayer) {
+          if (olLayer === 1) {
+
+            str = str.replace(startingRegex, `<li>$1</li>`).trim();
+          } else {
+
+            str = str.replace(normalRegex, `<li>$1</li>`).trim();
+          }
+        } else if (olLayer < layer) {
+
+          str = str.replace(normalRegex, `<ol><li>$1</li>`);
+          olLayer = layer;
+        } else {
+
+          str = str.replace(normalRegex, `</ol><li>$1</li>`);
+          olLayer = layer;
+        }
+
+      }
+    }
+
   } else if (str.includes("_") || str.includes("*") || str.includes("^") || str.includes("-")) {
 
     str = str.replace(/\^([^\^]+)\^/g, "<sup>$1</sup>");
@@ -169,12 +220,12 @@ function processLine(str: string) {
       str = str.replace(/--(\w+)/g, "&mdash; $1");
     } else if (str.startsWith("*") || str.startsWith("-") || characterIsFirstWithoutSpaces(str, "*") || characterIsFirstWithoutSpaces(str, "-")) { //This part is for controlling the unordened lists
 
-      if (listLayer === 0) {
+      if (ulLayer === 0) {
 
-        str = str.replace(/^\* (.*)/gm, `<ul id="ul-${listNumber}"><li>$1</li>`);
-        str = str.replace(/^\- (.*)/gm, `<ul id="ul-${listNumber}"><li>$1</li>`);
-        listLayer = 1;
-        listNumber++;
+        str = str.replace(/^\* (.*)/gm, `<ul id="ul-${ulNumber}"><li>$1</li>`);
+        str = str.replace(/^\- (.*)/gm, `<ul id="ul-${ulNumber}"><li>$1</li>`);
+        ulLayer = 1;
+        ulNumber++;
       } else {
 
         let layer = 0;
@@ -182,30 +233,26 @@ function processLine(str: string) {
 
         while (/ |\t/.test(str.charAt(c++))) layer++;
         layer = (layer / 2) + 1;
-
-        console.log(str, "layer", layer, "listLayer", listLayer)
-        if (layer === listLayer) {
-          console.log("Checking the layer", listLayer)
-          if (listLayer === 1) {
+        if (layer === ulLayer) {
+          if (ulLayer === 1) {
 
             str = str.replace(/^\* (.*)/gm, `<li>$1</li>`).trim();
             str = str.replace(/^\- (.*)/gm, `<li>$1</li>`).trim();
           } else {
 
-            console.log("I enter ", str, listLayer)
             str = str.replace(/\* (.*)/gm, `</ul><li>$1</li>`).trim();
             str = str.replace(/\- (.*)/gm, `</ul><li>$1</li>`).trim();
           }
-        } else if (listLayer < layer) {
+        } else if (ulLayer < layer) {
 
           str = str.replace(/\* (.*)/gm, `<ul><li>$1</li>`);
           str = str.replace(/\- (.*)/gm, `<ul><li>$1</li>`);
-          listLayer = layer;
+          ulLayer = layer;
         } else {
 
           str = str.replace(/\* (.*)/gm, `</ul><li>$1</li>`);
           str = str.replace(/\- (.*)/gm, `</ul><li>$1</li>`);
-          listLayer = layer;
+          ulLayer = layer;
         }
       }
     }
