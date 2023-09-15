@@ -13,6 +13,7 @@ let ulLayer: number = 0;
 let ulNumber: number = 0;
 let todoListLayer: number = 0;
 let todoListNumber: number = 0;
+let urlRegEx: RegExp = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/
 
 
 /**DONT FORGET ABOUT tsc -w WHEN WORKING WITH THE ENGINE PART IF NOT THEY WONT APPEAR ANY CHANGES FROM THE index.ts */
@@ -168,6 +169,10 @@ function processLine(str: string) {
   } else if (str.startsWith("###### ")) {
 
     return checkIfNeedClosingListandAdd() + "<h6>" + str.substring(7) + "</h6>";
+  } else if (urlRegEx.test(str)) {
+
+
+    str = str.replace(urlRegEx, `<a href="${`$1`}" target="_blank">$1</a>`)
   } else if (/([0-9]\.\s)/.test(str)) {
 
     let startingRegex = /^[0-9]+\.[ ](.*)/;
