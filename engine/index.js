@@ -36,12 +36,12 @@ function checkIfNeedClosingListandAdd() {
     let addClosingListTag = "";
     if (ulLayer != 0) {
         while (ulLayer-- != 0)
-            addClosingListTag += "</ul>";
+            addClosingListTag += "</ul></br>";
         ulLayer = 0;
     }
     if (olLayer != 0) {
         while (olLayer-- != 0)
-            addClosingListTag += "</ol>";
+            addClosingListTag += "</ol></br>";
         olLayer = 0;
     }
     if (todoListLayer != 0) {
@@ -171,7 +171,7 @@ function processLine(str) {
             str = str.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
             str = str.replace(/\*(.*?)\*/g, "<i>$1</i>");
             str = str.replace(/_([^_]+)_/g, "<sub>$1</sub>");
-            str = str.replace(/--(\w+)/g, "&mdash; $1");
+            str = str.replace(/--/g, "&mdash;");
         }
         else if (str.startsWith("*") || str.startsWith("-") || characterIsFirstWithoutSpaces(str, "*") || characterIsFirstWithoutSpaces(str, "-")) { //This part is for controlling the unordened lists
             if (ulLayer === 0) {
@@ -254,7 +254,7 @@ function processLine(str) {
     else if (!/(^(^([0-9]\.\s)|^\-\s|^\*\s|^\>\s|^(\!\s))|\n)/g.test(str) || !characterIsFirstWithoutSpaces(str, "\\")) {
         return checkIfNeedClosingListandAdd() + str;
     }
-    return str;
+    return str + "</br>";
 }
 const HEAD = `<html lang="en">
 <head>

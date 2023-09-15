@@ -60,10 +60,11 @@ Other java
 
 > Quotes
 >
-> -- _Socrates_
+> -- *Socrates*
 
 
-Em --dash
+
+Em -- dash
 
 Line *Hello* of *Goodbye*
 
