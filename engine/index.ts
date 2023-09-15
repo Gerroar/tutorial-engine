@@ -152,10 +152,10 @@ function generateCheckBoxAndLabel(id: string, value: string) {
 function processLine(str: string) {
   if (str.startsWith("# ")) {
 
-    return checkIfNeedClosingListandAdd() + "<h1>" + str.substring(2) + "</h1>";
+    return checkIfNeedClosingListandAdd() + "<h1>" + str.substring(2) + "</h1><hr>";
   } else if (str.startsWith("## ")) {
 
-    return checkIfNeedClosingListandAdd() + "<h2>" + str.substring(3) + "</h2>";
+    return checkIfNeedClosingListandAdd() + "<h2>" + str.substring(3) + "</h2><hr>";
   } else if (str.startsWith("### ")) {
 
     return checkIfNeedClosingListandAdd() + "<h3>" + str.substring(4) + "</h3>";
