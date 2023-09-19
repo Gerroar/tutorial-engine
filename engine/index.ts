@@ -211,7 +211,6 @@ function processLine(str: string) {
         str = str.replace(quoteBlockRegex, "");
       }
     }
-
   } else if (urlRegEx.test(str)) {
 
     str = str.replace(urlRegEx, `<a href="${`$1`}" target="_blank">$1</a>`)
@@ -369,10 +368,34 @@ const HEAD = `<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --content-max-width: 750px;
+    }
+    .content {
+      overflow-y: auto;
+      padding: 0 5px 50px 5px;
+      
+    }
+
+    main {
+
+      margin-left: auto;
+      margin-right: auto;
+      max-width: var(--content-max-width);
+    }
+
+    hr {
+      width: 80%;
+      margin-left: 0px;
+    }
+  </style>
   <title>Document</title>
 </head>
-<body>`;
-const FOOT = `</body>
+<body>
+<div id="content" class="content">
+<main>`;
+const FOOT = `</main></div></body>
 </html>`;
 
 /**Why arrDirectories inside this function ? 
