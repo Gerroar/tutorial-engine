@@ -13,8 +13,18 @@ let ulLayer: number = 0;
 let ulNumber: number = 0;
 let todoListLayer: number = 0;
 let todoListNumber: number = 0;
+let openBlockQuote: boolean = false;
+let quoteJumpLine: boolean = false;
+
+
+let cleanTheLine: boolean = false;
+//Regex
+
+let quoteBlockRegex: RegExp = /^\>[\s]*?/g;
+let quoteBlockRegexwText: RegExp = /^>(.*)/;
 let urlRegEx: RegExp = /(((http|https):\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*[-a-zA-Z0-9@:%_\+~#?&//=])?)/
 
+//Regex
 
 /**DONT FORGET ABOUT tsc -w WHEN WORKING WITH THE ENGINE PART IF NOT THEY WONT APPEAR ANY CHANGES FROM THE index.ts */
 
@@ -41,30 +51,42 @@ function characterIsFirstWithoutSpaces(str: string, character: string) {
  * * or - , checking the listLayer
  */
 
-function checkIfNeedClosingListandAdd() {
+function checkIfNeedClosingandAddTag(str?: string) {
 
-  let addClosingListTag = "";
+  let addClosingTag = "";
   if (ulLayer != 0) {
 
-    while (ulLayer-- != 0) addClosingListTag += "</ul></br>"
+    while (ulLayer-- != 0) addClosingTag += "</ul></br>"
     ulLayer = 0;
   }
 
   if (olLayer != 0) {
 
-    while (olLayer-- != 0) addClosingListTag += "</ol></br>"
+    while (olLayer-- != 0) addClosingTag += "</ol></br>"
     olLayer = 0;
   }
 
   if (todoListLayer != 0) {
 
-    addClosingListTag = "</div></br>"
+    addClosingTag = "</div></br>"
     todoListLayer = 0;
   }
 
+  if (openBlockQuote) {
 
+    if (str) {
+      if (/^>[\s]*?/.test(str)) {
 
-  return addClosingListTag;
+        cleanTheLine = true;
+      }
+    } else {
+      console.log("STR inside the checking and regex", str)
+      addClosingTag = "</blockquote>"
+      openBlockQuote = false;
+    }
+  }
+
+  return addClosingTag;
 }
 
 /**Iterates the string looking for more than one of the character type passed, 
@@ -153,24 +175,44 @@ function generateCheckBoxAndLabel(id: string, value: string) {
 function processLine(str: string) {
   if (str.startsWith("# ")) {
 
-    return checkIfNeedClosingListandAdd() + "<h1>" + str.substring(2) + "</h1><hr>";
+    return checkIfNeedClosingandAddTag() + "<h1>" + str.substring(2) + "</h1><hr>";
   } else if (str.startsWith("## ")) {
 
-    return checkIfNeedClosingListandAdd() + "<h2>" + str.substring(3) + "</h2><hr>";
+    return checkIfNeedClosingandAddTag() + "<h2>" + str.substring(3) + "</h2><hr>";
   } else if (str.startsWith("### ")) {
 
-    return checkIfNeedClosingListandAdd() + "<h3>" + str.substring(4) + "</h3>";
+    return checkIfNeedClosingandAddTag() + "<h3>" + str.substring(4) + "</h3>";
   } else if (str.startsWith("#### ")) {
 
-    return checkIfNeedClosingListandAdd() + "<h4>" + str.substring(5) + "</h4>";
+    return checkIfNeedClosingandAddTag() + "<h4>" + str.substring(5) + "</h4>";
   } else if (str.startsWith("##### ")) {
 
-    return checkIfNeedClosingListandAdd() + "<h5>" + str.substring(6) + "</h5>";
+    return checkIfNeedClosingandAddTag() + "<h5>" + str.substring(6) + "</h5>";
   } else if (str.startsWith("###### ")) {
 
-    return checkIfNeedClosingListandAdd() + "<h6>" + str.substring(7) + "</h6>";
-  } else if (urlRegEx.test(str)) {
+    return checkIfNeedClosingandAddTag() + "<h6>" + str.substring(7) + "</h6>";
+  } else if (quoteBlockRegex.test(str)) {
+    if (quoteBlockRegexwText.test(str)) {
+      if (openBlockQuote) {
+        str = str.replace(/(\r\n|\n|\r)/gm, "")
+        str = str.replace(/^>(.*)/, `$1`);
+        str = str.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+        str = str.replace(/\*(.*?)\*/g, "<i>$1</i>");
+        str = str.replace(/_([^_]+)_/g, "<sub>$1</sub>");
+        str = str.replace(/--/g, "&mdash;")
+      } else {
 
+        str = str.replace(quoteBlockRegexwText, `<blockquote>$1`)
+        openBlockQuote = true;
+      }
+    } else {
+      if (openBlockQuote) {
+
+        str = str.replace(quoteBlockRegex, "");
+      }
+    }
+
+  } else if (urlRegEx.test(str)) {
 
     str = str.replace(urlRegEx, `<a href="${`$1`}" target="_blank">$1</a>`)
   } else if (/([0-9]\.\s)/.test(str)) {
@@ -192,7 +234,6 @@ function processLine(str: string) {
         str = str.replace(startingRegex, `<ol id="ol-${olNumber}"><li>$1</li>`);
         olNumber++;
       } else {
-        console.log(str, "ollayer", olLayer, "layer", layer)
         if (layer === olLayer) {
           if (olLayer === 1) {
 
@@ -282,7 +323,7 @@ function processLine(str: string) {
 
     if (str.endsWith(`sh`)) lastSh = ``;
     inCode = !inCode;
-    return inCode ? checkIfNeedClosingListandAdd() + "<pre>" : "</pre>";
+    return inCode ? checkIfNeedClosingandAddTag() + "<pre>" : "</pre>";
   } else if (inCode) {
 
     lastSh += str + "\n";
@@ -305,10 +346,19 @@ function processLine(str: string) {
 
       fs.writeFileSync("tmp/prevRuns/" + hash, output);
     }
-    return checkIfNeedClosingListandAdd() + `<pre>${output}</pre>`;
-  } else if (!/(^(^([0-9]\.\s)|^\-\s|^\*\s|^\>\s|^(\!\s))|\n)/g.test(str) || !characterIsFirstWithoutSpaces(str, "\\")) {
+    return checkIfNeedClosingandAddTag() + `<pre>${output}</pre>`;
+  } else if (!/(^(^([0-9]\.\s)|^\-\s|^\*\s|^(\!\s))|(^>*?)|\n)/g.test(str) || !characterIsFirstWithoutSpaces(str, "\\")) {
 
-    return checkIfNeedClosingListandAdd() + str
+    let possibleValue = checkIfNeedClosingandAddTag(str);
+
+    if (cleanTheLine) {
+
+      cleanTheLine = false;
+      return "";
+    } else {
+
+      return possibleValue + str
+    }
   }
 
   return str + "</br>";

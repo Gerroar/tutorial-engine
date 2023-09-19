@@ -54,13 +54,23 @@ Other java
 
 ## Various
 
-! Callouts
+!good Callouts
+! good text
+! good text
 
 
 
 > Quotes
 >
+> de
+>
+> -- Hello
+>
 > -- *Socrates*
+>
+> **testing gr**
+>
+>Isosceles
 
 
 
@@ -70,7 +80,7 @@ Line *Hello* of *Goodbye*
 
 2^3^
 
-Text formatting *italics* and **bold**.
+Text formatting *italics* and **bold gfdfd dsad s**.
 
 
 1. Hello

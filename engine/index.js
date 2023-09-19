@@ -16,7 +16,14 @@ let ulLayer = 0;
 let ulNumber = 0;
 let todoListLayer = 0;
 let todoListNumber = 0;
+let openBlockQuote = false;
+let quoteJumpLine = false;
+let cleanTheLine = false;
+//Regex
+let quoteBlockRegex = /^\>[\s]*?/g;
+let quoteBlockRegexwText = /^>(.*)/;
 let urlRegEx = /(((http|https):\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*[-a-zA-Z0-9@:%_\+~#?&//=])?)/;
+//Regex
 /**DONT FORGET ABOUT tsc -w WHEN WORKING WITH THE ENGINE PART IF NOT THEY WONT APPEAR ANY CHANGES FROM THE index.ts */
 /**Removes the spaces to check if the first character is the one that was passed, this function it's used for detecting
  * if the line it's part of a nested list or just a line that concides with the characters used for lists
@@ -32,23 +39,35 @@ function characterIsFirstWithoutSpaces(str, character) {
 /**Function used for adding close tag ul in case that the next line doesn't have
  * * or - , checking the listLayer
  */
-function checkIfNeedClosingListandAdd() {
-    let addClosingListTag = "";
+function checkIfNeedClosingandAddTag(str) {
+    let addClosingTag = "";
     if (ulLayer != 0) {
         while (ulLayer-- != 0)
-            addClosingListTag += "</ul></br>";
+            addClosingTag += "</ul></br>";
         ulLayer = 0;
     }
     if (olLayer != 0) {
         while (olLayer-- != 0)
-            addClosingListTag += "</ol></br>";
+            addClosingTag += "</ol></br>";
         olLayer = 0;
     }
     if (todoListLayer != 0) {
-        addClosingListTag = "</div></br>";
+        addClosingTag = "</div></br>";
         todoListLayer = 0;
     }
-    return addClosingListTag;
+    if (openBlockQuote) {
+        if (str) {
+            if (/^>[\s]*?/.test(str)) {
+                cleanTheLine = true;
+            }
+        }
+        else {
+            console.log("STR inside the checking and regex", str);
+            addClosingTag = "</blockquote>";
+            openBlockQuote = false;
+        }
+    }
+    return addClosingTag;
 }
 /**Iterates the string looking for more than one of the character type passed,
  * doesn't matter if it's * , ** or *** ( for example, it could be any type accepted
@@ -109,22 +128,43 @@ function generateCheckBoxAndLabel(id, value) {
 }
 function processLine(str) {
     if (str.startsWith("# ")) {
-        return checkIfNeedClosingListandAdd() + "<h1>" + str.substring(2) + "</h1><hr>";
+        return checkIfNeedClosingandAddTag() + "<h1>" + str.substring(2) + "</h1><hr>";
     }
     else if (str.startsWith("## ")) {
-        return checkIfNeedClosingListandAdd() + "<h2>" + str.substring(3) + "</h2><hr>";
+        return checkIfNeedClosingandAddTag() + "<h2>" + str.substring(3) + "</h2><hr>";
     }
     else if (str.startsWith("### ")) {
-        return checkIfNeedClosingListandAdd() + "<h3>" + str.substring(4) + "</h3>";
+        return checkIfNeedClosingandAddTag() + "<h3>" + str.substring(4) + "</h3>";
     }
     else if (str.startsWith("#### ")) {
-        return checkIfNeedClosingListandAdd() + "<h4>" + str.substring(5) + "</h4>";
+        return checkIfNeedClosingandAddTag() + "<h4>" + str.substring(5) + "</h4>";
     }
     else if (str.startsWith("##### ")) {
-        return checkIfNeedClosingListandAdd() + "<h5>" + str.substring(6) + "</h5>";
+        return checkIfNeedClosingandAddTag() + "<h5>" + str.substring(6) + "</h5>";
     }
     else if (str.startsWith("###### ")) {
-        return checkIfNeedClosingListandAdd() + "<h6>" + str.substring(7) + "</h6>";
+        return checkIfNeedClosingandAddTag() + "<h6>" + str.substring(7) + "</h6>";
+    }
+    else if (quoteBlockRegex.test(str)) {
+        if (quoteBlockRegexwText.test(str)) {
+            if (openBlockQuote) {
+                str = str.replace(/(\r\n|\n|\r)/gm, "");
+                str = str.replace(/^>(.*)/, `$1`);
+                str = str.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+                str = str.replace(/\*(.*?)\*/g, "<i>$1</i>");
+                str = str.replace(/_([^_]+)_/g, "<sub>$1</sub>");
+                str = str.replace(/--/g, "&mdash;");
+            }
+            else {
+                str = str.replace(quoteBlockRegexwText, `<blockquote>$1`);
+                openBlockQuote = true;
+            }
+        }
+        else {
+            if (openBlockQuote) {
+                str = str.replace(quoteBlockRegex, "");
+            }
+        }
     }
     else if (urlRegEx.test(str)) {
         str = str.replace(urlRegEx, `<a href="${`$1`}" target="_blank">$1</a>`);
@@ -145,7 +185,6 @@ function processLine(str) {
                 olNumber++;
             }
             else {
-                console.log(str, "ollayer", olLayer, "layer", layer);
                 if (layer === olLayer) {
                     if (olLayer === 1) {
                         str = str.replace(startingRegex, `<li>$1</li>`).trim();
@@ -228,7 +267,7 @@ function processLine(str) {
         if (str.endsWith(`sh`))
             lastSh = ``;
         inCode = !inCode;
-        return inCode ? checkIfNeedClosingListandAdd() + "<pre>" : "</pre>";
+        return inCode ? checkIfNeedClosingandAddTag() + "<pre>" : "</pre>";
     }
     else if (inCode) {
         lastSh += str + "\n";
@@ -249,10 +288,17 @@ function processLine(str) {
         else {
             fs_1.default.writeFileSync("tmp/prevRuns/" + hash, output);
         }
-        return checkIfNeedClosingListandAdd() + `<pre>${output}</pre>`;
+        return checkIfNeedClosingandAddTag() + `<pre>${output}</pre>`;
     }
-    else if (!/(^(^([0-9]\.\s)|^\-\s|^\*\s|^\>\s|^(\!\s))|\n)/g.test(str) || !characterIsFirstWithoutSpaces(str, "\\")) {
-        return checkIfNeedClosingListandAdd() + str;
+    else if (!/(^(^([0-9]\.\s)|^\-\s|^\*\s|^(\!\s))|(^>*?)|\n)/g.test(str) || !characterIsFirstWithoutSpaces(str, "\\")) {
+        let possibleValue = checkIfNeedClosingandAddTag(str);
+        if (cleanTheLine) {
+            cleanTheLine = false;
+            return "";
+        }
+        else {
+            return possibleValue + str;
+        }
     }
     return str + "</br>";
 }
