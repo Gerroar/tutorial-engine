@@ -3,3 +3,8 @@
 |  **_2^3^_**      |    `2<sup>3</sup>`        |     2<sup>3</sup>  |   -      |
 |   **_\todo One_** | `<input type="checkbox" id="todo-component-1.1" name="todo-component-1.1" value="One"><label for="One">One</label><br>`    | Generate a checkbox with label | If its a new  todo list a div for store all the checkboxes and labels will be generated
 **_-- Text_** | `&mdash; Text` | &mdash; Text | Em dash
+|**_CALLOUTS_**||| For making a jumpline use !<good\|bad\|warning> without any space after, they work pretty the same as quotes, it's not posible to put a callout of different type inside of one in process||
+|**_!good\|!bad\|!warning_** |||If it's a new or first one callout it will generate the callout div , if not and its just the continuation of the callout it will be consider as a jumpline,**if it's empty**, dont use space after if no words are used after, **IF THE CALLOUT IT'S GOOD THE COLOR OF THE CALLOUT WILL BE GREEN, IF THE CALLOUT IT'S BAD IT WILL BE RED, IF THE CALLOUT IT'S WARNING IT WILL BE YELLOW**|
+|**_!goodTitle\|!badTitle\|!warningTitle(space)\<Text\>_** |||This is used to put an h3 inside of the callout and use it as a title once or more than once, it will work also if its anew callout as a creator of a callout and also adding the title inside already|
+|**_!\<type\>(space)\<Text\>_** |||This will be consider as text and also if this is the first one of a new callout it will create also the callout|
+|**_!goodHr\|!badHr\|!warningHr_** |`</hr> (with respective color)`||For using divisions inside the callout, this one dont create the callout for the logical reason of not starting a callout with a division|

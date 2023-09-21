@@ -54,10 +54,12 @@ Other java
 
 ## Various
 
-!good Callouts
-! good text
-! good text
-
+!warningTitle Callout
+!bad text
+!warning text
+!warning
+!warningHr
+!warning text
 
 
 > Quotes

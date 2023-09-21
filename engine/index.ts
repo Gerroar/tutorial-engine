@@ -14,7 +14,8 @@ let ulNumber: number = 0;
 let todoListLayer: number = 0;
 let todoListNumber: number = 0;
 let openBlockQuote: boolean = false;
-let quoteJumpLine: boolean = false;
+let openCallOut: boolean = false;
+let currentCOType: string = ""; //CallOut type
 
 
 let cleanTheLine: boolean = false;
@@ -80,10 +81,16 @@ function checkIfNeedClosingandAddTag(str?: string) {
         cleanTheLine = true;
       }
     } else {
-      console.log("STR inside the checking and regex", str)
+
       addClosingTag = "</blockquote>"
       openBlockQuote = false;
     }
+  }
+
+  if (openCallOut) {
+
+    addClosingTag = "</div>";
+    openCallOut = false;
   }
 
   return addClosingTag;
@@ -191,6 +198,128 @@ function processLine(str: string) {
   } else if (str.startsWith("###### ")) {
 
     return checkIfNeedClosingandAddTag() + "<h6>" + str.substring(7) + "</h6>";
+  } else if (/^!/.test(str)) {
+    let callOutType: string = "";
+    let callOutContent: string = "";
+
+    switch (true) {
+
+      case /^!good(\s\w+)?$/.test(str):
+
+        callOutType = "good";
+        callOutContent = str.replace(/^!good(\s\w+)?$/, "$1").trim();
+        break;
+      case /^!goodTitle(\s\w+)?$/.test(str):
+
+        callOutType = "goodTitle";
+        callOutContent = str.replace(/^!goodTitle(\s\w+)?$/, "$1").trim();
+        break;
+      case /^!goodHr$/.test(str):
+
+        callOutType = "goodHr";
+        break;
+      case /^!bad(\s\w+)?$$/.test(str):
+
+        callOutType = "bad";
+        callOutContent = str.replace(/^!bad(\s\w+)?$/, "$1").trim();
+        break;
+      case /^!badTitle(\s\w+)?$/.test(str):
+
+        callOutType = "badTitle";
+        callOutContent = str.replace(/^!badTitle(\s\w+)?$/, "$1").trim();
+        break;
+      case /^!badHr$/.test(str):
+
+        callOutType = "badHr";
+        break;
+      case /^!warning(\s\w+)?$/.test(str):
+
+        callOutType = "warning";
+        callOutContent = str.replace(/^!warning(\s\w+)?$/, "$1").trim();
+        break;
+      case /^!warningTitle(\s\w+)?$/.test(str):
+
+        callOutType = "warningTitle";
+        callOutContent = str.replace(/^!warningTitle(\s\w+)?$/, "$1").trim();
+        break;
+
+      case /^!warningHr$/.test(str):
+
+        callOutType = "warningHr";
+        break;
+    }
+
+
+    if (callOutType !== "") {
+
+
+      let cotLastWord: string = callOutType[callOutType.length - 1] //CallOut Type last word
+
+      /**Manage when the callout "tag" it's just !good, !bad or !warning wihtout any text
+       * after
+       */
+
+      if (cotLastWord === "d" || cotLastWord === "g") {
+        if (openCallOut) {
+          if (callOutContent !== "" && currentCOType === callOutType) {
+
+            return `<p>${callOutContent}</p>`
+          } else {
+
+            console.log(currentCOType)
+            return "";
+          }
+        } else {
+
+          openCallOut = true;
+          currentCOType = callOutType;
+          return `<div class="${callOutType}">`
+        }
+      } else if (cotLastWord === "r") {
+        /**Manage when the callout "tag" it's just !goodHr, !badHr or !warningHr without any text
+         * after
+         */
+
+        if (openCallOut) {
+
+          return `<hr>`
+        } else {
+
+          callOutType = "";
+        }
+      }
+
+      /**Manage when the callout "tag" it's !goodTitle, !badTitle or !warningTitle and also that
+       * there is some text, if there is no text for the title the type will be converted to an 
+       * empty string , what means that it's not valid and won't appear 
+       */
+      if (callOutType.includes("Title")) {
+        if (callOutContent !== "") {
+
+          let coClass = callOutType.substring(0, callOutType.lastIndexOf("T"));
+          if (openCallOut) {
+            if (coClass === currentCOType) {
+
+              openCallOut = true;
+              return `<div class="${coClass}"><h3>${callOutContent}</h3>`;
+            } else {
+
+              return "";
+            }
+          } else {
+
+            openCallOut = true;
+            currentCOType = coClass;
+            return `<div class="${coClass}"><h3>${callOutContent}</h3>`;
+          }
+        } else {
+
+          callOutType = "";
+        }
+      }
+    }
+
+
   } else if (quoteBlockRegex.test(str)) {
     if (quoteBlockRegexwText.test(str)) {
       if (openBlockQuote) {
@@ -389,6 +518,64 @@ const HEAD = `<html lang="en">
       width: 80%;
       margin-left: 0px;
     }
+
+    details summary { 
+      cursor: pointer;
+    }
+    
+    details summary > * {
+      display: inline;
+    }
+
+    /*Classes for CallOuts*/
+
+    .good,
+    .bad,
+    .warning {
+
+      border-style: solid;
+      border-width: 1px;
+      border-radius: 4px;
+      padding: 0 35px 0 35px
+    }
+
+    .good {
+
+      border-color: #6FAD6C;
+      background-color: #8FE08B;
+      color: #153b13;
+    }
+
+    .good hr {
+
+      border: 1px solid #6eab6b;
+    }
+
+    .bad {
+
+      border-color: #b04840;
+      background-color: #e77f78;
+      color: #450d09;
+    }
+
+    .bad hr {
+
+      border: 1px solid #bf4f47;
+
+    }
+
+    .warning {
+
+      border-color: #a7a343;
+      background-color: #fffa64;
+      color: #42401a;
+    }
+
+    .warning hr {
+
+      border: 1px solid #bab64b;
+    }
+    /*Classes for CallOuts*/
   </style>
   <title>Document</title>
 </head>
