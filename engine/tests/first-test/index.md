@@ -56,7 +56,7 @@ Other java
 
 !warningTitle Callout
 !bad text
-!warning text
+!warning fdsfdsfdsfdsfgdsgfdsgfdsgfsgfsgfsgrftrrvfsgrwgfdsgfwrwgfdgrwgrwegrwgrwgrwegrwegrwwwerrgewwwwwwwrgergwerr
 !warning
 !warningHr
 !warning text
@@ -83,6 +83,13 @@ Line *Hello* of *Goodbye*
 2^3^
 
 Text formatting *italics* and **bold gfdfd dsad s**.
+
+Spoiler
+$title Spoiler Title One
+$
+$ fdsfdsfdsfdsfgdsgfdsgfdsgfsgfsgfsgrftrrvfsgrwgfdsgfwrwgfdgrwgrwegrwgrwgrwegrwegrwwwerrgewwwwwwwrgergwerr
+$title Spoiler Title Two
+$ more text
 
 
 1. Hello

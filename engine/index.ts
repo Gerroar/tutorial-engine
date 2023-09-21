@@ -16,7 +16,12 @@ let todoListNumber: number = 0;
 let openBlockQuote: boolean = false;
 let openCallOut: boolean = false;
 let currentCOType: string = ""; //CallOut type
+let openSpoilerDiv: boolean = false;
+let openSpoilerDivContent: boolean = false;
+let spoilerBodyCounter: number = 0;
 
+
+/**FOR TOMORROW: Finish the length calculation from body of the spoiler  */
 
 let cleanTheLine: boolean = false;
 //Regex
@@ -91,6 +96,13 @@ function checkIfNeedClosingandAddTag(str?: string) {
 
     addClosingTag = "</div>";
     openCallOut = false;
+  }
+
+  if (openSpoilerDiv && openSpoilerDivContent) {
+
+    addClosingTag = "</div></div>";
+    openSpoilerDiv = false;
+    openSpoilerDivContent = false;
   }
 
   return addClosingTag;
@@ -198,6 +210,48 @@ function processLine(str: string) {
   } else if (str.startsWith("###### ")) {
 
     return checkIfNeedClosingandAddTag() + "<h6>" + str.substring(7) + "</h6>";
+  } else if (/^\$/.test(str)) {
+    if (/^\$title\s(\w+(.*)?)/.test(str)) {
+      let spoilerTitle: string = str.replace(/^\$title\s(\w+(.*)?)/, "$1");
+      if (openSpoilerDiv) {
+        if (openSpoilerDivContent) {
+
+          openSpoilerDivContent = false;
+          return `</div></div><div class="spoiler"><div class="spoiler-btn spoiler-btn-top">${spoilerTitle}</div>`;
+        } else {
+
+          return `</div><div class="spoiler"><div class="spoiler-btn spoiler-btn-top">${spoilerTitle}</div>`;
+        }
+      } else {
+
+        openSpoilerDiv = true;
+        return `<div class="spoiler"><div class="spoiler-btn spoiler-btn-top">${spoilerTitle}</div>`;
+      }
+    } else if (openSpoilerDiv) {
+      if (/^\$\s(\w+(.*)?)/.test(str)) {
+
+        let spoilerContent: string = str.replace(/^\$\s(\w+(.*)?)/, "$1");
+        if (openSpoilerDivContent) {
+
+          return `<p>${spoilerContent}</p>`;
+        } else {
+
+          openSpoilerDivContent = true;
+          spoilerBodyCounter++;
+          return `<div class="spoiler-body" id="spoiler-body-${spoilerBodyCounter}"><p>${spoilerContent}</p>`;
+        }
+      } else if (/^\$$/) {
+        if (openSpoilerDivContent) {
+
+          return "";
+        } else {
+
+          openSpoilerDivContent = true;
+          spoilerBodyCounter++;
+          return `<div class="spoiler-body" id="spoiler-body-${spoilerBodyCounter}">`
+        }
+      }
+    }
   } else if (/^!/.test(str)) {
     let callOutType: string = "";
     let callOutContent: string = "";
@@ -218,7 +272,7 @@ function processLine(str: string) {
 
         callOutType = "goodHr";
         break;
-      case /^!bad(\s\w+)?$$/.test(str):
+      case /^!bad(\s\w+)?$/.test(str):
 
         callOutType = "bad";
         callOutContent = str.replace(/^!bad(\s\w+)?$/, "$1").trim();
@@ -249,7 +303,6 @@ function processLine(str: string) {
         break;
     }
 
-
     if (callOutType !== "") {
 
 
@@ -263,10 +316,10 @@ function processLine(str: string) {
         if (openCallOut) {
           if (callOutContent !== "" && currentCOType === callOutType) {
 
-            return `<p>${callOutContent}</p>`
+            return `<p>${callOutContent}</p>`;
           } else {
 
-            console.log(currentCOType)
+
             return "";
           }
         } else {
@@ -430,6 +483,7 @@ function processLine(str: string) {
         }
       }
     }
+
   } else if (characterIsFirstWithoutSpaces(str, "\\")) {
 
     str = str.replace(/^\s*(?!\\)/, "");
@@ -536,7 +590,8 @@ const HEAD = `<html lang="en">
       border-style: solid;
       border-width: 1px;
       border-radius: 4px;
-      padding: 0 35px 0 35px
+      padding: 0 35px 0 35px;
+      overflow-wrap: break-word;
     }
 
     .good {
@@ -576,13 +631,183 @@ const HEAD = `<html lang="en">
       border: 1px solid #bab64b;
     }
     /*Classes for CallOuts*/
+
+    /*Classes for Spoiler*/
+
+    .spoiler {
+      border: 1px solid #999;
+      padding: 2px;
+      background: #cfc;
+      padding: 0 35px 0 35px;
+      overflow-wrap: break-word;
+    }
+    .spoiler-btn {
+      user-select: none;
+      font-size: 2rem;
+    }
+    .spoiler-btn:hover {
+      cursor: pointer;
+      color: #e00;
+    }
+    .spoiler-btn-bottom {
+      width: 100%;
+      text-align: right;
+    }
+    
+    .spoiler-body {
+      display: none;
+      height: 0;
+    }
+    
+
+    /*Classes for Spoiler*/
   </style>
   <title>Document</title>
 </head>
 <body>
 <div id="content" class="content">
 <main>`;
-const FOOT = `</main></div></body>
+const FOOT = `</main></div>
+<script>
+    function toggleSpoilerAnimated(spoilerElement, isInvertedCollapse, isInvertedExpand, duration=1000) {
+      let spoilerBody = spoilerElement.querySelector('.spoiler-body');
+      let isCollapsing = spoilerElement.classList.contains('expanded');
+      let heightBefore = spoilerElement.offsetHeight;
+      
+      let offsetBefore = window.scrollY;
+      spoilerElement.classList.toggle('expanded', !isCollapsing);
+      let isScrollRequired = ( isCollapsing && isInvertedCollapse) ||
+                              (!isCollapsing && isInvertedExpand );
+    
+      
+      // define a scroll func if one is required
+      let scrollFunc = (isScrollRequired)
+        ? () => {
+          let heightNow = spoilerElement.offsetHeight;
+          let heightDelta = heightNow - heightBefore;
+          //console.log(heightNow, spoilerBody.offsetHeight, spoilerBody.style.height);
+    
+          window.scrollTo(0, offsetBefore + heightDelta);
+        }
+        : undefined;
+      slideToggle(spoilerBody, !isCollapsing, { duration: duration, progress: scrollFunc, complete: scrollFunc });
+    }
+    
+    for (let el of document.querySelectorAll('.spoiler-btn-top')) {
+      el.addEventListener('click', e => toggleSpoilerAnimated(el.parentNode));
+    }
+    for (let el of document.querySelectorAll('.spoiler-btn-bottom')) {
+      el.addEventListener('click', e => toggleSpoilerAnimated(el.parentNode, true, true));
+    }
+    
+    function slideUp(element, options) { slideToggle(element, false, options); }
+    function slideDown(element, options) { slideToggle(element, true, options); }
+    
+    // main sliding
+    function slideToggle(element, isOpening, options) {
+      let h0 = getHeight(element);
+      
+      // set up transition event listeners
+      function resetStyle() {
+        console.log("reset");
+        //element.style.display = "none";
+        //element.style.height = '';
+      }
+      
+      const logType = e => console.log(e.type, e.propertyName);
+      element.addEventListener('transitionend', (e) => {
+        if (!isOpening) {
+          resetStyle();
+        }
+        logType(e);
+        }, true);
+      element.addEventListener('transitioncancel', logType, true);
+      element.addEventListener('transitionrun', logType, true);
+      element.addEventListener('transitionstart', logType, true);
+    
+      
+      // change: get to duration from css
+      let duration = (options && options.duration) || 1000;
+      element.style.transitionDuration = duration + "ms";
+      element.style.transitionProperty = "height";
+      let start = null;
+      
+      function step(timestamp) {
+        if (!start) { start = timestamp; }
+        let progress = 1.0 * (timestamp - start) / duration;
+        let h1 = isOpening ? (h0 * progress) : (h0 * (1 - progress));
+        if ((progress) < 1.0) {
+          //element.style.height = h1 + 'px';
+          if (options.progress) { options.progress(); }
+          window.requestAnimationFrame(step);
+        } else {
+          //element.style.height = '';
+          //element.style.overflow = '';
+          //if (!isOpening) { element.style.display = 'none'; }
+          console.log("here");
+          if (!isOpening) { 
+            // reset height so that h0 can be calculated again
+            // OLD STYLE RESET
+            // element.style.display = "none";
+            // element.style.height = '';
+    
+          }
+          //if (options.complete) { options.complete(); }
+        }
+      }
+      
+      // toggle un-hide
+      element.style.display = 'block';
+      // changed:  // timeout due to mdn ...
+      setTimeout(() => {
+        //element.style.height = 0;
+        if (!isOpening) {
+          element.style.height = "0px";
+          console.log("going down");
+        } else {
+            console.log("h0 is", h0 + "px");
+            // TODO the h0 from the getHeight hack needs to be used here
+            // to retrieve this correctly the right initial height, maxheight, display values etc need to be set (check function), but the
+            let t = element.children[0].innerHTML.length;
+            console.log(t)
+            element.style.height = 50 + "px"; // start expanding
+        }
+        element.style.overflow = 'hidden';
+        window.requestAnimationFrame(step);
+      }, 3);
+    }
+    
+    // https://stackoverflow.com/a/29047232/3423843
+    function getHeight(el) {
+      let el_comp_style = window.getComputedStyle(el),
+        el_display    = el_comp_style.display,
+        el_max_height = el_comp_style.maxHeight.replace('px', '').replace('%', ''),
+        el_position   = el.style.position,
+        el_visibility = el.style.visibility,
+        wanted_height = 0;
+        
+        console.log("joehoe", el_max_height, el_display);
+        
+    
+      if (el_display !== 'none' && el_max_height !== '0' && el_max_height !== 'none') {
+        return el.offsetHeight;
+      }
+      
+    
+      el.style.position   = 'absolute';
+      el.style.visibility = 'hidden';
+      el.style.display    = 'block';
+    
+      wanted_height = el.offsetHeight;
+    
+      el.style.display    = el_display;
+      el.style.position   = el_position;
+      el.style.visibility = el_visibility;
+    
+      return wanted_height;
+    }  
+  </script>
+</body>
 </html>`;
 
 /**Why arrDirectories inside this function ? 
