@@ -22,7 +22,6 @@ let currentCOType = ""; //CallOut type
 let openSpoilerDiv = false;
 let openSpoilerDivContent = false;
 let spoilerBodyCounter = 0;
-/**FOR TOMORROW: Finish the length calculation from body of the spoiler  */
 let cleanTheLine = false;
 //Regex
 let quoteBlockRegex = /^\>[\s]*?/g;
@@ -479,6 +478,10 @@ const HEAD = `<html lang="en">
       margin-left: 0px;
     }
 
+    blockquote {
+      font-style: italic;
+    }
+
     details summary { 
       cursor: pointer;
     }
@@ -542,18 +545,21 @@ const HEAD = `<html lang="en">
 
     .spoiler {
       border: 1px solid #999;
+      border-radius: 4px;
       padding: 2px;
-      background: #cfc;
+      background: rgb(195, 195, 195);
       padding: 0 35px 0 35px;
+      margin: 20px 0 20px 0;
       overflow-wrap: break-word;
     }
+
     .spoiler-btn {
       user-select: none;
       font-size: 2rem;
     }
     .spoiler-btn:hover {
       cursor: pointer;
-      color: #e00;
+      color: rgb(120, 120, 120);
     }
     .spoiler-btn-bottom {
       width: 100%;
@@ -591,8 +597,7 @@ const FOOT = `</main></div>
         ? () => {
           let heightNow = spoilerElement.offsetHeight;
           let heightDelta = heightNow - heightBefore;
-          //console.log(heightNow, spoilerBody.offsetHeight, spoilerBody.style.height);
-    
+           
           window.scrollTo(0, offsetBefore + heightDelta);
         }
         : undefined;
@@ -671,12 +676,30 @@ const FOOT = `</main></div>
           element.style.height = "0px";
           console.log("going down");
         } else {
-            console.log("h0 is", h0 + "px");
-            // TODO the h0 from the getHeight hack needs to be used here
-            // to retrieve this correctly the right initial height, maxheight, display values etc need to be set (check function), but the
-            let t = element.children[0].innerHTML.length;
-            console.log(t)
-            element.style.height = 50 + "px"; // start expanding
+          let allLengthsTogether = 0;
+          let elementChildren = element.children;
+
+          if (elementChildren !== 0) {
+            if (elementChildren.length === 1) {
+
+              allLengthsTogether = elementChildren[0].innerHTML.length;
+            } else {
+
+              for (const children of elementChildren) {
+
+                allLengthsTogether += children.innerHTML.length
+              }
+            }
+
+            if (allLengthsTogether < 103) {
+
+              element.style.height = 50 + "px";
+            } else {
+
+              console.log(allLengthsTogether / 102)
+              element.style.height = ((allLengthsTogether / 102) * 2) + "vh";
+            }
+          }
         }
         element.style.overflow = 'hidden';
         window.requestAnimationFrame(step);

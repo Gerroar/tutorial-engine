@@ -87,9 +87,13 @@ Text formatting *italics* and **bold gfdfd dsad s**.
 Spoiler
 $title Spoiler Title One
 $
+$ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Et malesuada fames ac turpis egestas maecenas pharetra convallis posuere. Nunc pulvinar sapien et ligula. Id cursus metus aliquam eleifend mi in nulla posuere. Mauris pharetra et ultrices neque ornare aenean euismod elementum. Ultricies mi quis hendrerit dolor magna eget. Mauris ultrices eros in cursus turpis massa. Dui accumsan sit amet nulla. Nunc eget lorem dolor sed viverra ipsum nunc aliquet. Duis tristique sollicitudin nibh sit amet commodo nulla. Eu turpis egestas pretium aenean pharetra magna ac placerat vestibulum. Nulla posuere sollicitudin aliquam ultrices sagittis orci a scelerisque. Magna ac placerat vestibulum lectus. Curabitur vitae nunc sed velit dignissim sodales ut eu sem. Enim eu turpis egestas pretium aenean pharetra. Interdum velit euismod in pellentesque massa placerat duis ultricies. Sodales ut eu sem integer vitae justo eget. Libero nunc consequat interdum varius sit amet mattis vulputate enim. Mauris in aliquam sem fringilla ut. Diam vel quam elementum pulvinar etiam non quam lacus.
+$
 $ fdsfdsfdsfdsfgdsgfdsgfdsgfsgfsgfsgrftrrvfsgrwgfdsgfwrwgfdgrwgrwegrwgrwgrwegrwegrwwwerrgewwwwwwwrgergwerr
+$
+$ Duis tristique sollicitudin nibh sit amet commodo nulla. Eu turpis egestas pretium aenean pharetra magna ac placerat vestibulum. Nulla posuere sollicitudin aliquam ultrices sagittis orci a scelerisque. Magna ac placerat vestibulum lectus. Curabitur vitae nunc sed velit dignissim sodales ut eu sem. Enim eu turpis egestas pretium aenean pharetra. Interdum velit euismod in pellentesque massa placerat duis ultricies. Sodales ut eu sem integer vitae justo eget. Libero nunc consequat interdum varius sit amet mattis vulputate enim. Mauris in aliquam sem fringilla ut. Diam vel quam elementum pulvinar etiam non quam lacus.
 $title Spoiler Title Two
-$ more text
+$
 
 
 1. Hello
