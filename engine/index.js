@@ -21,7 +21,6 @@ let openCallOut = false;
 let currentCOType = ""; //CallOut type
 let openSpoilerDiv = false;
 let openSpoilerDivContent = false;
-let spoilerBodyCounter = 0;
 let cleanTheLine = false;
 //Regex
 let quoteBlockRegex = /^\>[\s]*?/g;
@@ -46,13 +45,25 @@ function characterIsFirstWithoutSpaces(str, character) {
 function checkIfNeedClosingandAddTag(str) {
     let addClosingTag = "";
     if (ulLayer != 0) {
-        while (ulLayer-- != 0)
-            addClosingTag += "</ul></br>";
+        while (ulLayer-- != 0) {
+            if (ulLayer === 0) {
+                addClosingTag += "</ul></br>";
+            }
+            else {
+                addClosingTag += "</ul>";
+            }
+        }
         ulLayer = 0;
     }
     if (olLayer != 0) {
-        while (olLayer-- != 0)
-            addClosingTag += "</ol></br>";
+        while (olLayer-- != 0) {
+            if (olLayer === 0) {
+                addClosingTag += "</ol></br>";
+            }
+            else {
+                addClosingTag += "</ol>";
+            }
+        }
         olLayer = 0;
     }
     if (todoListLayer != 0) {
@@ -74,10 +85,9 @@ function checkIfNeedClosingandAddTag(str) {
         addClosingTag = "</div>";
         openCallOut = false;
     }
-    if (openSpoilerDiv && openSpoilerDivContent) {
-        addClosingTag = "</div></div>";
+    if (openSpoilerDiv) {
+        addClosingTag = "</details>";
         openSpoilerDiv = false;
-        openSpoilerDivContent = false;
     }
     return addClosingTag;
 }
@@ -135,7 +145,7 @@ function moreThanOne(str, charType) {
 }
 function generateCheckBoxAndLabel(id, value) {
     let checkbox = `<input type="checkbox" id="${id}" name="${id}" value="${value}">`;
-    let label = `<label for="${value}">${value}</label><br>`;
+    let label = `<label for="${id}">${value}</label><br>`;
     return checkbox + label;
 }
 function processLine(str) {
@@ -157,44 +167,40 @@ function processLine(str) {
     else if (str.startsWith("###### ")) {
         return checkIfNeedClosingandAddTag() + "<h6>" + str.substring(7) + "</h6>";
     }
+    else if (/\[.*\]\(.*\)/.test(str)) {
+        let beforeLink = str.substring(0, str.lastIndexOf("["));
+        let linkContent = str.substring(str.indexOf("[") + 1, str.lastIndexOf("]"));
+        let href = str.substring(str.indexOf("(") + 1, str.lastIndexOf(")"));
+        let afterLink = str.substring(str.indexOf(")") + 1);
+        if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
+            console.log(href);
+            return `<a href="${href}"><div id="forward-arrow">&#9002;</div></a>`;
+        }
+        else if (/(^back$)|(^\<\-$)/gi.test(href)) {
+            return `<a href="${href}"><div id="forward-arrow">&#9001;</div></a>`;
+        }
+        else {
+            return `${beforeLink}<a href="${href}">${linkContent}</a>${afterLink}`;
+        }
+    }
     else if (/^\$/.test(str)) {
         if (/^\$title\s(\w+(.*)?)/.test(str)) {
             let spoilerTitle = str.replace(/^\$title\s(\w+(.*)?)/, "$1");
             if (openSpoilerDiv) {
-                if (openSpoilerDivContent) {
-                    openSpoilerDivContent = false;
-                    return `</div></div><div class="spoiler"><div class="spoiler-btn spoiler-btn-top">${spoilerTitle}</div>`;
-                }
-                else {
-                    return `</div><div class="spoiler"><div class="spoiler-btn spoiler-btn-top">${spoilerTitle}</div>`;
-                }
+                return `</details><details><summary>${spoilerTitle}</summary>`;
             }
             else {
                 openSpoilerDiv = true;
-                return `<div class="spoiler"><div class="spoiler-btn spoiler-btn-top">${spoilerTitle}</div>`;
+                return `<details><summary>${spoilerTitle}</summary>`;
             }
         }
         else if (openSpoilerDiv) {
             if (/^\$\s(\w+(.*)?)/.test(str)) {
                 let spoilerContent = str.replace(/^\$\s(\w+(.*)?)/, "$1");
-                if (openSpoilerDivContent) {
-                    return `<p>${spoilerContent}</p>`;
-                }
-                else {
-                    openSpoilerDivContent = true;
-                    spoilerBodyCounter++;
-                    return `<div class="spoiler-body" id="spoiler-body-${spoilerBodyCounter}"><p>${spoilerContent}</p>`;
-                }
+                return `<p>${spoilerContent}</p>`;
             }
             else if (/^\$$/) {
-                if (openSpoilerDivContent) {
-                    return "";
-                }
-                else {
-                    openSpoilerDivContent = true;
-                    spoilerBodyCounter++;
-                    return `<div class="spoiler-body" id="spoiler-body-${spoilerBodyCounter}">`;
-                }
+                return "";
             }
         }
     }
@@ -304,9 +310,10 @@ function processLine(str) {
                 str = str.replace(/\*(.*?)\*/g, "<i>$1</i>");
                 str = str.replace(/_([^_]+)_/g, "<sub>$1</sub>");
                 str = str.replace(/--/g, "&mdash;");
+                str = `<p>${str}</p>`;
             }
             else {
-                str = str.replace(quoteBlockRegexwText, `<blockquote>$1`);
+                str = str.replace(quoteBlockRegexwText, `<blockquote><p>$1</p>`);
                 openBlockQuote = true;
             }
         }
@@ -355,12 +362,13 @@ function processLine(str) {
         }
     }
     else if (str.includes("_") || str.includes("*") || str.includes("^") || str.includes("-")) {
-        str = str.replace(/\^([^\^]+)\^/g, "<sup>$1</sup>");
+        str = str.replace(/\^([^\^]+)\^/g, "<sup>$1</sup></br>");
         if (moreThanOne(str, "*") || moreThanOne(str, "_") || moreThanOne(str, "-")) { //This part is for controlling the italics, bold and emdash
             str = str.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
             str = str.replace(/\*(.*?)\*/g, "<i>$1</i>");
             str = str.replace(/_([^_]+)_/g, "<sub>$1</sub>");
             str = str.replace(/--/g, "&mdash;");
+            str = `<p>${str}</p>`;
         }
         else if (str.startsWith("*") || str.startsWith("-") || characterIsFirstWithoutSpaces(str, "*") || characterIsFirstWithoutSpaces(str, "-")) { //This part is for controlling the unordened lists
             if (ulLayer === 0) {
@@ -440,6 +448,9 @@ function processLine(str) {
         }
         return checkIfNeedClosingandAddTag() + `<pre>${output}</pre>`;
     }
+    else if (/^[a-zA-Z0-9]/.test(str)) {
+        return `<p>${str}</p>`;
+    }
     else if (!/(^(^([0-9]\.\s)|^\-\s|^\*\s|^(\!\s))|(^>*?)|\n)/g.test(str) || !characterIsFirstWithoutSpaces(str, "\\")) {
         let possibleValue = checkIfNeedClosingandAddTag(str);
         if (cleanTheLine) {
@@ -450,7 +461,7 @@ function processLine(str) {
             return possibleValue + str;
         }
     }
-    return str + "</br>";
+    return str;
 }
 const HEAD = `<html lang="en">
 <head>
@@ -580,162 +591,6 @@ const HEAD = `<html lang="en">
 <div id="content" class="content">
 <main>`;
 const FOOT = `</main></div>
-<script>
-    function toggleSpoilerAnimated(spoilerElement, isInvertedCollapse, isInvertedExpand, duration=1000) {
-      let spoilerBody = spoilerElement.querySelector('.spoiler-body');
-      let isCollapsing = spoilerElement.classList.contains('expanded');
-      let heightBefore = spoilerElement.offsetHeight;
-      
-      let offsetBefore = window.scrollY;
-      spoilerElement.classList.toggle('expanded', !isCollapsing);
-      let isScrollRequired = ( isCollapsing && isInvertedCollapse) ||
-                              (!isCollapsing && isInvertedExpand );
-    
-      
-      // define a scroll func if one is required
-      let scrollFunc = (isScrollRequired)
-        ? () => {
-          let heightNow = spoilerElement.offsetHeight;
-          let heightDelta = heightNow - heightBefore;
-           
-          window.scrollTo(0, offsetBefore + heightDelta);
-        }
-        : undefined;
-      slideToggle(spoilerBody, !isCollapsing, { duration: duration, progress: scrollFunc, complete: scrollFunc });
-    }
-    
-    for (let el of document.querySelectorAll('.spoiler-btn-top')) {
-      el.addEventListener('click', e => toggleSpoilerAnimated(el.parentNode));
-    }
-    for (let el of document.querySelectorAll('.spoiler-btn-bottom')) {
-      el.addEventListener('click', e => toggleSpoilerAnimated(el.parentNode, true, true));
-    }
-    
-    function slideUp(element, options) { slideToggle(element, false, options); }
-    function slideDown(element, options) { slideToggle(element, true, options); }
-    
-    // main sliding
-    function slideToggle(element, isOpening, options) {
-      let h0 = getHeight(element);
-      
-      // set up transition event listeners
-      function resetStyle() {
-        console.log("reset");
-        //element.style.display = "none";
-        //element.style.height = '';
-      }
-      
-      const logType = e => console.log(e.type, e.propertyName);
-      element.addEventListener('transitionend', (e) => {
-        if (!isOpening) {
-          resetStyle();
-        }
-        logType(e);
-        }, true);
-      element.addEventListener('transitioncancel', logType, true);
-      element.addEventListener('transitionrun', logType, true);
-      element.addEventListener('transitionstart', logType, true);
-    
-      
-      // change: get to duration from css
-      let duration = (options && options.duration) || 1000;
-      element.style.transitionDuration = duration + "ms";
-      element.style.transitionProperty = "height";
-      let start = null;
-      
-      function step(timestamp) {
-        if (!start) { start = timestamp; }
-        let progress = 1.0 * (timestamp - start) / duration;
-        let h1 = isOpening ? (h0 * progress) : (h0 * (1 - progress));
-        if ((progress) < 1.0) {
-          //element.style.height = h1 + 'px';
-          if (options.progress) { options.progress(); }
-          window.requestAnimationFrame(step);
-        } else {
-          //element.style.height = '';
-          //element.style.overflow = '';
-          //if (!isOpening) { element.style.display = 'none'; }
-          console.log("here");
-          if (!isOpening) { 
-            // reset height so that h0 can be calculated again
-            // OLD STYLE RESET
-            // element.style.display = "none";
-            // element.style.height = '';
-    
-          }
-          //if (options.complete) { options.complete(); }
-        }
-      }
-      
-      // toggle un-hide
-      element.style.display = 'block';
-      // changed:  // timeout due to mdn ...
-      setTimeout(() => {
-        //element.style.height = 0;
-        if (!isOpening) {
-          element.style.height = "0px";
-          console.log("going down");
-        } else {
-          let allLengthsTogether = 0;
-          let elementChildren = element.children;
-
-          if (elementChildren !== 0) {
-            if (elementChildren.length === 1) {
-
-              allLengthsTogether = elementChildren[0].innerHTML.length;
-            } else {
-
-              for (const children of elementChildren) {
-
-                allLengthsTogether += children.innerHTML.length
-              }
-            }
-
-            if (allLengthsTogether < 103) {
-
-              element.style.height = 50 + "px";
-            } else {
-
-              console.log(allLengthsTogether / 102)
-              element.style.height = ((allLengthsTogether / 102) * 2) + "vh";
-            }
-          }
-        }
-        element.style.overflow = 'hidden';
-        window.requestAnimationFrame(step);
-      }, 3);
-    }
-    
-    // https://stackoverflow.com/a/29047232/3423843
-    function getHeight(el) {
-      let el_comp_style = window.getComputedStyle(el),
-        el_display    = el_comp_style.display,
-        el_max_height = el_comp_style.maxHeight.replace('px', '').replace('%', ''),
-        el_position   = el.style.position,
-        el_visibility = el.style.visibility,
-        wanted_height = 0;
-        
-        console.log("joehoe", el_max_height, el_display);
-        
-    
-      if (el_display !== 'none' && el_max_height !== '0' && el_max_height !== 'none') {
-        return el.offsetHeight;
-      }
-      
-    
-      el.style.position   = 'absolute';
-      el.style.visibility = 'hidden';
-      el.style.display    = 'block';
-    
-      wanted_height = el.offsetHeight;
-    
-      el.style.display    = el_display;
-      el.style.position   = el_position;
-      el.style.visibility = el_visibility;
-    
-      return wanted_height;
-    }  
-  </script>
 </body>
 </html>`;
 /**Why arrDirectories inside this function ?
