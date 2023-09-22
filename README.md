@@ -9,6 +9,6 @@
 |**_!\<type\>(space)\<Text\>_** |||This will be consider as text and also if this is the first one of a new callout it will create also the callout|
 |**_!goodHr\|!badHr\|!warningHr_** |`</hr> (with respective color)`||For using divisions inside the callout, this one dont create the callout for the logical reason of not starting a callout with a division|
 |**_SPOILERS_**||| In the case of spoilers it will be easier because there will be only needed the $ symbol, in order to create a spoiler section it will work similar to the quotes and callouts the only difference it's that to start the creation it must **ALWAYS** start with $title(space)\<Text\>||
-|**_$title\<Text\>_** |`<div class="spoiler"><div class="spoiler-btn spoiler-btn-top"`||This will create two things, the div that contains the whole spoiler and the "title" or what it's always visible for the user|
-|**_$_** |`(if it's first one after $title)<div class="spoiler-body">`||Considered as a jumpline, if one of this type it's the first to appear after $title \<Text\> it creates the spoiler body|
+|**_$title\<Text\>_** |`<details"><summary>(Text)</summary>"`||This will create two things, the div that contains the whole spoiler and the "title" or what it's always visible for the user|
+|**_$_** |||Jumpline|
 |**_$\<Text\>_** |`(if it's first one after $title)<div class="spoiler-body"><p>(Text)</p>(if it's not)<p>(Text)</p>`||Adds text to the spoiler, if one of this type it's the first to appear after $title \<Text\> it creates the spoiler body and also adds the text|
