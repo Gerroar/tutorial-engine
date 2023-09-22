@@ -20,7 +20,9 @@ let openBlockQuote = false;
 let openCallOut = false;
 let currentCOType = ""; //CallOut type
 let openSpoilerDiv = false;
-let openSpoilerDivContent = false;
+let openNavBar = false;
+let nextButtonCreated = false;
+let backButtonCreated = false;
 let cleanTheLine = false;
 //Regex
 let quoteBlockRegex = /^\>[\s]*?/g;
@@ -172,12 +174,87 @@ function processLine(str) {
         let linkContent = str.substring(str.indexOf("[") + 1, str.lastIndexOf("]"));
         let href = str.substring(str.indexOf("(") + 1, str.lastIndexOf(")"));
         let afterLink = str.substring(str.indexOf(")") + 1);
+        //These are in case is a back or forward link
+        //MOBILE
+        /** Nav element*/
+        let mobileNav = document.createElement("nav");
+        mobileNav.setAttribute("class", "nav-wrapper");
+        mobileNav.setAttribute("aria-label", "Page Navigation");
+        /** Nav element*/
+        /**Buttons */
+        let nextButton = document.createElement("a");
+        let backButton = document.createElement("a");
+        /**Buttons */
+        /** Div clear both */
+        let divClear = document.createElement("div");
+        divClear.setAttribute("style", "clear: both");
+        /** Div clear both */
+        //MOBILE
+        //DESKTOP
+        let desktopNav = document.createElement("nav");
+        desktopNav.setAttribute("class", "nav-wide-wrapper");
+        desktopNav.setAttribute("aria-label", "Page Navigation");
+        //DESKTOP
+        /**FOR MONDAY:
+         * - Correct the error of document.createElement , document is not defined ????
+         * - Add the page-wrapper ( inspect the structure of rust tutorial example)
+         * - Create and add the nav and elements for the desktop option
+         * - Create the classes for all the navs and their elements
+         * - Make the arrows good looking like in the rust tutorial example
+         */
         if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
-            console.log(href);
-            return `<a href="${href}"><div id="forward-arrow">&#9002;</div></a>`;
+            if (!nextButtonCreated) {
+                let contentDiv = document.getElementById("content");
+                nextButton.setAttribute("rel", "next");
+                nextButton.setAttribute("href", href);
+                nextButton.setAttribute("class", "mobile-nav-chapters next");
+                nextButton.setAttribute("title", "Next chapter");
+                nextButton.setAttribute("aria-label", "Next chapter");
+                nextButton.setAttribute("aria-keyshortcuts", "Right");
+                let nextButtonSymbol = document.createElement("div");
+                nextButtonSymbol.setAttribute("id", "forward-arrow");
+                let nextContent = document.createTextNode("&#9002;");
+                nextButtonSymbol.appendChild(nextContent);
+                nextButton.appendChild(nextButtonSymbol);
+                if (contentDiv) {
+                    if (backButtonCreated) {
+                        mobileNav.insertBefore(backButton, backButton);
+                    }
+                    else {
+                        mobileNav.appendChild(nextButton);
+                        mobileNav.appendChild(divClear);
+                        contentDiv.appendChild(mobileNav);
+                    }
+                    nextButtonCreated = true;
+                }
+            }
         }
-        else if (/(^back$)|(^\<\-$)/gi.test(href)) {
-            return `<a href="${href}"><div id="forward-arrow">&#9001;</div></a>`;
+        else if (/(^back$)|(^\<\-$)/gi.test(linkContent)) {
+            if (!backButtonCreated) {
+                let contentDiv = document.getElementById("content");
+                backButton.setAttribute("rel", "prev");
+                backButton.setAttribute("href", href);
+                backButton.setAttribute("class", "mobile-nav-chapters previous");
+                backButton.setAttribute("title", "Previous chapter");
+                backButton.setAttribute("aria-label", "Previous chapter");
+                backButton.setAttribute("aria-keyshortcuts", "Left");
+                let backButtonSymbol = document.createElement("div");
+                backButtonSymbol.setAttribute("id", "forward-arrow");
+                let backContent = document.createTextNode("&#9001;");
+                backButtonSymbol.appendChild(backContent);
+                backButton.appendChild(backButtonSymbol);
+                if (contentDiv) {
+                    if (nextButtonCreated) {
+                        mobileNav.insertBefore(divClear, backButton);
+                    }
+                    else {
+                        mobileNav.appendChild(backButton);
+                        mobileNav.appendChild(divClear);
+                        contentDiv.appendChild(mobileNav);
+                    }
+                    backButtonCreated = true;
+                }
+            }
         }
         else {
             return `${beforeLink}<a href="${href}">${linkContent}</a>${afterLink}`;
