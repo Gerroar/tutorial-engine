@@ -6,13 +6,7 @@ Something a little like https://doc.rust-lang.org/book/
 ## Light and Dark theme?
 
 ## Syntax Highlight
-```java
-class Main {
-  public static void foo(){
-    var a = 5;
-  }
-}
-```
+
 
 ## Auto Output
 
@@ -21,23 +15,6 @@ mist whoami
 ```
 [output]
 
-
-## Code tabs
-
-file.ts
-```typescript
-function foo(){
-  let a = 5;
-}
-```
-file.java
-```java
-class Main {
-  public static void foo(){
-    var a = 5;
-  }
-}
-```
 
 ### Besides that
 
@@ -110,7 +87,7 @@ Unordered list
         - Hello
 
 Test with starting tab
-  * Test
+* Test
 
 More tests
 * a 

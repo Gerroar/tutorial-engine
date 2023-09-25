@@ -1,0 +1,1 @@
+export default function file2(){  return(<><h2>Another file</h2><hr/></>)}

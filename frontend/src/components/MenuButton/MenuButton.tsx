@@ -35,8 +35,9 @@ export const MenuButton = () => {
       animate={isMenuOpen ? "open" : "closed"}
       custom={height}
       ref={containerRef}
+      className="fixed"
     >
-      <motion.div className="absolute top-0 left-0 bottom-0 w-80" variants={sidebar} />
+      <motion.div className="top-0 left-0 bottom-0" variants={sidebar} />
       <Navigation />
       <MenuToggle toggle={() => toggleMenuOpen()} />
     </motion.nav>

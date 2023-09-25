@@ -19,7 +19,7 @@ function hideElements(toggle: any) {
 }
 
 export const MenuToggle = ({ toggle }: { toggle: any }) => (
-  <button onClick={hideElements(toggle)} className="absolute border-none cursor-pointer top-[0.85rem] left-[1.85rem] w-14 h-14 border-r-8 bg-transparent select-none">
+  <button onClick={hideElements(toggle)} className="absolute border-none cursor-pointer top-[0.85rem] left-[1.20rem] w-14 h-14 border-r-8 bg-transparent select-none">
     <svg width="23" height="23" viewBox="0 0 23 23">
       <Path
         variants={{

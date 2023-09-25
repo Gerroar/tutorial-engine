@@ -82,7 +82,7 @@ export const MenuItem = ({ marginL, marginR, directoryElm, elementIndex, hasDocs
 
   let classN: string = "";
 
-
+  directoryElm = directoryElm.replace(".md", "");
   if (hidden) {
     classN = "hidden"
   } else {

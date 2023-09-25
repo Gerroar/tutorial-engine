@@ -63,7 +63,7 @@ function checkIfNeedClosingandAddTag(str?: string) {
     while (ulLayer-- != 0) {
       if (ulLayer === 0) {
 
-        addClosingTag += "</ul></br>";
+        addClosingTag += "</ul><br/>";
       } else {
 
         addClosingTag += "</ul>";
@@ -77,7 +77,7 @@ function checkIfNeedClosingandAddTag(str?: string) {
     while (olLayer-- != 0) {
       if (olLayer === 0) {
 
-        addClosingTag += "</ol></br>"
+        addClosingTag += "</ol><br/>"
       } else {
 
         addClosingTag += "</ol>";
@@ -88,7 +88,7 @@ function checkIfNeedClosingandAddTag(str?: string) {
 
   if (todoListLayer != 0) {
 
-    addClosingTag = "</div></br>"
+    addClosingTag = "</div><br/>"
     todoListLayer = 0;
   }
 
@@ -200,8 +200,8 @@ function moreThanOne(str: string, charType: string) {
 function generateCheckBoxAndLabel(id: string, value: string) {
 
 
-  let checkbox = `<input type="checkbox" id="${id}" name="${id}" value="${value}">`;
-  let label = `<label for="${id}">${value}</label><br>`
+  let checkbox = `<input type="checkbox" id="${id}" name="${id}" value="${value}"/>`;
+  let label = `<label htmlFor="${id}">${value}</label><br/>`
 
   return checkbox + label
 }
@@ -209,10 +209,10 @@ function generateCheckBoxAndLabel(id: string, value: string) {
 function processLine(str: string) {
   if (str.startsWith("# ")) {
 
-    return checkIfNeedClosingandAddTag() + "<h1>" + str.substring(2) + "</h1><hr>";
+    return checkIfNeedClosingandAddTag() + "<h1>" + str.substring(2) + "</h1><hr/>";
   } else if (str.startsWith("## ")) {
 
-    return checkIfNeedClosingandAddTag() + "<h2>" + str.substring(3) + "</h2><hr>";
+    return checkIfNeedClosingandAddTag() + "<h2>" + str.substring(3) + "</h2><hr/>";
   } else if (str.startsWith("### ")) {
 
     return checkIfNeedClosingandAddTag() + "<h3>" + str.substring(4) + "</h3>";
@@ -232,102 +232,54 @@ function processLine(str: string) {
     let href: string = str.substring(str.indexOf("(") + 1, str.lastIndexOf(")"));
     let afterLink: string = str.substring(str.indexOf(")") + 1);
 
-    //These are in case is a back or forward link
-    //MOBILE
-    /** Nav element*/
-    let mobileNav: Element = document.createElement("nav");
-    mobileNav.setAttribute("class", "nav-wrapper");
-    mobileNav.setAttribute("aria-label", "Page Navigation");
-    /** Nav element*/
-    /**Buttons */
-    let nextButton: Element = document.createElement("a");
-    let backButton: Element = document.createElement("a");
-    /**Buttons */
-    /** Div clear both */
-    let divClear: Element = document.createElement("div");
-    divClear.setAttribute("style", "clear: both")
-    /** Div clear both */
-    //MOBILE
-    //DESKTOP
-    let desktopNav: Element = document.createElement("nav");
-    desktopNav.setAttribute("class", "nav-wide-wrapper");
-    desktopNav.setAttribute("aria-label", "Page Navigation");
-    //DESKTOP
+    if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
+
+      if (!nextButtonCreated) {
+
+
+
+        if (backButtonCreated) {
+
+
+
+        } else {
+
+
+
+        }
+
+        nextButtonCreated = true;
+
+      }
+
+    } else if (/(^back$)|(^\<\-$)/gi.test(linkContent)) {
+      if (!backButtonCreated) {
+        if (nextButtonCreated) {
+
+
+        } else {
+
+        }
+
+        backButtonCreated = true;
+
+      }
+    } else {
+
+      return `${beforeLink}<a href="${href}">${linkContent}</a>${afterLink}`;
+    }
+
+
+    //&#9001;
 
     /**FOR MONDAY: 
-     * - Correct the error of document.createElement , document is not defined ????
      * - Add the page-wrapper ( inspect the structure of rust tutorial example)
      * - Create and add the nav and elements for the desktop option
      * - Create the classes for all the navs and their elements
      * - Make the arrows good looking like in the rust tutorial example
      */
 
-    if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
-      if (!nextButtonCreated) {
 
-        let contentDiv = document.getElementById("content");
-        nextButton.setAttribute("rel", "next");
-        nextButton.setAttribute("href", href);
-        nextButton.setAttribute("class", "mobile-nav-chapters next");
-        nextButton.setAttribute("title", "Next chapter");
-        nextButton.setAttribute("aria-label", "Next chapter");
-        nextButton.setAttribute("aria-keyshortcuts", "Right");
-
-        let nextButtonSymbol: Element = document.createElement("div");
-        nextButtonSymbol.setAttribute("id", "forward-arrow");
-        let nextContent = document.createTextNode("&#9002;");
-        nextButtonSymbol.appendChild(nextContent);
-
-        nextButton.appendChild(nextButtonSymbol);
-
-        if (contentDiv) {
-          if (backButtonCreated) {
-
-            mobileNav.insertBefore(backButton, backButton);
-          } else {
-            mobileNav.appendChild(nextButton);
-            mobileNav.appendChild(divClear);
-            contentDiv.appendChild(mobileNav);
-          }
-
-          nextButtonCreated = true;
-        }
-      }
-
-    } else if (/(^back$)|(^\<\-$)/gi.test(linkContent)) {
-      if (!backButtonCreated) {
-        let contentDiv = document.getElementById("content");
-        backButton.setAttribute("rel", "prev");
-        backButton.setAttribute("href", href);
-        backButton.setAttribute("class", "mobile-nav-chapters previous");
-        backButton.setAttribute("title", "Previous chapter");
-        backButton.setAttribute("aria-label", "Previous chapter");
-        backButton.setAttribute("aria-keyshortcuts", "Left");
-
-        let backButtonSymbol: Element = document.createElement("div");
-        backButtonSymbol.setAttribute("id", "forward-arrow");
-        let backContent = document.createTextNode("&#9001;");
-        backButtonSymbol.appendChild(backContent);
-
-        backButton.appendChild(backButtonSymbol);
-
-        if (contentDiv) {
-          if (nextButtonCreated) {
-
-            mobileNav.insertBefore(divClear, backButton);
-          } else {
-            mobileNav.appendChild(backButton);
-            mobileNav.appendChild(divClear);
-            contentDiv.appendChild(mobileNav);
-          }
-
-          backButtonCreated = true;
-        }
-      }
-    } else {
-
-      return `${beforeLink}<a href="${href}">${linkContent}</a>${afterLink}`;
-    }
   } else if (/^\$/.test(str)) {
     if (/^\$title\s(\w+(.*)?)/.test(str)) {
       let spoilerTitle: string = str.replace(/^\$title\s(\w+(.*)?)/, "$1");
@@ -423,7 +375,7 @@ function processLine(str: string) {
 
           openCallOut = true;
           currentCOType = callOutType;
-          return `<div class="${callOutType}">`
+          return `<div className="${callOutType}">`
         }
       } else if (cotLastWord === "r") {
         /**Manage when the callout "tag" it's just !goodHr, !badHr or !warningHr without any text
@@ -432,7 +384,7 @@ function processLine(str: string) {
 
         if (openCallOut) {
 
-          return `<hr>`
+          return `<hr/>`
         } else {
 
           callOutType = "";
@@ -451,7 +403,7 @@ function processLine(str: string) {
             if (coClass === currentCOType) {
 
               openCallOut = true;
-              return `<div class="${coClass}"><h3>${callOutContent}</h3>`;
+              return `<div className="${coClass}"><h3>${callOutContent}</h3>`;
             } else {
 
               return "";
@@ -460,7 +412,7 @@ function processLine(str: string) {
 
             openCallOut = true;
             currentCOType = coClass;
-            return `<div class="${coClass}"><h3>${callOutContent}</h3>`;
+            return `<div className="${coClass}"><h3>${callOutContent}</h3>`;
           }
         } else {
 
@@ -510,7 +462,7 @@ function processLine(str: string) {
       if (olLayer === 0) {
 
         olLayer = 1;
-        str = str.replace(startingRegex, `<ol id="ol-${olNumber}"><li>$1</li>`);
+        str = str.replace(startingRegex, `<ol id="ol-${olNumber}" className="list-decimal list-inside"><li>$1</li>`);
         olNumber++;
       } else {
         if (layer === olLayer) {
@@ -523,7 +475,7 @@ function processLine(str: string) {
           }
         } else if (olLayer < layer) {
 
-          str = str.replace(normalRegex, `<ol><li>$1</li>`);
+          str = str.replace(normalRegex, `<ol className="list-decimal list-inside"><li>$1</li>`);
           olLayer = layer;
         } else {
 
@@ -536,7 +488,7 @@ function processLine(str: string) {
 
   } else if (str.includes("_") || str.includes("*") || str.includes("^") || str.includes("-")) {
 
-    str = str.replace(/\^([^\^]+)\^/g, "<sup>$1</sup></br>");
+    str = str.replace(/\^([^\^]+)\^/g, "<sup>$1</sup><br/>");
     if (moreThanOne(str, "*") || moreThanOne(str, "_") || moreThanOne(str, "-")) { //This part is for controlling the italics, bold and emdash
 
       str = str.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
@@ -548,8 +500,8 @@ function processLine(str: string) {
 
       if (ulLayer === 0) {
 
-        str = str.replace(/^\* (.*)/gm, `<ul id="ul-${ulNumber}"><li>$1</li>`);
-        str = str.replace(/^\- (.*)/gm, `<ul id="ul-${ulNumber}"><li>$1</li>`);
+        str = str.replace(/^\* (.*)/gm, `<ul id="ul-${ulNumber}" className="list-disc list-inside"><li>$1</li>`);
+        str = str.replace(/^\- (.*)/gm, `<ul id="ul-${ulNumber}" className="list-disc list-inside"><li>$1</li>`);
         ulLayer = 1;
         ulNumber++;
       } else {
@@ -571,8 +523,8 @@ function processLine(str: string) {
           }
         } else if (ulLayer < layer) {
 
-          str = str.replace(/\* (.*)/gm, `<ul><li>$1</li>`);
-          str = str.replace(/\- (.*)/gm, `<ul><li>$1</li>`);
+          str = str.replace(/\* (.*)/gm, `<ul className="list-disc list-inside"><li>$1</li>`);
+          str = str.replace(/\- (.*)/gm, `<ul className="list-disc list-inside"><li>$1</li>`);
           ulLayer = layer;
         } else {
 
@@ -767,17 +719,20 @@ const HEAD = `<html lang="en">
       height: 0;
     }
     
-
     /*Classes for Spoiler*/
   </style>
   <title>Document</title>
 </head>
 <body>
-<div id="content" class="content">
+<div id="body-container">
+  <div id="content" className="content">
 <main>`;
-const FOOT = `</main></div>
+const FOOT = `</main></div></div>
 </body>
 </html>`;
+
+const HEAD2 = "";
+const FOOTER2 = "";
 
 /**Why arrDirectories inside this function ? 
  * 
@@ -801,8 +756,8 @@ function processFile(root: string, path: string) {
   let pathWithoutFile = path.substring(0, path.lastIndexOf("/"));
   fs.mkdirSync(`${buildFolder}/${pathWithoutFile}`, { recursive: true });
   fs.writeFileSync(
-    `${buildFolder}/${pathWithoutExtension}.html`,
-    HEAD + lines.map((line) => processLine(line)).join("\n") + FOOT
+    `${buildFolder}/${pathWithoutExtension}.tsx`,
+    `export default function ${filenameWithoutExtension}(){  return(<>` + lines.map((line) => processLine(line)).join("\n") + `</>)}`
   );
 }
 

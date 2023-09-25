@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --content-max-width: 750px;
+}
+
 #root {
     max-width: 1280px;
     margin: 0 auto;
@@ -21,7 +25,23 @@ nav {
     stroke: hsl(0, 0%, 18%);
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-size: revert;
+    font-weight: revert;
+}
 
+ol,
+ul,
+li,
+menu {
+
+    padding: revert;
+}
 
 .ul-menu,
 .li-menu {
@@ -32,7 +52,7 @@ nav {
 .ul-menu {
 
     position: absolute;
-    left: -40px;
+    left: -50px;
     top: 100px;
     width: 230px;
 
@@ -59,10 +79,122 @@ nav {
     color: blue;
 }
 
-h1 {
-    background-color: yellow;
+.content {
+    overflow-y: auto;
+    padding: 0 5px 50px 5px;
+
 }
 
+main {
+
+    margin-left: auto;
+    margin-right: auto;
+    max-width: var(--content-max-width);
+}
+
+hr {
+    width: 80%;
+    margin-left: 0px;
+    border: 1px solid rgb(168, 168, 168);
+}
+
+blockquote {
+    font-style: italic;
+}
+
+details summary {
+    cursor: pointer;
+}
+
+details summary>* {
+    display: inline;
+}
+
+/*Classes for CallOuts*/
+
+.good,
+.bad,
+.warning {
+
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 4px;
+    padding: 0 35px 0 35px;
+    overflow-wrap: break-word;
+}
+
+.good {
+
+    border-color: #6FAD6C;
+    background-color: #8FE08B;
+    color: #153b13;
+}
+
+.good hr {
+
+    border: 1px solid #6eab6b;
+}
+
+.bad {
+
+    border-color: #b04840;
+    background-color: #e77f78;
+    color: #450d09;
+}
+
+.bad hr {
+
+    border: 1px solid #bf4f47;
+
+}
+
+.warning {
+
+    border-color: #a7a343;
+    background-color: #fffa64;
+    color: #42401a;
+}
+
+.warning hr {
+
+    border: 1px solid #bab64b;
+}
+
+/*Classes for CallOuts*/
+
+/*Classes for Spoiler*/
+
+.spoiler {
+    border: 1px solid #999;
+    border-radius: 4px;
+    padding: 2px;
+    background: rgb(195, 195, 195);
+    padding: 0 35px 0 35px;
+    margin: 20px 0 20px 0;
+    overflow-wrap: break-word;
+}
+
+.spoiler-btn {
+    user-select: none;
+    font-size: 2rem;
+}
+
+.spoiler-btn:hover {
+    cursor: pointer;
+    color: rgb(120, 120, 120);
+}
+
+.spoiler-btn-bottom {
+    width: 100%;
+    text-align: right;
+}
+
+.spoiler-body {
+    display: none;
+    height: 0;
+}
+
+/*Classes for Spoiler*/
 /* Dark mode */
 
 /*@media (prefers-color-scheme: dark) {

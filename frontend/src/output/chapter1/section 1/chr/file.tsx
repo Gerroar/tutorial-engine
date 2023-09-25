@@ -1,0 +1,1 @@
+export default function file(){  return(<><p>With some content</p></>)}

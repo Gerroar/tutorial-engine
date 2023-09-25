@@ -1,0 +1,1 @@
+export default function file(){  return(<><h2>Hello how are ya</h2><hr/></>)}
