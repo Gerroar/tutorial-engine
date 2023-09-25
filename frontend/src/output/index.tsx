@@ -65,11 +65,11 @@ Other java
 <p>Spoiler</p>
 <details><summary>Spoiler Title One</summary>
 
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Et malesuada fames ac turpis egestas maecenas pharetra convallis posuere. Nunc pulvinar sapien et ligula. Id cursus metus aliquam eleifend mi in nulla posuere. Mauris pharetra et ultrices neque ornare aenean euismod elementum. Ultricies mi quis hendrerit dolor magna eget. Mauris ultrices eros in cursus turpis massa. Dui accumsan sit amet nulla. Nunc eget lorem dolor sed viverra ipsum nunc aliquet. Duis tristique sollicitudin nibh sit amet commodo nulla. Eu turpis egestas pretium aenean pharetra magna ac placerat vestibulum. Nulla posuere sollicitudin aliquam ultrices sagittis orci a scelerisque. Magna ac placerat vestibulum lectus. Curabitur vitae nunc sed velit dignissim sodales ut eu sem. Enim eu turpis egestas pretium aenean pharetra. Interdum velit euismod in pellentesque massa placerat duis ultricies. Sodales ut eu sem integer vitae justo eget. Libero nunc consequat interdum varius sit amet mattis vulputate enim. Mauris in aliquam sem fringilla ut. Diam vel quam elementum pulvinar etiam non quam lacus.</p>
+<p className="mt-2 mb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Et malesuada fames ac turpis egestas maecenas pharetra convallis posuere. Nunc pulvinar sapien et ligula. Id cursus metus aliquam eleifend mi in nulla posuere. Mauris pharetra et ultrices neque ornare aenean euismod elementum. Ultricies mi quis hendrerit dolor magna eget. Mauris ultrices eros in cursus turpis massa. Dui accumsan sit amet nulla. Nunc eget lorem dolor sed viverra ipsum nunc aliquet. Duis tristique sollicitudin nibh sit amet commodo nulla. Eu turpis egestas pretium aenean pharetra magna ac placerat vestibulum. Nulla posuere sollicitudin aliquam ultrices sagittis orci a scelerisque. Magna ac placerat vestibulum lectus. Curabitur vitae nunc sed velit dignissim sodales ut eu sem. Enim eu turpis egestas pretium aenean pharetra. Interdum velit euismod in pellentesque massa placerat duis ultricies. Sodales ut eu sem integer vitae justo eget. Libero nunc consequat interdum varius sit amet mattis vulputate enim. Mauris in aliquam sem fringilla ut. Diam vel quam elementum pulvinar etiam non quam lacus.</p>
 
-<p>fdsfdsfdsfdsfgdsgfdsgfdsgfsgfsgfsgrftrrvfsgrwgfdsgfwrwgfdgrwgrwegrwgrwgrwegrwegrwwwerrgewwwwwwwrgergwerr</p>
+<p className="mt-2 mb-2">fdsfdsfdsfdsfgdsgfdsgfdsgfsgfsgfsgrftrrvfsgrwgfdsgfwrwgfdgrwgrwegrwgrwgrwegrwegrwwwerrgewwwwwwwrgergwerr</p>
 
-<p>Duis tristique sollicitudin nibh sit amet commodo nulla. Eu turpis egestas pretium aenean pharetra magna ac placerat vestibulum. Nulla posuere sollicitudin aliquam ultrices sagittis orci a scelerisque. Magna ac placerat vestibulum lectus. Curabitur vitae nunc sed velit dignissim sodales ut eu sem. Enim eu turpis egestas pretium aenean pharetra. Interdum velit euismod in pellentesque massa placerat duis ultricies. Sodales ut eu sem integer vitae justo eget. Libero nunc consequat interdum varius sit amet mattis vulputate enim. Mauris in aliquam sem fringilla ut. Diam vel quam elementum pulvinar etiam non quam lacus.</p>
+<p className="mt-2 mb-2">Duis tristique sollicitudin nibh sit amet commodo nulla. Eu turpis egestas pretium aenean pharetra magna ac placerat vestibulum. Nulla posuere sollicitudin aliquam ultrices sagittis orci a scelerisque. Magna ac placerat vestibulum lectus. Curabitur vitae nunc sed velit dignissim sodales ut eu sem. Enim eu turpis egestas pretium aenean pharetra. Interdum velit euismod in pellentesque massa placerat duis ultricies. Sodales ut eu sem integer vitae justo eget. Libero nunc consequat interdum varius sit amet mattis vulputate enim. Mauris in aliquam sem fringilla ut. Diam vel quam elementum pulvinar etiam non quam lacus.</p>
 </details><details><summary>Spoiler Title Two</summary>
 
 </details>
@@ -115,9 +115,9 @@ Other java
       <ul className="list-disc list-inside"><li>okay</li>
 </ul></ul></ul></ul><br/>
 <p>Todo list</p>
-<div id="todo-1"><input type="checkbox" id="todo-component-1.1" name="todo-component-1.1" value="One"/><label htmlFor="todo-component-1.1">One</label><br/>
-<input type="checkbox" id="todo-component-1.2" name="todo-component-1.2" value="Two"/><label htmlFor="todo-component-1.2">Two</label><br/>
-<input type="checkbox" id="todo-component-1.3" name="todo-component-1.3" value="Three"/><label htmlFor="todo-component-1.3">Three</label><br/>
+<div id="todo-1"><div className="flex items-center mt-2 mb-2"><input type="checkbox" id="todo-component-1.1" name="todo-component-1.1" value="One" className="mr-2" /><label htmlFor="todo-component-1.1">One</label><br/></div>
+<div className="flex items-center mt-2 mb-2"><input type="checkbox" id="todo-component-1.2" name="todo-component-1.2" value="Two" className="mr-2" /><label htmlFor="todo-component-1.2">Two</label><br/></div>
+<div className="flex items-center mt-2 mb-2"><input type="checkbox" id="todo-component-1.3" name="todo-component-1.3" value="Three" className="mr-2" /><label htmlFor="todo-component-1.3">Three</label><br/></div>
 </div><br/>
 <p>Spoiler, collapsable section</p>
 

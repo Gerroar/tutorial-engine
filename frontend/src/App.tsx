@@ -7,7 +7,7 @@ export default function App() {
   return (
     <>
       <MenuButton />
-      <div id="page-wrap" className='pl-80'>
+      <div id="page-wrap" className='pl-80 pr-20'>
         <StartingPage />
       </div>
     </>

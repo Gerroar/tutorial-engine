@@ -200,10 +200,10 @@ function moreThanOne(str: string, charType: string) {
 function generateCheckBoxAndLabel(id: string, value: string) {
 
 
-  let checkbox = `<input type="checkbox" id="${id}" name="${id}" value="${value}"/>`;
+  let checkbox = `<input type="checkbox" id="${id}" name="${id}" value="${value}" className="mr-2" />`;
   let label = `<label htmlFor="${id}">${value}</label><br/>`
 
-  return checkbox + label
+  return `<div className="flex items-center mt-2 mb-2">` + checkbox + label + `</div>`
 }
 
 function processLine(str: string) {
@@ -295,7 +295,7 @@ function processLine(str: string) {
       if (/^\$\s(\w+(.*)?)/.test(str)) {
 
         let spoilerContent: string = str.replace(/^\$\s(\w+(.*)?)/, "$1");
-        return `<p>${spoilerContent}</p>`;
+        return `<p className="mt-2 mb-2">${spoilerContent}</p>`;
       } else if (/^\$$/) {
 
         return "";
