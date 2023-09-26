@@ -5,18 +5,10 @@ import { useState } from "react"
 
 const variants: Variants = {
   open: {
-    y: 1,
     opacity: 1,
-    transition: {
-      y: { stiffness: 1000, velocity: 20 },
-    }
   },
   closed: {
-    y: 0,
     opacity: 0,
-    transition: {
-      y: { stiffness: 1000 }
-    }
   }
 };
 
@@ -32,7 +24,7 @@ function changeSubsVisibility(index: string, isActive: boolean, setIsActive: any
       if (menuChild.id.length > maxLength) {
         maxLength = menuChild.id.length
       }
-      // console.log(menuChild)
+
     }
 
     if (isActive === false) {
@@ -73,10 +65,10 @@ function changeSubsVisibility(index: string, isActive: boolean, setIsActive: any
 
 
 type MenuItemProps = {
-  marginL: string, marginR: string, directoryElm: string, elementIndex: string, hasDocsInside: boolean, hidden: boolean
+  marginL: string, marginR: string, directoryElm: string, elementIndex: string, hasDocsInside: boolean, hidden: boolean, currentPageIndex: number, setCurrentPageIndex: any, fileCountIndex: number, setFileCountIndex: any
 }
 
-export const MenuItem = ({ marginL, marginR, directoryElm, elementIndex, hasDocsInside, hidden }: MenuItemProps) => {
+export const MenuItem = ({ marginL, marginR, directoryElm, elementIndex, hasDocsInside, hidden, currentPageIndex, setCurrentPageIndex, fileCountIndex, setFileCountIndex }: MenuItemProps) => {
 
   const [isActive, setIsActive] = useState(false);
 
@@ -87,6 +79,10 @@ export const MenuItem = ({ marginL, marginR, directoryElm, elementIndex, hasDocs
     classN = "hidden"
   } else {
     classN = "li-menu"
+  }
+
+  const handleFileClick = () => {
+
   }
 
   return (
@@ -131,17 +127,17 @@ export const MenuItem = ({ marginL, marginR, directoryElm, elementIndex, hasDocs
             (<div className="flex flex-row">
 
               <div className={`w-6 h-6  flex-shrink-0  content-center font-bold`}>{elementIndex}</div>
-              <div className={`w-20 h-5`}>
+              <div className={`w-20 h-5`} id={`${currentPageIndex}`} onClick={() => alert('clicked')}>
                 {directoryElm}
               </div>
             </div>
             )
             :
             (
-              <div className="flex flex-row">
+              <div className="flex flex-row ml-3">
 
                 <div className={`w-6 h-6 flex-shrink-0 content-center font-bold`} style={{ marginRight: `${marginR}` }}>{elementIndex}</div>
-                <div className="w-20 h-5">
+                <div className="w-20 h-5" onClick={() => alert('clicked')}>
                   {directoryElm}
                 </div>
 

@@ -272,7 +272,7 @@ function processLine(str: string) {
 
     //&#9001;
 
-    /**FOR MONDAY: 
+    /**FOR TUESDAY: 
      * - Add the page-wrapper ( inspect the structure of rust tutorial example)
      * - Create and add the nav and elements for the desktop option
      * - Create the classes for all the navs and their elements
@@ -778,10 +778,68 @@ fs.rmSync(buildFolder, { recursive: true, force: true });
 fs.mkdirSync(buildFolder);
 processPath(process.argv[2] || "tests/first-test", "");
 
-/** Same as creating files for every page, each time that a new directory or file its created 
- * the array will be updated so will the menu do, the array it's being mapped to transform 
- * the contents into strings 
- */
+let defaultAppContentImports = `import './index.css';
+import { arrDirectories } from './output/directoriesList';
+import { MenuButton } from './components/MenuButton/MenuButton';
+import { lazy, Suspense, useState } from 'react';
+
+`
+let defaultAppContentFunction = `
+export default function App() {
+    return (
+        <>
+            <MenuButton />
+            <div id="page-wrap" className='pl-80 pr-20'>
+                <Index />
+            </div>
+        </>
+    )
+}`;
+
+function generateComponentName(dir: string) {
+
+  let dashPositions: Array<number> = [];
+  for (let index = 0; index < dir.length; index++) {
+    const element = dir[index];
+    if (element === "/") {
+
+      dashPositions.push(index);
+    }
+  }
+
+  let componentName: string = dir.substring(dashPositions[dashPositions.length - 2] + 1);
+  componentName = componentName.replace(".md", "").replace("/", "").replace(" ", "");
+  componentName = componentName.replace(componentName[0], componentName[0].toUpperCase())
+  return componentName;
+}
+
+let lazyImports: string = "";
+let arrPages: string = `const pages = [ \n`;
+
+for (let index = 0; index < arrDirectories.length; index++) {
+  const dir = arrDirectories[index];
+  let componentName: string = generateComponentName(dir);
+  let correctedFile: string = `const ${componentName} = lazy(() => import("./output${dir}"));\n`;
+  correctedFile = correctedFile.replace(".md", "");
+
+  lazyImports += correctedFile;
+
+  if (index !== arrDirectories.length - 1) {
+
+    arrPages += `\t{ component: ${componentName}},\n`
+  } else {
+
+    arrPages += `\t{ component: ${componentName}},\n];`
+  }
+}
+
+
+
+fs.writeFileSync(
+  `../frontend/src/App.tsx`,
+  defaultAppContentImports + lazyImports + arrPages + defaultAppContentFunction
+)
+
 fs.writeFileSync(
   `../frontend/src/output/directoriesList.ts`,
   `export const arrDirectories = [\n${arrDirectories.map(x => `"${x}"`).join(",\n")}\n];`

@@ -24,7 +24,7 @@ const sidebar = {
   }
 };
 
-export const MenuButton = () => {
+export const MenuButton = ({ currentPageIndex, setCurrentPageIndex }: { currentPageIndex: number, setCurrentPageIndex: any }) => {
   const [isMenuOpen, toggleMenuOpen] = useCycle(false, true);
   const containerRef = useRef(null);
   const { height } = useDimensions(containerRef);
@@ -38,7 +38,7 @@ export const MenuButton = () => {
       className="fixed"
     >
       <motion.div className="top-0 left-0 bottom-0" variants={sidebar} />
-      <Navigation />
+      <Navigation currentPageIndex={currentPageIndex} setCurrentPageIndex={setCurrentPageIndex} />
       <MenuToggle toggle={() => toggleMenuOpen()} />
     </motion.nav>
   );
