@@ -1,5 +1,4 @@
 import './index.css';
-import { arrDirectories } from './output/directoriesList';
 import { MenuButton } from './components/MenuButton/MenuButton';
 import { lazy, Suspense, useState } from 'react';
 
@@ -9,30 +8,36 @@ const LayerTestlayertest = lazy(() => import("./output/chapter1/section 1/chr/La
 const Section2file2 = lazy(() => import("./output/chapter1/section 2/file2"));
 const Section1file = lazy(() => import("./output/chapter2/section 1/file"));
 const Index = lazy(() => import("./output/index"));
-const pages = [
-    { component: Chapter1index },
-    { component: Chrfile },
-    { component: LayerTestlayertest },
-    { component: Section2file2 },
-    { component: Section1file },
-    { component: Index },
+const Other = lazy(() => import("./output/other"));
+const pages = [ 
+	{ component: Chapter1index, name: "Chapter1index"},
+	{ component: Chrfile, name: "Chrfile"},
+	{ component: LayerTestlayertest, name: "LayerTestlayertest"},
+	{ component: Section2file2, name: "Section2file2"},
+	{ component: Section1file, name: "Section1file"},
+	{ component: Index, name: "Index"},
+	{ component: Other, name: "Other"},
 ];
 export default function App() {
 
-    //new
-    const [currentPageIndex, setCurrentPageIndex] = useState(pages.length - 1);
+    let defaultIndex: number = 0;
+    for (let i = 0; i < pages.length; i++) {
+      const element = pages[i];
+      if (element.name === "Index") {
+        defaultIndex = i;
+      }
+    }
 
+    const [currentPageIndex, setCurrentPageIndex] = useState(defaultIndex);
     const renderPage = () => {
 
         const Page = pages[currentPageIndex].component;
         return <Page />
     }
 
-
-    //new
     return (
         <>
-            <MenuButton />
+            <MenuButton currentPageIndex={currentPageIndex} setCurrentPageIndex={setCurrentPageIndex} defaultIndex={defaultIndex} />
             <div id="page-wrap" className='pl-80 pr-20'>
                 <Suspense fallback={<div>Loading...</div>}>
                     {renderPage()}

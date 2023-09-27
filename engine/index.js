@@ -653,18 +653,35 @@ fs_1.default.rmSync(buildFolder, { recursive: true, force: true });
 fs_1.default.mkdirSync(buildFolder);
 processPath(process.argv[2] || "tests/first-test", "");
 let defaultAppContentImports = `import './index.css';
-import { arrDirectories } from './output/directoriesList';
 import { MenuButton } from './components/MenuButton/MenuButton';
 import { lazy, Suspense, useState } from 'react';
 
 `;
 let defaultAppContentFunction = `
 export default function App() {
+
+    let defaultIndex: number = 0;
+    for (let i = 0; i < pages.length; i++) {
+      const element = pages[i];
+      if (element.name === "Index") {
+        defaultIndex = i;
+      }
+    }
+
+    const [currentPageIndex, setCurrentPageIndex] = useState(defaultIndex);
+    const renderPage = () => {
+
+        const Page = pages[currentPageIndex].component;
+        return <Page />
+    }
+
     return (
         <>
-            <MenuButton />
+            <MenuButton currentPageIndex={currentPageIndex} setCurrentPageIndex={setCurrentPageIndex} defaultIndex={defaultIndex} />
             <div id="page-wrap" className='pl-80 pr-20'>
-                <Index />
+                <Suspense fallback={<div>Loading...</div>}>
+                    {renderPage()}
+                </Suspense>
             </div>
         </>
     )
@@ -691,10 +708,10 @@ for (let index = 0; index < arrDirectories.length; index++) {
     correctedFile = correctedFile.replace(".md", "");
     lazyImports += correctedFile;
     if (index !== arrDirectories.length - 1) {
-        arrPages += `\t{ component: ${componentName}},\n`;
+        arrPages += `\t{ component: ${componentName}, name: "${componentName}"},\n`;
     }
     else {
-        arrPages += `\t{ component: ${componentName}},\n];`;
+        arrPages += `\t{ component: ${componentName}, name: "${componentName}"},\n];`;
     }
 }
 fs_1.default.writeFileSync(`../frontend/src/App.tsx`, defaultAppContentImports + lazyImports + arrPages + defaultAppContentFunction);

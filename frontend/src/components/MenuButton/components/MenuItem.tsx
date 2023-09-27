@@ -1,7 +1,6 @@
 import { Variants, motion } from "framer-motion";
 import { TriangleToggle } from "./TriangleToggle";
-import { useState } from "react"
-
+import { useState, useEffect } from "react";
 
 const variants: Variants = {
   open: {
@@ -9,11 +8,14 @@ const variants: Variants = {
   },
   closed: {
     opacity: 0,
-  }
+  },
 };
 
-function changeSubsVisibility(index: string, isActive: boolean, setIsActive: any) {
-
+function changeSubsVisibility(
+  index: string,
+  isActive: boolean,
+  setIsActive: any
+) {
   setIsActive(!isActive);
   const ulMenu = document.getElementById("ul-menu");
   if (ulMenu) {
@@ -22,68 +24,81 @@ function changeSubsVisibility(index: string, isActive: boolean, setIsActive: any
 
     for (const menuChild of menuChildren) {
       if (menuChild.id.length > maxLength) {
-        maxLength = menuChild.id.length
+        maxLength = menuChild.id.length;
       }
-
     }
 
     if (isActive === false) {
-
       for (const menuChild of menuChildren) {
-
         let mChildId = menuChild.id;
-
-
-        console.log(menuChild)
-        if ((mChildId.startsWith(`${index}.`)) && (mChildId.length === (index.length + 2))) {
-
+        if (
+          mChildId.startsWith(`${index}.`) &&
+          mChildId.length === index.length + 2
+        ) {
           let visibleElement = document.getElementById(mChildId);
-          if (visibleElement) { visibleElement.className = 'li-menu' }
+          if (visibleElement) {
+            visibleElement.className = "li-menu";
+          }
         }
-
       }
     } else {
-
       for (const menuChild of menuChildren) {
-
         let mChildId = menuChild.id;
-        console.log(mChildId.length)
-
-        if ((mChildId.startsWith(`${index}.`))) {
-
+        if (mChildId.startsWith(`${index}.`)) {
           let visibleElement = document.getElementById(mChildId);
-          if (visibleElement) { visibleElement.className = 'hidden' }
+          if (visibleElement) {
+            visibleElement.className = "hidden";
+          }
         }
-
       }
     }
   }
-
-
 }
-
-
 
 type MenuItemProps = {
-  marginL: string, marginR: string, directoryElm: string, elementIndex: string, hasDocsInside: boolean, hidden: boolean, currentPageIndex: number, setCurrentPageIndex: any, fileCountIndex: number, setFileCountIndex: any
-}
+  marginL: string;
+  marginR: string;
+  directoryElm: string;
+  elementIndex: string;
+  hasDocsInside: boolean;
+  hidden: boolean;
+  currentPageIndex: number;
+  setCurrentPageIndex: any;
+  fileCountIndex: number;
+  defaultIndex: number;
+};
 
-export const MenuItem = ({ marginL, marginR, directoryElm, elementIndex, hasDocsInside, hidden, currentPageIndex, setCurrentPageIndex, fileCountIndex, setFileCountIndex }: MenuItemProps) => {
-
+export const MenuItem = ({
+  marginL,
+  marginR,
+  directoryElm,
+  elementIndex,
+  hasDocsInside,
+  hidden,
+  currentPageIndex,
+  setCurrentPageIndex,
+  fileCountIndex,
+  defaultIndex,
+}: MenuItemProps) => {
   const [isActive, setIsActive] = useState(false);
 
   let classN: string = "";
+  let oneLayerNoDocsId: number = defaultIndex;
+
+  if (fileCountIndex > oneLayerNoDocsId) {
+    oneLayerNoDocsId = fileCountIndex;
+  }
 
   directoryElm = directoryElm.replace(".md", "");
   if (hidden) {
-    classN = "hidden"
+    classN = "hidden";
   } else {
-    classN = "li-menu"
+    classN = "li-menu";
   }
 
-  const handleFileClick = () => {
-
-  }
+  const handleFileClick = (newId: number) => {
+    setCurrentPageIndex(newId);
+  };
 
   return (
     <motion.li
@@ -93,59 +108,66 @@ export const MenuItem = ({ marginL, marginR, directoryElm, elementIndex, hasDocs
       onClick={() => changeSubsVisibility(elementIndex, isActive, setIsActive)}
       id={elementIndex}
     >
-      {hasDocsInside ?
-        (
-          (elementIndex.length === 1) ?
-            (
-              <>
-                <div className="flex flex-row">
-                  <div className={`w-6 h-6 flex-shrink-0 content-center font-bold`} style={{ marginRight: `${marginR}` }}>{elementIndex}</div>
-                  <div className="w-20 h-5 ">
-                    {directoryElm}
-                  </div>
-                  <TriangleToggle isActive={isActive} indexLength={elementIndex.length} />
-                </div>
-              </>
-            )
-            :
-            (
-              <>
-                <div className="flex flex-row ml-3">
-                  <div className={`w-6 h-6 flex-shrink-0 content-center font-bold`} style={{ marginRight: `${marginR}` }}>{elementIndex}</div>
-                  <div className="w-20 h-5">
-                    {directoryElm}
-                  </div>
-                  <TriangleToggle isActive={isActive} indexLength={elementIndex.length} />
-                </div>
-              </>
-
-            )
-        )
-        :
-        (
-          (elementIndex.length === 1) ?
-            (<div className="flex flex-row">
-
-              <div className={`w-6 h-6  flex-shrink-0  content-center font-bold`}>{elementIndex}</div>
-              <div className={`w-20 h-5`} id={`${currentPageIndex}`} onClick={() => alert('clicked')}>
-                {directoryElm}
+      {hasDocsInside ? (
+        elementIndex.length === 1 ? (
+          <>
+            <div className="flex flex-row">
+              <div
+                className={`w-6 h-6 flex-shrink-0 content-center font-bold`}
+                style={{ marginRight: `${marginR}` }}
+              >
+                {elementIndex}
               </div>
+              <div className="w-20 h-5 ">{directoryElm}</div>
+              <TriangleToggle
+                isActive={isActive}
+                indexLength={elementIndex.length}
+              />
             </div>
-            )
-            :
-            (
-              <div className="flex flex-row ml-3">
-
-                <div className={`w-6 h-6 flex-shrink-0 content-center font-bold`} style={{ marginRight: `${marginR}` }}>{elementIndex}</div>
-                <div className="w-20 h-5" onClick={() => alert('clicked')}>
-                  {directoryElm}
-                </div>
-
+          </>
+        ) : (
+          <>
+            <div className="flex flex-row ml-3">
+              <div
+                className={`w-6 h-6 flex-shrink-0 content-center font-bold`}
+                style={{ marginRight: `${marginR}` }}
+              >
+                {elementIndex}
               </div>
-            )
-
+              <div className="w-20 h-5">{directoryElm}</div>
+              <TriangleToggle
+                isActive={isActive}
+                indexLength={elementIndex.length}
+              />
+            </div>
+          </>
         )
-      }
+      ) : elementIndex.length === 1 ? (
+        <div
+          className="flex flex-row"
+          id={`${oneLayerNoDocsId - 1}`}
+          onClick={() => handleFileClick(oneLayerNoDocsId - 1)}
+        >
+          <div className={`w-6 h-6  flex-shrink-0  content-center font-bold`}>
+            {elementIndex}
+          </div>
+          <div className={`w-20 h-5`}>{directoryElm}</div>
+        </div>
+      ) : (
+        <div
+          className="flex flex-row ml-3"
+          id={`${fileCountIndex - 1}`}
+          onClick={() => handleFileClick(fileCountIndex - 1)}
+        >
+          <div
+            className={`w-6 h-6 flex-shrink-0 content-center font-bold`}
+            style={{ marginRight: `${marginR}` }}
+          >
+            {elementIndex}
+          </div>
+          <div className="w-20 h-5">{directoryElm}</div>
+        </div>
+      )}
     </motion.li>
   );
 };

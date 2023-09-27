@@ -1,3 +1,4 @@
+<!-- prettier-ignore -->
 | In MarkDown      | HTML Translation          | Result                   | Comments |
 | ------           | ------                    | --------                 | -------- |
 |  **_2^3^_**      |    `2<sup>3</sup>`        |     2<sup>3</sup>  |   -      |
@@ -12,3 +13,7 @@
 |**_$title\<Text\>_** |`<details"><summary>(Text)</summary>"`||This will create two things, the div that contains the whole spoiler and the "title" or what it's always visible for the user|
 |**_$_** |||Jumpline|
 |**_$\<Text\>_** |`(if it's first one after $title)<div class="spoiler-body"><p>(Text)</p>(if it's not)<p>(Text)</p>`||Adds text to the spoiler, if one of this type it's the first to appear after $title \<Text\> it creates the spoiler body and also adds the text|
+
+## NOTES
+
+While writting the documentation the index.md in the "root" of the folder to process in the engine will be always the default page , it can be used for example as a landing page or as a list will all the content listed and with the respective links to the file like in the Rust Tutorial, but it will always search for the title "index" or "Index" in the root to treat it as a default page
