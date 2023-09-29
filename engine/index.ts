@@ -3,7 +3,7 @@ import fs from "fs";
 import crypto from "crypto";
 
 const buildFolder = "../frontend/src/output";
-var arrDirectories: string[] = [];
+let arrDirectories: string[] = [];
 
 let inCode = false;
 let lastSh = ``;
@@ -18,10 +18,16 @@ let openCallOut: boolean = false;
 let currentCOType: string = ""; //CallOut type
 let openSpoilerDiv: boolean = false;
 let openNavBar: boolean = false;
+let backButtonInfoExtracted: boolean = false;
+let nextButtonInfoExtracted: boolean = false;
 let nextButtonCreated: boolean = false;
 let backButtonCreated: boolean = false;
-
 let cleanTheLine: boolean = false;
+let navButtonsMap: Map<string, string> = new Map([
+  ["back", ""],
+  ["next", ""]
+])
+
 //Regex
 
 let quoteBlockRegex: RegExp = /^\>[\s]*?/g;
@@ -33,6 +39,31 @@ let urlRegEx: RegExp = /(((http|https):\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-z
 /**DONT FORGET ABOUT tsc -w WHEN WORKING WITH THE ENGINE PART IF NOT THEY WONT APPEAR ANY CHANGES FROM THE index.ts */
 
 
+/**Restart all the vars to the default value */
+
+function restartVariables() {
+
+  inCode = false;
+  lastSh = ``;
+  olLayer = 0;
+  olNumber = 0;
+  ulLayer = 0;
+  ulNumber = 0;
+  todoListLayer = 0;
+  todoListNumber = 0;
+  openBlockQuote = false;
+  openCallOut = false;
+  currentCOType = ""; //CallOut type
+  openSpoilerDiv = false;
+  openNavBar = false;
+  backButtonInfoExtracted = false;
+  nextButtonInfoExtracted = false;
+  nextButtonCreated = false;
+  backButtonCreated = false;
+  cleanTheLine = false;
+  navButtonsMap.set("back", "");
+  navButtonsMap.set("next", "");
+}
 
 /**Removes the spaces to check if the first character is the one that was passed, this function it's used for detecting
  * if the line it's part of a nested list or just a line that concides with the characters used for lists
@@ -50,10 +81,6 @@ function characterIsFirstWithoutSpaces(str: string, character: string) {
   return isFirstCharacter;
 }
 
-
-/**Function used for adding close tag ul in case that the next line doesn't have
- * * or - , checking the listLayer
- */
 
 function checkIfNeedClosingandAddTag(str?: string) {
 
@@ -118,6 +145,11 @@ function checkIfNeedClosingandAddTag(str?: string) {
     openSpoilerDiv = false;
   }
 
+  if (backButtonCreated) {
+
+    addClosingTag = "</div>"
+    backButtonCreated = false;
+  }
 
 
   return addClosingTag;
@@ -206,6 +238,56 @@ function generateCheckBoxAndLabel(id: string, value: string) {
   return `<div className="flex items-center mt-2 mb-2">` + checkbox + label + `</div>`
 }
 
+/**For friday, create a function that looks for specefic [next]() [back]() links, and extract the route
+ * inside of the parentesis , to generate the component name for the setter
+*/
+
+function generateComponentName(dir: string) {
+
+  let dashPositions: Array<number> = [];
+  for (let index = 0; index < dir.length; index++) {
+    const element = dir[index];
+    if (element === "/") {
+
+      dashPositions.push(index);
+    }
+  }
+
+  let componentName: string = dir.substring(dashPositions[dashPositions.length - 2] + 1);
+  componentName = componentName.replace(".md", "").replace("/", "").replace(" ", "");
+  componentName = componentName.replace(componentName[0], componentName[0].toUpperCase())
+  return componentName;
+}
+
+
+function fillNavButtonsMap(str: string) {
+
+  if (/\[.*\]\(.*\)/.test(str)) {
+
+    let linkContent: string = str.substring(str.indexOf("[") + 1, str.lastIndexOf("]"));
+    let href: string = str.substring(str.indexOf("(") + 1, str.lastIndexOf(")"));
+    href = generateComponentName(href);
+    
+
+    if (/(^back$)|(^\<\-$)/gi.test(linkContent)) { 
+      console.log("Generated href", href)   
+      if (!backButtonInfoExtracted) {
+    
+        backButtonInfoExtracted = true;
+        navButtonsMap.set("back", href);
+      }
+
+    } else if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
+      console.log("Generated href", href)
+      if (!nextButtonCreated) {
+        
+        nextButtonInfoExtracted = true;
+        navButtonsMap.set("next", href);
+      }
+    }
+  }
+}
+
 function processLine(str: string) {
   if (str.startsWith("# ")) {
 
@@ -230,35 +312,31 @@ function processLine(str: string) {
     let beforeLink: string = str.substring(0, str.lastIndexOf("["));
     let linkContent: string = str.substring(str.indexOf("[") + 1, str.lastIndexOf("]"));
     let href: string = str.substring(str.indexOf("(") + 1, str.lastIndexOf(")"));
+
     let afterLink: string = str.substring(str.indexOf(")") + 1);
 
-    if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
 
-      if (!nextButtonCreated) {
+    if (/(^back$)|(^\<\-$)/gi.test(linkContent)) {
 
-
-
-        if (backButtonCreated) {
-
-
-
-        } else {
-
-
-
-        }
-
-        nextButtonCreated = true;
-
+      href = "../" + href.replace(".md", ".tsx");
+      console.log(href)
+      if (!backButtonCreated) {
+   
+        backButtonCreated = true;
+        return `<div className="nav-wrapper flex" aria-label="Page Navigation"><div className="nav-back flex-none" rel="previous" title="Previous Chapter" aria-label="Previous Chapter" aria-keyshortcuts="Left" onClick={() => handleLinkClick("back")}><FontAwesomeIcon icon={faAngleLeft} size="2x" color="gray"/></div><div className="flex-initial w-80"></div>` 
       }
 
-    } else if (/(^back$)|(^\<\-$)/gi.test(linkContent)) {
-      if (!backButtonCreated) {
-        if (nextButtonCreated) {
+    } else if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
 
+      href = "../" + href.replace(".md", ".tsx");
+      console.log(href)
+      if (!nextButtonCreated) {
+        if (backButtonCreated) {
 
+          return `<div className="nav-next flex-none" rel="next" title="Next Chapter" aria-label="Next Chapter" aria-keyshortcuts="Right" onClick={() => handleLinkClick("next")}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></div>`
         } else {
 
+          return `<div className="nav-wrapper flex" aria-label="Page Navigation"><div className="flex-none"></div><div className="flex-initial w-80"></div><div className="nav-back flex-none" rel="next" title="Next Chapter" aria-label="Next Chapter" aria-keyshortcuts="Right" onClick={() => handleLinkClick("next")}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></div></div>`
         }
 
         backButtonCreated = true;
@@ -268,17 +346,6 @@ function processLine(str: string) {
 
       return `${beforeLink}<a href="${href}">${linkContent}</a>${afterLink}`;
     }
-
-
-    //&#9001;
-
-    /**FOR TUESDAY: 
-     * - Add the page-wrapper ( inspect the structure of rust tutorial example)
-     * - Create and add the nav and elements for the desktop option
-     * - Create the classes for all the navs and their elements
-     * - Make the arrows good looking like in the rust tutorial example
-     */
-
 
   } else if (/^\$/.test(str)) {
     if (/^\$title\s(\w+(.*)?)/.test(str)) {
@@ -600,140 +667,6 @@ function processLine(str: string) {
 }
 
 
-const HEAD = `<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    :root {
-      --content-max-width: 750px;
-    }
-    .content {
-      overflow-y: auto;
-      padding: 0 5px 50px 5px;
-      
-    }
-
-    main {
-
-      margin-left: auto;
-      margin-right: auto;
-      max-width: var(--content-max-width);
-    }
-
-    hr {
-      width: 80%;
-      margin-left: 0px;
-    }
-
-    blockquote {
-      font-style: italic;
-    }
-
-    details summary { 
-      cursor: pointer;
-    }
-    
-    details summary > * {
-      display: inline;
-    }
-
-    /*Classes for CallOuts*/
-
-    .good,
-    .bad,
-    .warning {
-
-      border-style: solid;
-      border-width: 1px;
-      border-radius: 4px;
-      padding: 0 35px 0 35px;
-      overflow-wrap: break-word;
-    }
-
-    .good {
-
-      border-color: #6FAD6C;
-      background-color: #8FE08B;
-      color: #153b13;
-    }
-
-    .good hr {
-
-      border: 1px solid #6eab6b;
-    }
-
-    .bad {
-
-      border-color: #b04840;
-      background-color: #e77f78;
-      color: #450d09;
-    }
-
-    .bad hr {
-
-      border: 1px solid #bf4f47;
-
-    }
-
-    .warning {
-
-      border-color: #a7a343;
-      background-color: #fffa64;
-      color: #42401a;
-    }
-
-    .warning hr {
-
-      border: 1px solid #bab64b;
-    }
-    /*Classes for CallOuts*/
-
-    /*Classes for Spoiler*/
-
-    .spoiler {
-      border: 1px solid #999;
-      border-radius: 4px;
-      padding: 2px;
-      background: rgb(195, 195, 195);
-      padding: 0 35px 0 35px;
-      margin: 20px 0 20px 0;
-      overflow-wrap: break-word;
-    }
-
-    .spoiler-btn {
-      user-select: none;
-      font-size: 2rem;
-    }
-    .spoiler-btn:hover {
-      cursor: pointer;
-      color: rgb(120, 120, 120);
-    }
-    .spoiler-btn-bottom {
-      width: 100%;
-      text-align: right;
-    }
-    
-    .spoiler-body {
-      display: none;
-      height: 0;
-    }
-    
-    /*Classes for Spoiler*/
-  </style>
-  <title>Document</title>
-</head>
-<body>
-<div id="body-container">
-  <div id="content" className="content">
-<main>`;
-const FOOT = `</main></div></div>
-</body>
-</html>`;
-
-const HEAD2 = "";
-const FOOTER2 = "";
-
 /**Why arrDirectories inside this function ? 
  * 
  * In order to generate a menu with all the directories and files that they are being created,
@@ -741,6 +674,11 @@ const FOOTER2 = "";
  */
 
 function processFile(root: string, path: string) {
+
+  console.log("I enter")
+  //Restart all the needed variables
+    restartVariables();
+  //Restart all the needed variables
 
   let pathWithoutExtension = path.substring(0, path.lastIndexOf("."));
   console.log(`Processing ${pathWithoutExtension}`);
@@ -750,14 +688,72 @@ function processFile(root: string, path: string) {
     0,
     filename.lastIndexOf(".")
   );
+  //filenameWithoutExtension = filenameWithoutExtension.replace(filenameWithoutExtension[0], filenameWithoutExtension[0].toUpperCase);
   let lines = ("" + fs.readFileSync(`${root}/${pathWithoutExtension}.md`))
     .split("\n")
     .map((x) => x.trimEnd());
   let pathWithoutFile = path.substring(0, path.lastIndexOf("/"));
+
+  let slashes: number = 0;
+  for (const character of path) {
+    if (character === "/") {
+      slashes++;
+    }
+  }
+
+  let importRouteToApp: string = "";
+  for (let i = 0; i < slashes; i++) {
+    
+    if (i === slashes - 1) {
+
+      importRouteToApp += "../App"
+    } else {
+
+      importRouteToApp += "../";
+    }
+  }
+  //Fill the map of the component name for back and next
+  lines.map((line) => fillNavButtonsMap(line));
+  
+
+  let headOfFile: string = `import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+  import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
+  import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
+  import { pages } from "${importRouteToApp}";
+  export default function ${filenameWithoutExtension}({setCurrentPageIndex}:{setCurrentPageIndex: any}){
+    
+    let pageIndex: number = 0;
+    let backComponentName: string = "${navButtonsMap.get("back")}";
+    let nextComponentName: string = "${navButtonsMap.get("next")}";
+    const handleLinkClick = (option: string) => {
+
+      for (let i = 0; i < pages.length; i++) {
+        const element = pages[i];
+        switch (option) {
+          case "back":
+            
+            if (element.name === backComponentName) {
+              pageIndex = i;
+            }
+            break;
+          case "next":
+            
+            if (element.name === nextComponentName) {
+
+              pageIndex = i;
+            }
+            break;
+        }
+      }
+
+      setCurrentPageIndex(pageIndex);
+    }
+  return(<>`
+
   fs.mkdirSync(`${buildFolder}/${pathWithoutFile}`, { recursive: true });
   fs.writeFileSync(
     `${buildFolder}/${pathWithoutExtension}.tsx`,
-    `export default function ${filenameWithoutExtension}(){  return(<>` + lines.map((line) => processLine(line)).join("\n") + `</>)}`
+    headOfFile + lines.map((line) => processLine(line)).join("\n") + `</>)}`
   );
 }
 
@@ -798,7 +794,7 @@ export default function App() {
     const renderPage = () => {
 
         const Page = pages[currentPageIndex].component;
-        return <Page />
+        return <Page setCurrentPageIndex={setCurrentPageIndex} />
     }
 
     return (
@@ -813,25 +809,10 @@ export default function App() {
     )
 }`;
 
-function generateComponentName(dir: string) {
 
-  let dashPositions: Array<number> = [];
-  for (let index = 0; index < dir.length; index++) {
-    const element = dir[index];
-    if (element === "/") {
-
-      dashPositions.push(index);
-    }
-  }
-
-  let componentName: string = dir.substring(dashPositions[dashPositions.length - 2] + 1);
-  componentName = componentName.replace(".md", "").replace("/", "").replace(" ", "");
-  componentName = componentName.replace(componentName[0], componentName[0].toUpperCase())
-  return componentName;
-}
 
 let lazyImports: string = "";
-let arrPages: string = `const pages = [ \n`;
+let arrPages: string = `export const pages = [ \n`;
 
 for (let index = 0; index < arrDirectories.length; index++) {
   const dir = arrDirectories[index];

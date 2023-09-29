@@ -9,7 +9,7 @@ const Section2file2 = lazy(() => import("./output/chapter1/section 2/file2"));
 const Section1file = lazy(() => import("./output/chapter2/section 1/file"));
 const Index = lazy(() => import("./output/index"));
 const Other = lazy(() => import("./output/other"));
-const pages = [ 
+export const pages = [ 
 	{ component: Chapter1index, name: "Chapter1index"},
 	{ component: Chrfile, name: "Chrfile"},
 	{ component: LayerTestlayertest, name: "LayerTestlayertest"},
@@ -32,7 +32,7 @@ export default function App() {
     const renderPage = () => {
 
         const Page = pages[currentPageIndex].component;
-        return <Page />
+        return <Page setCurrentPageIndex={setCurrentPageIndex} />
     }
 
     return (

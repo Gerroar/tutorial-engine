@@ -10,6 +10,7 @@
     max-width: 1280px;
     margin: 0 auto;
     padding: 2rem;
+    background-color: darkgrey;
 }
 
 /*CSS of the menu*/
@@ -200,6 +201,22 @@ details summary>* {
 }
 
 /*Classes for Spoiler*/
+
+.nav-wrapper {
+    
+}
+
+.nav-back {
+
+    /*float: left;*/
+    cursor: pointer;
+}
+
+.nav-next {
+
+    /*float: right;*/
+    cursor: pointer;
+}
 
 /*CSS of the content*/
 /* Dark mode */

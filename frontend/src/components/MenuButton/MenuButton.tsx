@@ -5,26 +5,34 @@ import { Navigation } from "./components/Navigation";
 import { MenuToggle } from "./components/MenuToggle";
 
 const sidebar = {
-  open: (height = 1000) => ({
+  open: (height = 800) => ({
     clipPath: `circle(${height * 2 + 200}px at 40px 40px)`,
     transition: {
       type: "spring",
       stiffness: 20,
-      restDelta: 2
-    }
+      restDelta: 2,
+    },
   }),
   closed: {
     clipPath: "circle(30px at 40px 40px)",
     transition: {
       delay: 0.5,
       type: "spring",
-      stiffness: 400,
-      damping: 40
-    }
-  }
+      stiffness: 450,
+      damping: 40,
+    },
+  },
 };
 
-export const MenuButton = ({ currentPageIndex, setCurrentPageIndex, defaultIndex }: { currentPageIndex: number, setCurrentPageIndex: any, defaultIndex: number }) => {
+export const MenuButton = ({
+  currentPageIndex,
+  setCurrentPageIndex,
+  defaultIndex,
+}: {
+  currentPageIndex: number;
+  setCurrentPageIndex: any;
+  defaultIndex: number;
+}) => {
   const [isMenuOpen, toggleMenuOpen] = useCycle(false, true);
   const containerRef = useRef(null);
   const { height } = useDimensions(containerRef);
@@ -37,8 +45,15 @@ export const MenuButton = ({ currentPageIndex, setCurrentPageIndex, defaultIndex
       ref={containerRef}
       className="fixed"
     >
-      <motion.div className="top-0 left-0 bottom-0" variants={sidebar} />
-      <Navigation currentPageIndex={currentPageIndex} setCurrentPageIndex={setCurrentPageIndex} defaultIndex={defaultIndex} />
+      <motion.div
+        className="absolute top-0 -left-1 bottom-0 w-[260px] bg-white"
+        variants={sidebar}
+      />
+      <Navigation
+        currentPageIndex={currentPageIndex}
+        setCurrentPageIndex={setCurrentPageIndex}
+        defaultIndex={defaultIndex}
+      />
       <MenuToggle toggle={() => toggleMenuOpen()} />
     </motion.nav>
   );
