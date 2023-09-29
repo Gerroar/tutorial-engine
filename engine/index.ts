@@ -750,6 +750,8 @@ function processFile(root: string, path: string) {
     }
   return(<>`
 
+  //Checking branches , this is main
+
   fs.mkdirSync(`${buildFolder}/${pathWithoutFile}`, { recursive: true });
   fs.writeFileSync(
     `${buildFolder}/${pathWithoutExtension}.tsx`,
