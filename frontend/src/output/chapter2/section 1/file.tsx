@@ -27,7 +27,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
             break;
         }
       }
-
       setCurrentPageIndex(pageIndex);
     }
-  return(<><h2>Hello how are ya</h2><hr/></>)}
+  return(<><div id="page-content" className="pl-40 pr-40"><h2>Hello how are ya</h2><hr/></>)}

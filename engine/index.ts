@@ -25,24 +25,23 @@ let backButtonCreated: boolean = false;
 let cleanTheLine: boolean = false;
 let navButtonsMap: Map<string, string> = new Map([
   ["back", ""],
-  ["next", ""]
-])
+  ["next", ""],
+]);
 
 //Regex
 
 let quoteBlockRegex: RegExp = /^\>[\s]*?/g;
 let quoteBlockRegexwText: RegExp = /^>(.*)/;
-let urlRegEx: RegExp = /(((http|https):\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*[-a-zA-Z0-9@:%_\+~#?&//=])?)/
+let urlRegEx: RegExp =
+  /(((http|https):\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*[-a-zA-Z0-9@:%_\+~#?&//=])?)/;
 
 //Regex
 
 /**DONT FORGET ABOUT tsc -w WHEN WORKING WITH THE ENGINE PART IF NOT THEY WONT APPEAR ANY CHANGES FROM THE index.ts */
 
-
 /**Restart all the vars to the default value */
 
 function restartVariables() {
-
   inCode = false;
   lastSh = ``;
   olLayer = 0;
@@ -67,32 +66,25 @@ function restartVariables() {
 
 /**Removes the spaces to check if the first character is the one that was passed, this function it's used for detecting
  * if the line it's part of a nested list or just a line that concides with the characters used for lists
-*/
+ */
 
 function characterIsFirstWithoutSpaces(str: string, character: string) {
-
   let isFirstCharacter: boolean = false;
-  let whiteSpaceRemoved: string = str.replace(/\s/g, '');
+  let whiteSpaceRemoved: string = str.replace(/\s/g, "");
   if (whiteSpaceRemoved[0] === character) {
-
     isFirstCharacter = true;
   }
 
   return isFirstCharacter;
 }
 
-
 function checkIfNeedClosingandAddTag(str?: string) {
-
   let addClosingTag = "";
   if (ulLayer != 0) {
-
     while (ulLayer-- != 0) {
       if (ulLayer === 0) {
-
         addClosingTag += "</ul><br/>";
       } else {
-
         addClosingTag += "</ul>";
       }
     }
@@ -100,13 +92,10 @@ function checkIfNeedClosingandAddTag(str?: string) {
   }
 
   if (olLayer != 0) {
-
     while (olLayer-- != 0) {
       if (olLayer === 0) {
-
-        addClosingTag += "</ol><br/>"
+        addClosingTag += "</ol><br/>";
       } else {
-
         addClosingTag += "</ol>";
       }
     }
@@ -114,114 +103,95 @@ function checkIfNeedClosingandAddTag(str?: string) {
   }
 
   if (todoListLayer != 0) {
-
-    addClosingTag = "</div><br/>"
+    addClosingTag = "</div><br/>";
     todoListLayer = 0;
   }
 
   if (openBlockQuote) {
-
     if (str) {
       if (/^>[\s]*?/.test(str)) {
-
         cleanTheLine = true;
       }
     } else {
-
-      addClosingTag = "</blockquote>"
+      addClosingTag = "</blockquote>";
       openBlockQuote = false;
     }
   }
 
   if (openCallOut) {
-
     addClosingTag = "</div>";
     openCallOut = false;
   }
 
   if (openSpoilerDiv) {
-
     addClosingTag = "</details>";
     openSpoilerDiv = false;
   }
 
   if (backButtonCreated) {
-
-    addClosingTag = "</div>"
+    addClosingTag = "</div>";
     backButtonCreated = false;
   }
-
 
   return addClosingTag;
 }
 
-/**Iterates the string looking for more than one of the character type passed, 
+/**Iterates the string looking for more than one of the character type passed,
  * doesn't matter if it's * , ** or *** ( for example, it could be any type accepted
  * for italics, bold or both (***x***, ___x___)), it will check if there is a pair of
  * that amount of symbols.
  */
 
 function moreThanOne(str: string, charType: string) {
-
   let charTypeLength: number = charType.length;
   let hasMoreThanOne: boolean = false;
   let howManyChars: number = 0;
 
   switch (charTypeLength) {
-
     case 1:
-
       for (const chr of str) {
-
         if (chr === charType) {
           howManyChars++;
         }
       }
 
       if (howManyChars > 1) {
-
         hasMoreThanOne = true;
       }
 
       return hasMoreThanOne;
     case 2:
-
       for (let i = 0; i < str.length; i++) {
         const chr = str[i];
 
-        if ((i + 1) !== str.length) {
-
-          let twoChars = chr + str[i + 1]
+        if (i + 1 !== str.length) {
+          let twoChars = chr + str[i + 1];
           if (twoChars === charType) {
             i++;
-            howManyChars += 2
+            howManyChars += 2;
           }
         }
       }
 
       if (howManyChars > 2) {
-
         hasMoreThanOne = true;
       }
 
       return hasMoreThanOne;
     case 3:
-
       for (let i = 0; i < str.length; i++) {
         const chr = str[i];
 
-        if ((i + 1) !== str.length) {
-
-          let twoChars = chr + str[i + 1]
+        if (i + 1 !== str.length) {
+          let twoChars = chr + str[i + 1];
           if (twoChars === charType) {
             i++;
-            howManyChars += 2
+            howManyChars += 2;
           }
         }
       }
 
       if (howManyChars > 3) {
-
         hasMoreThanOne = true;
       }
 
@@ -230,57 +200,65 @@ function moreThanOne(str: string, charType: string) {
 }
 
 function generateCheckBoxAndLabel(id: string, value: string) {
-
-
   let checkbox = `<input type="checkbox" id="${id}" name="${id}" value="${value}" className="mr-2" />`;
-  let label = `<label htmlFor="${id}">${value}</label><br/>`
+  let label = `<label htmlFor="${id}">${value}</label><br/>`;
 
-  return `<div className="flex items-center mt-2 mb-2">` + checkbox + label + `</div>`
+  return (
+    `<div className="flex items-center mt-2 mb-2">` +
+    checkbox +
+    label +
+    `</div>`
+  );
 }
 
 /**For friday, create a function that looks for specefic [next]() [back]() links, and extract the route
  * inside of the parentesis , to generate the component name for the setter
-*/
+ */
 
 function generateComponentName(dir: string) {
-
   let dashPositions: Array<number> = [];
   for (let index = 0; index < dir.length; index++) {
     const element = dir[index];
     if (element === "/") {
-
       dashPositions.push(index);
     }
   }
 
-  let componentName: string = dir.substring(dashPositions[dashPositions.length - 2] + 1);
-  componentName = componentName.replace(".md", "").replace("/", "").replace(" ", "");
-  componentName = componentName.replace(componentName[0], componentName[0].toUpperCase())
+  let componentName: string = dir.substring(
+    dashPositions[dashPositions.length - 2] + 1
+  );
+  componentName = componentName
+    .replace(".md", "")
+    .replace("/", "")
+    .replace(" ", "");
+  componentName = componentName.replace(
+    componentName[0],
+    componentName[0].toUpperCase()
+  );
   return componentName;
 }
 
-
 function fillNavButtonsMap(str: string) {
-
   if (/\[.*\]\(.*\)/.test(str)) {
-
-    let linkContent: string = str.substring(str.indexOf("[") + 1, str.lastIndexOf("]"));
-    let href: string = str.substring(str.indexOf("(") + 1, str.lastIndexOf(")"));
+    let linkContent: string = str.substring(
+      str.indexOf("[") + 1,
+      str.lastIndexOf("]")
+    );
+    let href: string = str.substring(
+      str.indexOf("(") + 1,
+      str.lastIndexOf(")")
+    );
     href = generateComponentName(href);
-    
 
-    if (/(^back$)|(^\<\-$)/gi.test(linkContent)) { 
-      console.log("Generated href", href)   
+    if (/(^back$)|(^\<\-$)/gi.test(linkContent)) {
+      console.log("Generated href", href);
       if (!backButtonInfoExtracted) {
-    
         backButtonInfoExtracted = true;
         navButtonsMap.set("back", href);
       }
-
     } else if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
-      console.log("Generated href", href)
+      console.log("Generated href", href);
       if (!nextButtonCreated) {
-        
         nextButtonInfoExtracted = true;
         navButtonsMap.set("next", href);
       }
@@ -290,81 +268,69 @@ function fillNavButtonsMap(str: string) {
 
 function processLine(str: string) {
   if (str.startsWith("# ")) {
-
-    return checkIfNeedClosingandAddTag() + "<h1>" + str.substring(2) + "</h1><hr/>";
+    return (
+      checkIfNeedClosingandAddTag() + "<h1>" + str.substring(2) + "</h1><hr/>"
+    );
   } else if (str.startsWith("## ")) {
-
-    return checkIfNeedClosingandAddTag() + "<h2>" + str.substring(3) + "</h2><hr/>";
+    return (
+      checkIfNeedClosingandAddTag() + "<h2>" + str.substring(3) + "</h2><hr/>"
+    );
   } else if (str.startsWith("### ")) {
-
     return checkIfNeedClosingandAddTag() + "<h3>" + str.substring(4) + "</h3>";
   } else if (str.startsWith("#### ")) {
-
     return checkIfNeedClosingandAddTag() + "<h4>" + str.substring(5) + "</h4>";
   } else if (str.startsWith("##### ")) {
-
     return checkIfNeedClosingandAddTag() + "<h5>" + str.substring(6) + "</h5>";
   } else if (str.startsWith("###### ")) {
-
     return checkIfNeedClosingandAddTag() + "<h6>" + str.substring(7) + "</h6>";
   } else if (/\[.*\]\(.*\)/.test(str)) {
-
     let beforeLink: string = str.substring(0, str.lastIndexOf("["));
-    let linkContent: string = str.substring(str.indexOf("[") + 1, str.lastIndexOf("]"));
-    let href: string = str.substring(str.indexOf("(") + 1, str.lastIndexOf(")"));
+    let linkContent: string = str.substring(
+      str.indexOf("[") + 1,
+      str.lastIndexOf("]")
+    );
+    let href: string = str.substring(
+      str.indexOf("(") + 1,
+      str.lastIndexOf(")")
+    );
 
     let afterLink: string = str.substring(str.indexOf(")") + 1);
 
-
     if (/(^back$)|(^\<\-$)/gi.test(linkContent)) {
-
       href = "../" + href.replace(".md", ".tsx");
-      console.log(href)
+      console.log(href);
       if (!backButtonCreated) {
-   
         backButtonCreated = true;
-        return `<div className="nav-wrapper flex" aria-label="Page Navigation"><div className="nav-back flex-none" rel="previous" title="Previous Chapter" aria-label="Previous Chapter" aria-keyshortcuts="Left" onClick={() => handleLinkClick("back")}><FontAwesomeIcon icon={faAngleLeft} size="2x" color="gray"/></div><div className="flex-initial w-80"></div>` 
+        return `</div><div className="nav-wrapper flex" aria-label="Page Navigation"><div className="nav-back flex-none" rel="previous" title="Previous Chapter" aria-label="Previous Chapter" aria-keyshortcuts="Left" onClick={() => handleLinkClick("back")}><FontAwesomeIcon icon={faAngleLeft} size="2x" color="gray"/></div><div className="flex-initial w-1/2"></div>`;
       }
-
     } else if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
-
       href = "../" + href.replace(".md", ".tsx");
-      console.log(href)
+      console.log(href);
       if (!nextButtonCreated) {
+        nextButtonCreated = true;
         if (backButtonCreated) {
-
-          return `<div className="nav-next flex-none" rel="next" title="Next Chapter" aria-label="Next Chapter" aria-keyshortcuts="Right" onClick={() => handleLinkClick("next")}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></div>`
+          return `<div className="nav-next flex-none" rel="next" title="Next Chapter" aria-label="Next Chapter" aria-keyshortcuts="Right" onClick={() => handleLinkClick("next")}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></div>`;
         } else {
-
-          return `<div className="nav-wrapper flex" aria-label="Page Navigation"><div className="flex-none"></div><div className="flex-initial w-80"></div><div className="nav-back flex-none" rel="next" title="Next Chapter" aria-label="Next Chapter" aria-keyshortcuts="Right" onClick={() => handleLinkClick("next")}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></div></div>`
+          return `</div><div className="nav-wrapper flex" aria-label="Page Navigation"><div ></div><div className="flex-initial w-1/2"></div><div className="nav-back flex-none" rel="next" title="Next Chapter" aria-label="Next Chapter" aria-keyshortcuts="Right" onClick={() => handleLinkClick("next")}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></div></div>`;
         }
-
-        backButtonCreated = true;
-
       }
     } else {
-
       return `${beforeLink}<a href="${href}">${linkContent}</a>${afterLink}`;
     }
-
   } else if (/^\$/.test(str)) {
     if (/^\$title\s(\w+(.*)?)/.test(str)) {
       let spoilerTitle: string = str.replace(/^\$title\s(\w+(.*)?)/, "$1");
       if (openSpoilerDiv) {
-
         return `</details><details><summary>${spoilerTitle}</summary>`;
       } else {
-
         openSpoilerDiv = true;
         return `<details><summary>${spoilerTitle}</summary>`;
       }
     } else if (openSpoilerDiv) {
       if (/^\$\s(\w+(.*)?)/.test(str)) {
-
         let spoilerContent: string = str.replace(/^\$\s(\w+(.*)?)/, "$1");
         return `<p className="mt-2 mb-2">${spoilerContent}</p>`;
       } else if (/^\$$/) {
-
         return "";
       }
     }
@@ -373,56 +339,44 @@ function processLine(str: string) {
     let callOutContent: string = "";
 
     switch (true) {
-
       case /^!good(\s\w+)?$/.test(str):
-
         callOutType = "good";
         callOutContent = str.replace(/^!good(\s\w+)?$/, "$1").trim();
         break;
       case /^!goodTitle(\s\w+)?$/.test(str):
-
         callOutType = "goodTitle";
         callOutContent = str.replace(/^!goodTitle(\s\w+)?$/, "$1").trim();
         break;
       case /^!goodHr$/.test(str):
-
         callOutType = "goodHr";
         break;
       case /^!bad(\s\w+)?$/.test(str):
-
         callOutType = "bad";
         callOutContent = str.replace(/^!bad(\s\w+)?$/, "$1").trim();
         break;
       case /^!badTitle(\s\w+)?$/.test(str):
-
         callOutType = "badTitle";
         callOutContent = str.replace(/^!badTitle(\s\w+)?$/, "$1").trim();
         break;
       case /^!badHr$/.test(str):
-
         callOutType = "badHr";
         break;
       case /^!warning(\s\w+)?$/.test(str):
-
         callOutType = "warning";
         callOutContent = str.replace(/^!warning(\s\w+)?$/, "$1").trim();
         break;
       case /^!warningTitle(\s\w+)?$/.test(str):
-
         callOutType = "warningTitle";
         callOutContent = str.replace(/^!warningTitle(\s\w+)?$/, "$1").trim();
         break;
 
       case /^!warningHr$/.test(str):
-
         callOutType = "warningHr";
         break;
     }
 
     if (callOutType !== "") {
-
-
-      let cotLastWord: string = callOutType[callOutType.length - 1] //CallOut Type last word
+      let cotLastWord: string = callOutType[callOutType.length - 1]; //CallOut Type last word
 
       /**Manage when the callout "tag" it's just !good, !bad or !warning wihtout any text
        * after
@@ -431,18 +385,14 @@ function processLine(str: string) {
       if (cotLastWord === "d" || cotLastWord === "g") {
         if (openCallOut) {
           if (callOutContent !== "" && currentCOType === callOutType) {
-
             return `<p>${callOutContent}</p>`;
           } else {
-
-
             return "";
           }
         } else {
-
           openCallOut = true;
           currentCOType = callOutType;
-          return `<div className="${callOutType}">`
+          return `<div className="${callOutType}">`;
         }
       } else if (cotLastWord === "r") {
         /**Manage when the callout "tag" it's just !goodHr, !badHr or !warningHr without any text
@@ -450,192 +400,201 @@ function processLine(str: string) {
          */
 
         if (openCallOut) {
-
-          return `<hr/>`
+          return `<hr/>`;
         } else {
-
           callOutType = "";
         }
       }
 
       /**Manage when the callout "tag" it's !goodTitle, !badTitle or !warningTitle and also that
-       * there is some text, if there is no text for the title the type will be converted to an 
-       * empty string , what means that it's not valid and won't appear 
+       * there is some text, if there is no text for the title the type will be converted to an
+       * empty string , what means that it's not valid and won't appear
        */
       if (callOutType.includes("Title")) {
         if (callOutContent !== "") {
-
           let coClass = callOutType.substring(0, callOutType.lastIndexOf("T"));
           if (openCallOut) {
             if (coClass === currentCOType) {
-
               openCallOut = true;
               return `<div className="${coClass}"><h3>${callOutContent}</h3>`;
             } else {
-
               return "";
             }
           } else {
-
             openCallOut = true;
             currentCOType = coClass;
             return `<div className="${coClass}"><h3>${callOutContent}</h3>`;
           }
         } else {
-
           callOutType = "";
         }
       }
     }
-
-
   } else if (quoteBlockRegex.test(str)) {
     if (quoteBlockRegexwText.test(str)) {
       if (openBlockQuote) {
-        str = str.replace(/(\r\n|\n|\r)/gm, "")
+        str = str.replace(/(\r\n|\n|\r)/gm, "");
         str = str.replace(/^>(.*)/, `$1`);
         str = str.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
         str = str.replace(/\*(.*?)\*/g, "<i>$1</i>");
         str = str.replace(/_([^_]+)_/g, "<sub>$1</sub>");
-        str = str.replace(/--/g, "&mdash;")
+        str = str.replace(/--/g, "&mdash;");
         str = `<p>${str}</p>`;
       } else {
-
-        str = str.replace(quoteBlockRegexwText, `<blockquote><p>$1</p>`)
+        str = str.replace(quoteBlockRegexwText, `<blockquote><p>$1</p>`);
         openBlockQuote = true;
       }
     } else {
       if (openBlockQuote) {
-
         str = str.replace(quoteBlockRegex, "");
       }
     }
   } else if (urlRegEx.test(str)) {
-
-    str = str.replace(urlRegEx, `<a href="${`$1`}" target="_blank">$1</a>`)
+    str = str.replace(urlRegEx, `<a href="${`$1`}" target="_blank">$1</a>`);
   } else if (/([0-9]\.\s)/.test(str)) {
-
     let startingRegex = /^[0-9]+\.[ ](.*)/;
     let normalRegex = /^[0-9]+\.[ ](.*)/;
     if (/^([0-9]\.\s)/.test(str.trim())) {
-
       let layer = 0;
       let c = 0;
 
       while (/ |\t/.test(str.charAt(c++))) layer++;
-      layer = (layer / 2) + 1;
+      layer = layer / 2 + 1;
       str = str.trim();
 
       if (olLayer === 0) {
-
         olLayer = 1;
-        str = str.replace(startingRegex, `<ol id="ol-${olNumber}" className="list-decimal list-inside"><li>$1</li>`);
+        str = str.replace(
+          startingRegex,
+          `<ol id="ol-${olNumber}" className="list-decimal list-inside"><li>$1</li>`
+        );
         olNumber++;
       } else {
         if (layer === olLayer) {
           if (olLayer === 1) {
-
             str = str.replace(startingRegex, `<li>$1</li>`).trim();
           } else {
-
             str = str.replace(normalRegex, `<li>$1</li>`).trim();
           }
         } else if (olLayer < layer) {
-
-          str = str.replace(normalRegex, `<ol className="list-decimal list-inside"><li>$1</li>`);
+          str = str.replace(
+            normalRegex,
+            `<ol className="list-decimal list-inside"><li>$1</li>`
+          );
           olLayer = layer;
         } else {
-
           str = str.replace(normalRegex, `</ol><li>$1</li>`);
           olLayer = layer;
         }
-
       }
     }
-
-  } else if (str.includes("_") || str.includes("*") || str.includes("^") || str.includes("-")) {
-
+  } else if (
+    str.includes("_") ||
+    str.includes("*") ||
+    str.includes("^") ||
+    str.includes("-")
+  ) {
     str = str.replace(/\^([^\^]+)\^/g, "<sup>$1</sup><br/>");
-    if (moreThanOne(str, "*") || moreThanOne(str, "_") || moreThanOne(str, "-")) { //This part is for controlling the italics, bold and emdash
+    if (
+      moreThanOne(str, "*") ||
+      moreThanOne(str, "_") ||
+      moreThanOne(str, "-")
+    ) {
+      //This part is for controlling the italics, bold and emdash
 
       str = str.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
       str = str.replace(/\*(.*?)\*/g, "<i>$1</i>");
       str = str.replace(/_([^_]+)_/g, "<sub>$1</sub>");
       str = str.replace(/--/g, "&mdash;");
       str = `<p>${str}</p>`;
-    } else if (str.startsWith("*") || str.startsWith("-") || characterIsFirstWithoutSpaces(str, "*") || characterIsFirstWithoutSpaces(str, "-")) { //This part is for controlling the unordened lists
+    } else if (
+      str.startsWith("*") ||
+      str.startsWith("-") ||
+      characterIsFirstWithoutSpaces(str, "*") ||
+      characterIsFirstWithoutSpaces(str, "-")
+    ) {
+      //This part is for controlling the unordened lists
 
       if (ulLayer === 0) {
-
-        str = str.replace(/^\* (.*)/gm, `<ul id="ul-${ulNumber}" className="list-disc list-inside"><li>$1</li>`);
-        str = str.replace(/^\- (.*)/gm, `<ul id="ul-${ulNumber}" className="list-disc list-inside"><li>$1</li>`);
+        str = str.replace(
+          /^\* (.*)/gm,
+          `<ul id="ul-${ulNumber}" className="list-disc list-inside"><li>$1</li>`
+        );
+        str = str.replace(
+          /^\- (.*)/gm,
+          `<ul id="ul-${ulNumber}" className="list-disc list-inside"><li>$1</li>`
+        );
         ulLayer = 1;
         ulNumber++;
       } else {
-
         let layer = 0;
         let c = 0;
 
         while (/ |\t/.test(str.charAt(c++))) layer++;
-        layer = (layer / 2) + 1;
+        layer = layer / 2 + 1;
         if (layer === ulLayer) {
           if (ulLayer === 1) {
-
             str = str.replace(/^\* (.*)/gm, `<li>$1</li>`).trim();
             str = str.replace(/^\- (.*)/gm, `<li>$1</li>`).trim();
           } else {
-
             str = str.replace(/\* (.*)/gm, `</ul><li>$1</li>`).trim();
             str = str.replace(/\- (.*)/gm, `</ul><li>$1</li>`).trim();
           }
         } else if (ulLayer < layer) {
-
-          str = str.replace(/\* (.*)/gm, `<ul className="list-disc list-inside"><li>$1</li>`);
-          str = str.replace(/\- (.*)/gm, `<ul className="list-disc list-inside"><li>$1</li>`);
+          str = str.replace(
+            /\* (.*)/gm,
+            `<ul className="list-disc list-inside"><li>$1</li>`
+          );
+          str = str.replace(
+            /\- (.*)/gm,
+            `<ul className="list-disc list-inside"><li>$1</li>`
+          );
           ulLayer = layer;
         } else {
-
           str = str.replace(/\* (.*)/gm, `</ul><li>$1</li>`);
           str = str.replace(/\- (.*)/gm, `</ul><li>$1</li>`);
           ulLayer = layer;
         }
       }
     }
-
   } else if (characterIsFirstWithoutSpaces(str, "\\")) {
-
     str = str.replace(/^\s*(?!\\)/, "");
     if (/^\\todo\s[\w|\s]+/g.test(str)) {
-
       let todoContent = str.replace(/^\\todo\s/g, "");
       if (todoListLayer === 0) {
-
         todoListNumber++;
         todoListLayer = 1;
-        str = str.replace(/^\\todo\s[\w|\s]+/g, `<div id="todo-${todoListNumber}">${generateCheckBoxAndLabel(`todo-component-${todoListNumber}.${todoListLayer}`, todoContent)}`);
+        str = str.replace(
+          /^\\todo\s[\w|\s]+/g,
+          `<div id="todo-${todoListNumber}">${generateCheckBoxAndLabel(
+            `todo-component-${todoListNumber}.${todoListLayer}`,
+            todoContent
+          )}`
+        );
       } else {
-
         todoListLayer++;
-        str = str.replace(/^\\todo\s[\w|\s]+/g, `${generateCheckBoxAndLabel(`todo-component-${todoListNumber}.${todoListLayer}`, todoContent)}`);
+        str = str.replace(
+          /^\\todo\s[\w|\s]+/g,
+          `${generateCheckBoxAndLabel(
+            `todo-component-${todoListNumber}.${todoListLayer}`,
+            todoContent
+          )}`
+        );
       }
     }
   } else if (str.startsWith("```")) {
-
     if (str.endsWith(`sh`)) lastSh = ``;
     inCode = !inCode;
     return inCode ? checkIfNeedClosingandAddTag() + "<pre>" : "</pre>";
   } else if (inCode) {
-
     lastSh += str + "\n";
   } else if (str === "[output]") {
-
     fs.writeFileSync("tmp/tmp.sh", lastSh);
     let ls = spawnSync("./tmp/tmp.sh", [], { shell: "sh" });
     let output = ls.stdout;
 
     let hash = crypto.createHash("md5").update(lastSh).digest("hex");
     if (fs.existsSync("tmp/prevRuns/" + hash)) {
-
       let prevOutput = fs.readFileSync("tmp/prevRuns/" + hash);
       if (!prevOutput.equals(output)) {
         console.log(`Output changed for command: \x1B[0;93m${lastSh}\x1B[0m`);
@@ -643,41 +602,37 @@ function processLine(str: string) {
         console.log(`Output was:\n\x1B[0;31m${output}\x1B[0m`);
       }
     } else {
-
       fs.writeFileSync("tmp/prevRuns/" + hash, output);
     }
     return checkIfNeedClosingandAddTag() + `<pre>${output}</pre>`;
   } else if (/^[a-zA-Z0-9]/.test(str)) {
-
-    return `<p>${str}</p>`
-  } else if (!/(^(^([0-9]\.\s)|^\-\s|^\*\s|^(\!\s))|(^>*?)|\n)/g.test(str) || !characterIsFirstWithoutSpaces(str, "\\")) {
-
+    return `<p>${str}</p>`;
+  } else if (
+    !/(^(^([0-9]\.\s)|^\-\s|^\*\s|^(\!\s))|(^>*?)|\n)/g.test(str) ||
+    !characterIsFirstWithoutSpaces(str, "\\")
+  ) {
     let possibleValue = checkIfNeedClosingandAddTag(str);
     if (cleanTheLine) {
-
       cleanTheLine = false;
       return "";
     } else {
-
-      return possibleValue + str
+      return possibleValue + str;
     }
   }
 
   return str;
 }
 
-
-/**Why arrDirectories inside this function ? 
- * 
+/**Why arrDirectories inside this function ?
+ *
  * In order to generate a menu with all the directories and files that they are being created,
- * we store the path as a string in the array 
+ * we store the path as a string in the array
  */
 
 function processFile(root: string, path: string) {
-
-  console.log("I enter")
+  console.log("I enter");
   //Restart all the needed variables
-    restartVariables();
+  restartVariables();
   //Restart all the needed variables
 
   let pathWithoutExtension = path.substring(0, path.lastIndexOf("."));
@@ -703,19 +658,16 @@ function processFile(root: string, path: string) {
 
   let importRouteToApp: string = "";
   for (let i = 0; i < slashes; i++) {
-    
     if (i === slashes - 1) {
-
-      importRouteToApp += "../App"
+      importRouteToApp += "../App";
     } else {
-
       importRouteToApp += "../";
     }
   }
   //Fill the map of the component name for back and next
   lines.map((line) => fillNavButtonsMap(line));
-  
 
+  /**Just in case that it gives problems with the routes: on friday i tried to manipulate the href when you click */
   let headOfFile: string = `import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
   import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
   import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
@@ -745,12 +697,9 @@ function processFile(root: string, path: string) {
             break;
         }
       }
-
       setCurrentPageIndex(pageIndex);
     }
-  return(<>`
-
-  //Checking branches , this is main
+  return(<><div id="page-content" className="pl-40 pr-40">`;
 
   fs.mkdirSync(`${buildFolder}/${pathWithoutFile}`, { recursive: true });
   fs.writeFileSync(
@@ -780,7 +729,7 @@ let defaultAppContentImports = `import './index.css';
 import { MenuButton } from './components/MenuButton/MenuButton';
 import { lazy, Suspense, useState } from 'react';
 
-`
+`;
 let defaultAppContentFunction = `
 export default function App() {
 
@@ -802,7 +751,7 @@ export default function App() {
     return (
         <>
             <MenuButton currentPageIndex={currentPageIndex} setCurrentPageIndex={setCurrentPageIndex} defaultIndex={defaultIndex} />
-            <div id="page-wrap" className='pl-80 pr-20'>
+            <div id="page-wrap" className='ml-64 2xl:ml-0 pr-20 max-w-[1280px]'>
                 <Suspense fallback={<div>Loading...</div>}>
                     {renderPage()}
                 </Suspense>
@@ -810,8 +759,6 @@ export default function App() {
         </>
     )
 }`;
-
-
 
 let lazyImports: string = "";
 let arrPages: string = `export const pages = [ \n`;
@@ -825,23 +772,20 @@ for (let index = 0; index < arrDirectories.length; index++) {
   lazyImports += correctedFile;
 
   if (index !== arrDirectories.length - 1) {
-
-    arrPages += `\t{ component: ${componentName}, name: "${componentName}"},\n`
+    arrPages += `\t{ component: ${componentName}, name: "${componentName}"},\n`;
   } else {
-
-    arrPages += `\t{ component: ${componentName}, name: "${componentName}"},\n];`
+    arrPages += `\t{ component: ${componentName}, name: "${componentName}"},\n];`;
   }
 }
-
-
 
 fs.writeFileSync(
   `../frontend/src/App.tsx`,
   defaultAppContentImports + lazyImports + arrPages + defaultAppContentFunction
-)
+);
 
 fs.writeFileSync(
   `../frontend/src/output/directoriesList.ts`,
-  `export const arrDirectories = [\n${arrDirectories.map(x => `"${x}"`).join(",\n")}\n];`
-)
-
+  `export const arrDirectories = [\n${arrDirectories
+    .map((x) => `"${x}"`)
+    .join(",\n")}\n];`
+);

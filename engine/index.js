@@ -28,7 +28,7 @@ let backButtonCreated = false;
 let cleanTheLine = false;
 let navButtonsMap = new Map([
     ["back", ""],
-    ["next", ""]
+    ["next", ""],
 ]);
 //Regex
 let quoteBlockRegex = /^\>[\s]*?/g;
@@ -61,10 +61,10 @@ function restartVariables() {
 }
 /**Removes the spaces to check if the first character is the one that was passed, this function it's used for detecting
  * if the line it's part of a nested list or just a line that concides with the characters used for lists
-*/
+ */
 function characterIsFirstWithoutSpaces(str, character) {
     let isFirstCharacter = false;
-    let whiteSpaceRemoved = str.replace(/\s/g, '');
+    let whiteSpaceRemoved = str.replace(/\s/g, "");
     if (whiteSpaceRemoved[0] === character) {
         isFirstCharacter = true;
     }
@@ -146,7 +146,7 @@ function moreThanOne(str, charType) {
         case 2:
             for (let i = 0; i < str.length; i++) {
                 const chr = str[i];
-                if ((i + 1) !== str.length) {
+                if (i + 1 !== str.length) {
                     let twoChars = chr + str[i + 1];
                     if (twoChars === charType) {
                         i++;
@@ -161,7 +161,7 @@ function moreThanOne(str, charType) {
         case 3:
             for (let i = 0; i < str.length; i++) {
                 const chr = str[i];
-                if ((i + 1) !== str.length) {
+                if (i + 1 !== str.length) {
                     let twoChars = chr + str[i + 1];
                     if (twoChars === charType) {
                         i++;
@@ -178,11 +178,14 @@ function moreThanOne(str, charType) {
 function generateCheckBoxAndLabel(id, value) {
     let checkbox = `<input type="checkbox" id="${id}" name="${id}" value="${value}" className="mr-2" />`;
     let label = `<label htmlFor="${id}">${value}</label><br/>`;
-    return `<div className="flex items-center mt-2 mb-2">` + checkbox + label + `</div>`;
+    return (`<div className="flex items-center mt-2 mb-2">` +
+        checkbox +
+        label +
+        `</div>`);
 }
 /**For friday, create a function that looks for specefic [next]() [back]() links, and extract the route
  * inside of the parentesis , to generate the component name for the setter
-*/
+ */
 function generateComponentName(dir) {
     let dashPositions = [];
     for (let index = 0; index < dir.length; index++) {
@@ -192,7 +195,10 @@ function generateComponentName(dir) {
         }
     }
     let componentName = dir.substring(dashPositions[dashPositions.length - 2] + 1);
-    componentName = componentName.replace(".md", "").replace("/", "").replace(" ", "");
+    componentName = componentName
+        .replace(".md", "")
+        .replace("/", "")
+        .replace(" ", "");
     componentName = componentName.replace(componentName[0], componentName[0].toUpperCase());
     return componentName;
 }
@@ -219,10 +225,10 @@ function fillNavButtonsMap(str) {
 }
 function processLine(str) {
     if (str.startsWith("# ")) {
-        return checkIfNeedClosingandAddTag() + "<h1>" + str.substring(2) + "</h1><hr/>";
+        return (checkIfNeedClosingandAddTag() + "<h1>" + str.substring(2) + "</h1><hr/>");
     }
     else if (str.startsWith("## ")) {
-        return checkIfNeedClosingandAddTag() + "<h2>" + str.substring(3) + "</h2><hr/>";
+        return (checkIfNeedClosingandAddTag() + "<h2>" + str.substring(3) + "</h2><hr/>");
     }
     else if (str.startsWith("### ")) {
         return checkIfNeedClosingandAddTag() + "<h3>" + str.substring(4) + "</h3>";
@@ -246,20 +252,20 @@ function processLine(str) {
             console.log(href);
             if (!backButtonCreated) {
                 backButtonCreated = true;
-                return `<div className="nav-wrapper flex" aria-label="Page Navigation"><div className="nav-back flex-none" rel="previous" title="Previous Chapter" aria-label="Previous Chapter" aria-keyshortcuts="Left" onClick={() => handleLinkClick("back")}><FontAwesomeIcon icon={faAngleLeft} size="2x" color="gray"/></div><div className="flex-initial w-80"></div>`;
+                return `</div><div className="nav-wrapper flex" aria-label="Page Navigation"><div className="nav-back flex-none" rel="previous" title="Previous Chapter" aria-label="Previous Chapter" aria-keyshortcuts="Left" onClick={() => handleLinkClick("back")}><FontAwesomeIcon icon={faAngleLeft} size="2x" color="gray"/></div><div className="flex-initial w-1/2"></div>`;
             }
         }
         else if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
             href = "../" + href.replace(".md", ".tsx");
             console.log(href);
             if (!nextButtonCreated) {
+                nextButtonCreated = true;
                 if (backButtonCreated) {
                     return `<div className="nav-next flex-none" rel="next" title="Next Chapter" aria-label="Next Chapter" aria-keyshortcuts="Right" onClick={() => handleLinkClick("next")}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></div>`;
                 }
                 else {
-                    return `<div className="nav-wrapper flex" aria-label="Page Navigation"><div className="flex-none"></div><div className="flex-initial w-80"></div><div className="nav-back flex-none" rel="next" title="Next Chapter" aria-label="Next Chapter" aria-keyshortcuts="Right" onClick={() => handleLinkClick("next")}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></div></div>`;
+                    return `</div><div className="nav-wrapper flex" aria-label="Page Navigation"><div ></div><div className="flex-initial w-1/2"></div><div className="nav-back flex-none" rel="next" title="Next Chapter" aria-label="Next Chapter" aria-keyshortcuts="Right" onClick={() => handleLinkClick("next")}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></div></div>`;
                 }
-                backButtonCreated = true;
             }
         }
         else {
@@ -417,7 +423,7 @@ function processLine(str) {
             let c = 0;
             while (/ |\t/.test(str.charAt(c++)))
                 layer++;
-            layer = (layer / 2) + 1;
+            layer = layer / 2 + 1;
             str = str.trim();
             if (olLayer === 0) {
                 olLayer = 1;
@@ -444,16 +450,26 @@ function processLine(str) {
             }
         }
     }
-    else if (str.includes("_") || str.includes("*") || str.includes("^") || str.includes("-")) {
+    else if (str.includes("_") ||
+        str.includes("*") ||
+        str.includes("^") ||
+        str.includes("-")) {
         str = str.replace(/\^([^\^]+)\^/g, "<sup>$1</sup><br/>");
-        if (moreThanOne(str, "*") || moreThanOne(str, "_") || moreThanOne(str, "-")) { //This part is for controlling the italics, bold and emdash
+        if (moreThanOne(str, "*") ||
+            moreThanOne(str, "_") ||
+            moreThanOne(str, "-")) {
+            //This part is for controlling the italics, bold and emdash
             str = str.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
             str = str.replace(/\*(.*?)\*/g, "<i>$1</i>");
             str = str.replace(/_([^_]+)_/g, "<sub>$1</sub>");
             str = str.replace(/--/g, "&mdash;");
             str = `<p>${str}</p>`;
         }
-        else if (str.startsWith("*") || str.startsWith("-") || characterIsFirstWithoutSpaces(str, "*") || characterIsFirstWithoutSpaces(str, "-")) { //This part is for controlling the unordened lists
+        else if (str.startsWith("*") ||
+            str.startsWith("-") ||
+            characterIsFirstWithoutSpaces(str, "*") ||
+            characterIsFirstWithoutSpaces(str, "-")) {
+            //This part is for controlling the unordened lists
             if (ulLayer === 0) {
                 str = str.replace(/^\* (.*)/gm, `<ul id="ul-${ulNumber}" className="list-disc list-inside"><li>$1</li>`);
                 str = str.replace(/^\- (.*)/gm, `<ul id="ul-${ulNumber}" className="list-disc list-inside"><li>$1</li>`);
@@ -465,7 +481,7 @@ function processLine(str) {
                 let c = 0;
                 while (/ |\t/.test(str.charAt(c++)))
                     layer++;
-                layer = (layer / 2) + 1;
+                layer = layer / 2 + 1;
                 if (layer === ulLayer) {
                     if (ulLayer === 1) {
                         str = str.replace(/^\* (.*)/gm, `<li>$1</li>`).trim();
@@ -534,7 +550,8 @@ function processLine(str) {
     else if (/^[a-zA-Z0-9]/.test(str)) {
         return `<p>${str}</p>`;
     }
-    else if (!/(^(^([0-9]\.\s)|^\-\s|^\*\s|^(\!\s))|(^>*?)|\n)/g.test(str) || !characterIsFirstWithoutSpaces(str, "\\")) {
+    else if (!/(^(^([0-9]\.\s)|^\-\s|^\*\s|^(\!\s))|(^>*?)|\n)/g.test(str) ||
+        !characterIsFirstWithoutSpaces(str, "\\")) {
         let possibleValue = checkIfNeedClosingandAddTag(str);
         if (cleanTheLine) {
             cleanTheLine = false;
@@ -583,6 +600,7 @@ function processFile(root, path) {
     }
     //Fill the map of the component name for back and next
     lines.map((line) => fillNavButtonsMap(line));
+    /**Just in case that it gives problems with the routes: on friday i tried to manipulate the href when you click */
     let headOfFile = `import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
   import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
   import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
@@ -612,10 +630,9 @@ function processFile(root, path) {
             break;
         }
       }
-
       setCurrentPageIndex(pageIndex);
     }
-  return(<>`;
+  return(<><div id="page-content" className="pl-40 pr-40">`;
     fs_1.default.mkdirSync(`${buildFolder}/${pathWithoutFile}`, { recursive: true });
     fs_1.default.writeFileSync(`${buildFolder}/${pathWithoutExtension}.tsx`, headOfFile + lines.map((line) => processLine(line)).join("\n") + `</>)}`);
 }
@@ -664,7 +681,7 @@ export default function App() {
     return (
         <>
             <MenuButton currentPageIndex={currentPageIndex} setCurrentPageIndex={setCurrentPageIndex} defaultIndex={defaultIndex} />
-            <div id="page-wrap" className='pl-80 pr-20'>
+            <div id="page-wrap" className='ml-64 2xl:ml-0 pr-20 max-w-[1280px]'>
                 <Suspense fallback={<div>Loading...</div>}>
                     {renderPage()}
                 </Suspense>
@@ -688,4 +705,6 @@ for (let index = 0; index < arrDirectories.length; index++) {
     }
 }
 fs_1.default.writeFileSync(`../frontend/src/App.tsx`, defaultAppContentImports + lazyImports + arrPages + defaultAppContentFunction);
-fs_1.default.writeFileSync(`../frontend/src/output/directoriesList.ts`, `export const arrDirectories = [\n${arrDirectories.map(x => `"${x}"`).join(",\n")}\n];`);
+fs_1.default.writeFileSync(`../frontend/src/output/directoriesList.ts`, `export const arrDirectories = [\n${arrDirectories
+    .map((x) => `"${x}"`)
+    .join(",\n")}\n];`);

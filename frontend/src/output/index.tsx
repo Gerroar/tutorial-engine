@@ -27,10 +27,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
             break;
         }
       }
-
       setCurrentPageIndex(pageIndex);
     }
-  return(<>
+  return(<><div id="page-content" className="pl-40 pr-40">
 <h1>Tutorial Engine</h1><hr/>
 
 Something a little like <a href="https://doc.rust-lang.org/book/" target="_blank">https://doc.rust-lang.org/book/</a>
@@ -162,7 +161,7 @@ Links <a href="https://doc.rust-lang.org/book/#the-rust-programming-language">to
 <p>Prev button</p>
 
 
-<div className="nav-wrapper flex" aria-label="Page Navigation"><div className="flex-none"></div><div className="flex-initial w-80"></div><div className="nav-back flex-none" rel="next" title="Next Chapter" aria-label="Next Chapter" aria-keyshortcuts="Right" onClick={() => handleLinkClick("next")}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></div></div>
+</div><div className="nav-wrapper flex" aria-label="Page Navigation"><div ></div><div className="flex-initial w-1/2"></div><div className="nav-back flex-none" rel="next" title="Next Chapter" aria-label="Next Chapter" aria-keyshortcuts="Right" onClick={() => handleLinkClick("next")}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></div></div>
 
 
 

@@ -38,7 +38,7 @@ export default function App() {
     return (
         <>
             <MenuButton currentPageIndex={currentPageIndex} setCurrentPageIndex={setCurrentPageIndex} defaultIndex={defaultIndex} />
-            <div id="page-wrap" className='pl-80 pr-20'>
+            <div id="page-wrap" className='ml-64 2xl:ml-0 pr-20 max-w-[1280px]'>
                 <Suspense fallback={<div>Loading...</div>}>
                     {renderPage()}
                 </Suspense>
