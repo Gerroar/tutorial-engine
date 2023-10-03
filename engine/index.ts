@@ -4,7 +4,7 @@ import crypto from "crypto";
 
 const buildFolder = "../frontend/src/output";
 let arrDirectories: string[] = [];
-
+let openPageContent: boolean = false;
 let inCode = false;
 let lastSh = ``;
 let olLayer: number = 0;
@@ -248,7 +248,8 @@ function fillNavButtonsMap(str: string) {
       str.indexOf("(") + 1,
       str.lastIndexOf(")")
     );
-    href = generateComponentName(href);
+
+    href = "/" + href.replace(".md", "");
 
     if (/(^back$)|(^\<\-$)/gi.test(linkContent)) {
       console.log("Generated href", href);
@@ -301,7 +302,8 @@ function processLine(str: string) {
       console.log(href);
       if (!backButtonCreated) {
         backButtonCreated = true;
-        return `</div><div className="nav-wrapper flex" aria-label="Page Navigation"><div className="nav-back flex-none" rel="previous" title="Previous Chapter" aria-label="Previous Chapter" aria-keyshortcuts="Left" onClick={() => handleLinkClick("back")}><FontAwesomeIcon icon={faAngleLeft} size="2x" color="gray"/></div><div className="flex-initial w-1/2"></div>`;
+        openPageContent = false;
+        return `</div><div className="nav-wrapper flex" aria-label="Page Navigation"><Link  className="nav-back flex-none" to={backPath}><FontAwesomeIcon icon={faAngleLeft} size="2x" color="gray"/></Link><div className="flex-initial w-1/2"></div>`;
       }
     } else if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
       href = "../" + href.replace(".md", ".tsx");
@@ -309,9 +311,10 @@ function processLine(str: string) {
       if (!nextButtonCreated) {
         nextButtonCreated = true;
         if (backButtonCreated) {
-          return `<div className="nav-next flex-none" rel="next" title="Next Chapter" aria-label="Next Chapter" aria-keyshortcuts="Right" onClick={() => handleLinkClick("next")}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></div>`;
+          return `<Link  className="nav-next flex-none" to={nextPath}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></Link>`;
         } else {
-          return `</div><div className="nav-wrapper flex" aria-label="Page Navigation"><div ></div><div className="flex-initial w-1/2"></div><div className="nav-back flex-none" rel="next" title="Next Chapter" aria-label="Next Chapter" aria-keyshortcuts="Right" onClick={() => handleLinkClick("next")}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></div></div>`;
+          openPageContent = false;
+          return `</div><div className="nav-wrapper flex" aria-label="Page Navigation"><div ></div><div className="flex-initial w-1/2"></div><Link  className="nav-back flex-none" to={nextPath}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></Link></div>`;
         }
       }
     } else {
@@ -664,47 +667,49 @@ function processFile(root: string, path: string) {
       importRouteToApp += "../";
     }
   }
+
   //Fill the map of the component name for back and next
   lines.map((line) => fillNavButtonsMap(line));
+  console.log(navButtonsMap);
+
+  let backPath: string = "";
+  let nextPath: string = "";
+
+  if (navButtonsMap.get("back") !== "") {
+    backPath = navButtonsMap.get("back")!;
+  }
+
+  if (navButtonsMap.get("next") !== "") {
+    nextPath = navButtonsMap.get("next")!;
+  }
 
   /**Just in case that it gives problems with the routes: on friday i tried to manipulate the href when you click */
   let headOfFile: string = `import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
   import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
   import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
-  import { pages } from "${importRouteToApp}";
-  export default function ${filenameWithoutExtension}({setCurrentPageIndex}:{setCurrentPageIndex: any}){
-    
-    let pageIndex: number = 0;
-    let backComponentName: string = "${navButtonsMap.get("back")}";
-    let nextComponentName: string = "${navButtonsMap.get("next")}";
-    const handleLinkClick = (option: string) => {
+  import { Link } from "react-router-dom";
+  export default function ${filenameWithoutExtension}(){
 
-      for (let i = 0; i < pages.length; i++) {
-        const element = pages[i];
-        switch (option) {
-          case "back":
-            
-            if (element.name === backComponentName) {
-              pageIndex = i;
-            }
-            break;
-          case "next":
-            
-            if (element.name === nextComponentName) {
-
-              pageIndex = i;
-            }
-            break;
-        }
-      }
-      setCurrentPageIndex(pageIndex);
-    }
+  let backPath: string = "${backPath}";
+  let nextPath: string = "${nextPath}";
   return(<><div id="page-content" className="pl-40 pr-40">`;
+  openPageContent = true;
+
+  function correctTheFooterTags() {
+    if (openPageContent) {
+      openPageContent = false;
+      return `</div></>)}`;
+    } else {
+      return `</>)}`;
+    }
+  }
 
   fs.mkdirSync(`${buildFolder}/${pathWithoutFile}`, { recursive: true });
   fs.writeFileSync(
     `${buildFolder}/${pathWithoutExtension}.tsx`,
-    headOfFile + lines.map((line) => processLine(line)).join("\n") + `</>)}`
+    headOfFile +
+      lines.map((line) => processLine(line)).join("\n") +
+      correctTheFooterTags()
   );
 }
 
@@ -727,60 +732,56 @@ processPath(process.argv[2] || "tests/first-test", "");
 
 let defaultAppContentImports = `import './index.css';
 import { MenuButton } from './components/MenuButton/MenuButton';
-import { lazy, Suspense, useState } from 'react';
+import { Routes, Route, } from "react-router-dom";
+import ErrorPage from "./ErrorPage";
 
 `;
-let defaultAppContentFunction = `
-export default function App() {
 
-    let defaultIndex: number = 0;
-    for (let i = 0; i < pages.length; i++) {
-      const element = pages[i];
-      if (element.name === "Index") {
-        defaultIndex = i;
-      }
-    }
-
-    const [currentPageIndex, setCurrentPageIndex] = useState(defaultIndex);
-    const renderPage = () => {
-
-        const Page = pages[currentPageIndex].component;
-        return <Page setCurrentPageIndex={setCurrentPageIndex} />
-    }
+let appContent = `export default function App() {
 
     return (
-        <>
-            <MenuButton currentPageIndex={currentPageIndex} setCurrentPageIndex={setCurrentPageIndex} defaultIndex={defaultIndex} />
-            <div id="page-wrap" className='ml-64 2xl:ml-0 pr-20 max-w-[1280px]'>
-                <Suspense fallback={<div>Loading...</div>}>
-                    {renderPage()}
-                </Suspense>
-            </div>
-        </>
-    )
+      <>
+        <MenuButton />
+        <div id="page-wrap" className="ml-64 2xl:ml-0 pr-20 max-w-[1280px]">
+          <Routes>
+            <Route path="/" element={<Index />} />  
+       `;
+
+let appEnd = ` </div>
+  </>
+  )
 }`;
 
-let lazyImports: string = "";
-let arrPages: string = `export const pages = [ \n`;
+let routeImports: string = "";
+let routeElements: string = "";
 
-for (let index = 0; index < arrDirectories.length; index++) {
-  const dir = arrDirectories[index];
+for (let i = 0; i < arrDirectories.length; i++) {
+  const dir = arrDirectories[i];
   let componentName: string = generateComponentName(dir);
-  let correctedFile: string = `const ${componentName} = lazy(() => import("./output${dir}"));\n`;
-  correctedFile = correctedFile.replace(".md", "");
+  let routerPath: string = dir.replace(".md", "");
+  let correctedFile: string = `import ${componentName} from "./output${routerPath}";\n`;
 
-  lazyImports += correctedFile;
+  routeImports += correctedFile;
 
-  if (index !== arrDirectories.length - 1) {
-    arrPages += `\t{ component: ${componentName}, name: "${componentName}"},\n`;
+  console.log(routerPath);
+  if (i !== arrDirectories.length - 1) {
+    if (routerPath !== "/index") {
+      routeElements += `<Route path="${routerPath.replace(
+        / /g,
+        ""
+      )}" element={<${componentName} />} />\n`;
+    }
   } else {
-    arrPages += `\t{ component: ${componentName}, name: "${componentName}"},\n];`;
+    routeElements += `<Route path="${routerPath.replace(
+      / /g,
+      ""
+    )}" element={<${componentName} />} />\n</Routes></div></>)};\n`;
   }
 }
 
 fs.writeFileSync(
   `../frontend/src/App.tsx`,
-  defaultAppContentImports + lazyImports + arrPages + defaultAppContentFunction
+  defaultAppContentImports + routeImports + appContent + routeElements
 );
 
 fs.writeFileSync(

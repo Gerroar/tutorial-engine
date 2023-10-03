@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { MenuItem } from "./MenuItem";
-import { useState, useEffect } from "react";
 import { arrDirectories } from "../../../output/directoriesList";
 
 //Framer motion
@@ -96,10 +95,8 @@ function generateTsx(
   name: string,
   index: string,
   hasDocsInside: boolean,
-  currentPageIndex: number,
-  setCurrentPageIndex: any,
   fileCountIndex: number,
-  defaultIndex: number
+  pathToUse: string
 ) {
   if (index.length === 1) {
     return (
@@ -111,10 +108,8 @@ function generateTsx(
         key={index}
         hasDocsInside={hasDocsInside}
         hidden={false}
-        currentPageIndex={currentPageIndex}
-        setCurrentPageIndex={setCurrentPageIndex}
         fileCountIndex={fileCountIndex}
-        defaultIndex={defaultIndex}
+        pathToUse={pathToUse}
       />
     );
   } else {
@@ -127,10 +122,8 @@ function generateTsx(
         key={index}
         hasDocsInside={hasDocsInside}
         hidden={true}
-        currentPageIndex={currentPageIndex}
-        setCurrentPageIndex={setCurrentPageIndex}
         fileCountIndex={fileCountIndex}
-        defaultIndex={defaultIndex}
+        pathToUse={pathToUse}
       />
     );
   }
@@ -146,15 +139,7 @@ let directoryTree = parseArrayDirectories(arrSplitDir);
 
 flatten(directoryTree, "");
 
-export const Navigation = ({
-  currentPageIndex,
-  setCurrentPageIndex,
-  defaultIndex,
-}: {
-  currentPageIndex: number;
-  setCurrentPageIndex: any;
-  defaultIndex: number;
-}) => {
+export const Navigation = () => {
   let fileCountIndex = 0;
 
   if (flattenOutput.length === 0) {
@@ -168,10 +153,8 @@ export const Navigation = ({
           key={"1"}
           hasDocsInside={false}
           hidden={false}
-          currentPageIndex={currentPageIndex}
-          setCurrentPageIndex={setCurrentPageIndex}
           fileCountIndex={fileCountIndex}
-          defaultIndex={defaultIndex}
+          pathToUse=""
         />
       </motion.ul>
     );
@@ -186,8 +169,21 @@ export const Navigation = ({
           let index = value.substring(0, value.indexOf(" "));
           let name = value.substring(value.indexOf(" "));
           let hasDocsInside = docsInside(name);
+          let pathToUse: string = "";
 
           if (!hasDocsInside) {
+            if (fileCountIndex <= arrDirectories.length) {
+              console.log("arrlength", arrDirectories.length);
+              console.log("filecount", fileCountIndex);
+              if (arrDirectories[fileCountIndex] === "/index.md") {
+                pathToUse = "/";
+              } else {
+                pathToUse = arrDirectories[fileCountIndex]
+                  .replace(".md", "")
+                  .replace(/ /g, "");
+                console.log(pathToUse);
+              }
+            }
             fileCountIndex++;
           }
 
@@ -198,10 +194,8 @@ export const Navigation = ({
               name,
               index,
               hasDocsInside,
-              currentPageIndex,
-              setCurrentPageIndex,
               fileCountIndex,
-              defaultIndex
+              pathToUse
             );
           } else if (index.length > depth) {
             depth = index.length;
@@ -213,10 +207,8 @@ export const Navigation = ({
               name,
               index,
               hasDocsInside,
-              currentPageIndex,
-              setCurrentPageIndex,
               fileCountIndex,
-              defaultIndex
+              pathToUse
             );
           } else if (index.length < depth) {
             let oldDepth = depth;
@@ -234,10 +226,8 @@ export const Navigation = ({
               name,
               index,
               hasDocsInside,
-              currentPageIndex,
-              setCurrentPageIndex,
               fileCountIndex,
-              defaultIndex
+              pathToUse
             );
           }
         })}

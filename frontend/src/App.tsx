@@ -1,48 +1,27 @@
 import './index.css';
 import { MenuButton } from './components/MenuButton/MenuButton';
-import { lazy, Suspense, useState } from 'react';
+import { Routes, Route, } from "react-router-dom";
+import ErrorPage from "./ErrorPage";
 
-const Chapter1index = lazy(() => import("./output/chapter1/index"));
-const Chrfile = lazy(() => import("./output/chapter1/section 1/chr/file"));
-const LayerTestlayertest = lazy(() => import("./output/chapter1/section 1/chr/Layer Test/layertest"));
-const Section2file2 = lazy(() => import("./output/chapter1/section 2/file2"));
-const Section1file = lazy(() => import("./output/chapter2/section 1/file"));
-const Index = lazy(() => import("./output/index"));
-const Other = lazy(() => import("./output/other"));
-export const pages = [ 
-	{ component: Chapter1index, name: "Chapter1index"},
-	{ component: Chrfile, name: "Chrfile"},
-	{ component: LayerTestlayertest, name: "LayerTestlayertest"},
-	{ component: Section2file2, name: "Section2file2"},
-	{ component: Section1file, name: "Section1file"},
-	{ component: Index, name: "Index"},
-	{ component: Other, name: "Other"},
-];
+import Chapter1index from "./output/chapter1/index";
+import Chrfile from "./output/chapter1/section 1/chr/file";
+import LayerTestlayertest from "./output/chapter1/section 1/chr/Layer Test/layertest";
+import Section2file2 from "./output/chapter1/section 2/file2";
+import Section1file from "./output/chapter2/section 1/file";
+import Index from "./output/index";
+import Other from "./output/other";
 export default function App() {
 
-    let defaultIndex: number = 0;
-    for (let i = 0; i < pages.length; i++) {
-      const element = pages[i];
-      if (element.name === "Index") {
-        defaultIndex = i;
-      }
-    }
-
-    const [currentPageIndex, setCurrentPageIndex] = useState(defaultIndex);
-    const renderPage = () => {
-
-        const Page = pages[currentPageIndex].component;
-        return <Page setCurrentPageIndex={setCurrentPageIndex} />
-    }
-
     return (
-        <>
-            <MenuButton currentPageIndex={currentPageIndex} setCurrentPageIndex={setCurrentPageIndex} defaultIndex={defaultIndex} />
-            <div id="page-wrap" className='ml-64 2xl:ml-0 pr-20 max-w-[1280px]'>
-                <Suspense fallback={<div>Loading...</div>}>
-                    {renderPage()}
-                </Suspense>
-            </div>
-        </>
-    )
-}
+      <>
+        <MenuButton />
+        <div id="page-wrap" className="ml-64 2xl:ml-0 pr-20 max-w-[1280px]">
+          <Routes>
+            <Route path="/" element={<Index />} />  
+       <Route path="/chapter1/index" element={<Chapter1index />} />
+<Route path="/chapter1/section1/chr/file" element={<Chrfile />} />
+<Route path="/chapter1/section1/chr/LayerTest/layertest" element={<LayerTestlayertest />} />
+<Route path="/chapter1/section2/file2" element={<Section2file2 />} />
+<Route path="/chapter2/section1/file" element={<Section1file />} />
+<Route path="/other" element={<Other />} />
+</Routes></div></>)};
