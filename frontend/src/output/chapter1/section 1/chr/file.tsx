@@ -6,4 +6,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
   let backPath: string = "";
   let nextPath: string = "";
+  if (backPath === "/index") {
+    backPath = "/";
+  } else if (nextPath === "/index") {
+    nextPath = "/";
+  }
   return(<><div id="page-content" className="pl-40 pr-40"><p>With some content</p></div></>)}

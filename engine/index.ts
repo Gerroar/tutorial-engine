@@ -252,13 +252,11 @@ function fillNavButtonsMap(str: string) {
     href = "/" + href.replace(".md", "");
 
     if (/(^back$)|(^\<\-$)/gi.test(linkContent)) {
-      console.log("Generated href", href);
       if (!backButtonInfoExtracted) {
         backButtonInfoExtracted = true;
         navButtonsMap.set("back", href);
       }
     } else if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
-      console.log("Generated href", href);
       if (!nextButtonCreated) {
         nextButtonInfoExtracted = true;
         navButtonsMap.set("next", href);
@@ -299,7 +297,6 @@ function processLine(str: string) {
 
     if (/(^back$)|(^\<\-$)/gi.test(linkContent)) {
       href = "../" + href.replace(".md", ".tsx");
-      console.log(href);
       if (!backButtonCreated) {
         backButtonCreated = true;
         openPageContent = false;
@@ -307,7 +304,6 @@ function processLine(str: string) {
       }
     } else if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
       href = "../" + href.replace(".md", ".tsx");
-      console.log(href);
       if (!nextButtonCreated) {
         nextButtonCreated = true;
         if (backButtonCreated) {
@@ -633,7 +629,6 @@ function processLine(str: string) {
  */
 
 function processFile(root: string, path: string) {
-  console.log("I enter");
   //Restart all the needed variables
   restartVariables();
   //Restart all the needed variables
@@ -670,7 +665,6 @@ function processFile(root: string, path: string) {
 
   //Fill the map of the component name for back and next
   lines.map((line) => fillNavButtonsMap(line));
-  console.log(navButtonsMap);
 
   let backPath: string = "";
   let nextPath: string = "";
@@ -683,7 +677,6 @@ function processFile(root: string, path: string) {
     nextPath = navButtonsMap.get("next")!;
   }
 
-  /**Just in case that it gives problems with the routes: on friday i tried to manipulate the href when you click */
   let headOfFile: string = `import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
   import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
   import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
@@ -692,6 +685,11 @@ function processFile(root: string, path: string) {
 
   let backPath: string = "${backPath}";
   let nextPath: string = "${nextPath}";
+  if (backPath === "/index") {
+    backPath = "/";
+  } else if (nextPath === "/index") {
+    nextPath = "/";
+  }
   return(<><div id="page-content" className="pl-40 pr-40">`;
   openPageContent = true;
 
@@ -760,10 +758,7 @@ for (let i = 0; i < arrDirectories.length; i++) {
   let componentName: string = generateComponentName(dir);
   let routerPath: string = dir.replace(".md", "");
   let correctedFile: string = `import ${componentName} from "./output${routerPath}";\n`;
-
   routeImports += correctedFile;
-
-  console.log(routerPath);
   if (i !== arrDirectories.length - 1) {
     if (routerPath !== "/index") {
       routeElements += `<Route path="${routerPath.replace(

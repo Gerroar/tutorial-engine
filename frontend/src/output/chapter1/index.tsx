@@ -6,6 +6,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
   let backPath: string = "/index";
   let nextPath: string = "/chapter1/section1/chr/file";
+  if (backPath === "/index") {
+    backPath = "/";
+  } else if (nextPath === "/index") {
+    nextPath = "/";
+  }
   return(<><div id="page-content" className="pl-40 pr-40"><h1>This is chapter 1</h1><hr/>
 
 </div><div className="nav-wrapper flex" aria-label="Page Navigation"><Link  className="nav-back flex-none" to={backPath}><FontAwesomeIcon icon={faAngleLeft} size="2x" color="gray"/></Link><div className="flex-initial w-1/2"></div>
