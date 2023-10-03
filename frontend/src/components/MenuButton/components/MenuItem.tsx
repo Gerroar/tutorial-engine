@@ -1,6 +1,7 @@
 import { Variants, motion } from "framer-motion";
 import { TriangleToggle } from "./TriangleToggle";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const variants: Variants = {
   open: {
@@ -16,6 +17,7 @@ function changeSubsVisibility(
   isActive: boolean,
   setIsActive: any
 ) {
+  console.log("enter");
   setIsActive(!isActive);
   const ulMenu = document.getElementById("ul-menu");
   if (ulMenu) {
@@ -62,10 +64,8 @@ type MenuItemProps = {
   elementIndex: string;
   hasDocsInside: boolean;
   hidden: boolean;
-  currentPageIndex: number;
-  setCurrentPageIndex: any;
   fileCountIndex: number;
-  defaultIndex: number;
+  pathToUse: string;
 };
 
 export const MenuItem = ({
@@ -75,19 +75,13 @@ export const MenuItem = ({
   elementIndex,
   hasDocsInside,
   hidden,
-  currentPageIndex,
-  setCurrentPageIndex,
   fileCountIndex,
-  defaultIndex,
+  pathToUse,
 }: MenuItemProps) => {
   const [isActive, setIsActive] = useState(false);
 
   let classN: string = "";
-  let oneLayerNoDocsId: number = defaultIndex;
-
-  if (fileCountIndex > oneLayerNoDocsId) {
-    oneLayerNoDocsId = fileCountIndex;
-  }
+  let havePath: boolean = false;
 
   directoryElm = directoryElm.replace(".md", "");
   if (hidden) {
@@ -96,11 +90,116 @@ export const MenuItem = ({
     classN = "li-menu";
   }
 
-  const handleFileClick = (newId: number) => {
-    setCurrentPageIndex(newId);
-  };
+  if (hasDocsInside) {
+    if (elementIndex.length === 1) {
+      return (
+        <motion.li
+          style={{ marginLeft: marginL }}
+          className={classN}
+          variants={variants}
+          onClick={() =>
+            changeSubsVisibility(elementIndex, isActive, setIsActive)
+          }
+          id={elementIndex}
+        >
+          <>
+            <div className="flex flex-row">
+              <div
+                className={`w-6 h-6 flex-shrink-0 content-center font-bold`}
+                style={{ marginRight: `${marginR}` }}
+              >
+                {elementIndex}
+              </div>
+              <div className="w-20 h-5 ">{directoryElm}</div>
+              <TriangleToggle
+                isActive={isActive}
+                indexLength={elementIndex.length}
+              />
+            </div>
+          </>
+        </motion.li>
+      );
+    } else {
+      return (
+        <motion.li
+          style={{ marginLeft: marginL }}
+          className={classN}
+          variants={variants}
+          onClick={() =>
+            changeSubsVisibility(elementIndex, isActive, setIsActive)
+          }
+          id={elementIndex}
+        >
+          <>
+            <div className="flex flex-row ml-3">
+              <div
+                className={`w-6 h-6 flex-shrink-0 content-center font-bold`}
+                style={{ marginRight: `${marginR}` }}
+              >
+                {elementIndex}
+              </div>
+              <div className="w-20 h-5">{directoryElm}</div>
+              <TriangleToggle
+                isActive={isActive}
+                indexLength={elementIndex.length}
+              />
+            </div>
+          </>
+        </motion.li>
+      );
+    }
+  } else if (pathToUse !== "") {
+    console.log("I enter with this path", pathToUse);
+    if (elementIndex.length === 1) {
+      return (
+        <motion.li
+          style={{ marginLeft: marginL }}
+          className={classN}
+          variants={variants}
+          id={elementIndex}
+        >
+          <>
+            <Link to={pathToUse}>
+              <div className="flex flex-row">
+                <div
+                  className={`w-6 h-6  flex-shrink-0  content-center font-bold`}
+                >
+                  {elementIndex}
+                </div>
+                <div className={`w-20 h-5 font-normal`}>{directoryElm}</div>
+              </div>
+            </Link>
+          </>
+        </motion.li>
+      );
+    } else {
+      return (
+        <motion.li
+          style={{ marginLeft: marginL }}
+          className={classN}
+          variants={variants}
+          id={elementIndex}
+        >
+          <>
+            <Link to={pathToUse}>
+              <div className="flex flex-row ml-3" id={`${fileCountIndex - 1}`}>
+                <div
+                  className={`w-6 h-6 flex-shrink-0 content-center font-bold`}
+                  style={{ marginRight: `${marginR}` }}
+                >
+                  {elementIndex}
+                </div>
+                <div className="w-20 h-5">{directoryElm}</div>
+              </div>
+            </Link>
+          </>
+        </motion.li>
+      );
+    }
+  }
 
-  return (
+  /**
+  *  return (
     <motion.li
       style={{ marginLeft: marginL }}
       className={classN}
@@ -143,22 +242,14 @@ export const MenuItem = ({
           </>
         )
       ) : elementIndex.length === 1 ? (
-        <div
-          className="flex flex-row"
-          id={`${oneLayerNoDocsId - 1}`}
-          onClick={() => handleFileClick(oneLayerNoDocsId - 1)}
-        >
+        <div className="flex flex-row">
           <div className={`w-6 h-6  flex-shrink-0  content-center font-bold`}>
             {elementIndex}
           </div>
-          <div className={`w-20 h-5`}>{directoryElm}</div>
+          <div className={`w-20 h-5 font-normal`}>{directoryElm}</div>
         </div>
       ) : (
-        <div
-          className="flex flex-row ml-3"
-          id={`${fileCountIndex - 1}`}
-          onClick={() => handleFileClick(fileCountIndex - 1)}
-        >
+        <div className="flex flex-row ml-3" id={`${fileCountIndex - 1}`}>
           <div
             className={`w-6 h-6 flex-shrink-0 content-center font-bold`}
             style={{ marginRight: `${marginR}` }}
@@ -170,4 +261,5 @@ export const MenuItem = ({
       )}
     </motion.li>
   );
+ */
 };

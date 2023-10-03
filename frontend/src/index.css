@@ -19,7 +19,7 @@ nav {
     top: 0;
     left: 0;
     bottom: 0;
-    width: 300px;
+    width: 250px;
 }
 
 #menu-path {
@@ -202,16 +202,21 @@ details summary>* {
 
 /*Classes for Spoiler*/
 
+.nav-wrapper {
+
+    margin-top: 5rem;
+    justify-content: space-between;
+}
 
 .nav-back {
 
-    /*float: left;*/
+    float: left;
     cursor: pointer;
 }
 
 .nav-next {
 
-    /*float: right;*/
+    float: right;
     cursor: pointer;
 }
 
