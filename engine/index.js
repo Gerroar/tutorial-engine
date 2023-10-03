@@ -616,6 +616,7 @@ function processFile(root, path) {
       setCurrentPageIndex(pageIndex);
     }
   return(<>`;
+    //Checking branches , this is main
     fs_1.default.mkdirSync(`${buildFolder}/${pathWithoutFile}`, { recursive: true });
     fs_1.default.writeFileSync(`${buildFolder}/${pathWithoutExtension}.tsx`, headOfFile + lines.map((line) => processLine(line)).join("\n") + `</>)}`);
 }
