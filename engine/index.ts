@@ -1,6 +1,7 @@
 import { execFileSync, execSync, spawnSync } from "child_process";
 import fs from "fs";
 import crypto from "crypto";
+import hljs from "highlight.js";
 
 const buildFolder = "../frontend/src/output";
 let arrDirectories: string[] = [];
@@ -27,6 +28,13 @@ let navButtonsMap: Map<string, string> = new Map([
   ["back", ""],
   ["next", ""],
 ]);
+/**This variable its used to specify which path will be the first to appear in the app, that means that it uses
+ * it will the route that it's located in "/" so that means the first route to appear when the page its loaded
+ * without any specific url, change it at your convinience, the specified path will appear "hardcoded" in the
+ * routes and will use "/" instead of for example "/index, always start your path with / because all of the
+ * paths start with them ( you can check in the generated App.jsx)
+ */
+let rootPath: string = "/index";
 
 //Regex
 
@@ -36,8 +44,6 @@ let urlRegEx: RegExp =
   /(((http|https):\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*[-a-zA-Z0-9@:%_\+~#?&//=])?)/;
 
 //Regex
-
-/**DONT FORGET ABOUT tsc -w WHEN WORKING WITH THE ENGINE PART IF NOT THEY WONT APPEAR ANY CHANGES FROM THE index.ts */
 
 /**Restart all the vars to the default value */
 
@@ -685,9 +691,9 @@ function processFile(root: string, path: string) {
 
   let backPath: string = "${backPath}";
   let nextPath: string = "${nextPath}";
-  if (backPath === "/index") {
+  if (backPath === "${rootPath}") {
     backPath = "/";
-  } else if (nextPath === "/index") {
+  } else if (nextPath === "${rootPath}") {
     nextPath = "/";
   }
   return(<><div id="page-content" className="pl-40 pr-40">`;
@@ -742,7 +748,9 @@ let appContent = `export default function App() {
         <MenuButton />
         <div id="page-wrap" className="ml-64 2xl:ml-0 pr-20 max-w-[1280px]">
           <Routes>
-            <Route path="/" element={<Index />} />  
+            <Route path="/" element={<${generateComponentName(
+              rootPath
+            )} />} />  
        `;
 
 let appEnd = ` </div>
@@ -760,7 +768,7 @@ for (let i = 0; i < arrDirectories.length; i++) {
   let correctedFile: string = `import ${componentName} from "./output${routerPath}";\n`;
   routeImports += correctedFile;
   if (i !== arrDirectories.length - 1) {
-    if (routerPath !== "/index") {
+    if (routerPath !== rootPath) {
       routeElements += `<Route path="${routerPath.replace(
         / /g,
         ""
