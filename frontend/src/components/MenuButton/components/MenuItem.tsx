@@ -17,7 +17,6 @@ function changeSubsVisibility(
   isActive: boolean,
   setIsActive: any
 ) {
-  console.log("enter");
   setIsActive(!isActive);
   const ulMenu = document.getElementById("ul-menu");
   if (ulMenu) {
@@ -149,7 +148,6 @@ export const MenuItem = ({
       );
     }
   } else if (pathToUse !== "") {
-    console.log("I enter with this path", pathToUse);
     if (elementIndex.length === 1) {
       return (
         <motion.li

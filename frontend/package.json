@@ -18,6 +18,7 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@reduxjs/toolkit": "^1.9.5",
     "customize-cra": "^1.0.0",
+    "devicons-react": "^1.2.6",
     "dompurify": "^3.0.5",
     "framer-motion": "^10.15.2",
     "list-react-files": "^0.2.0",

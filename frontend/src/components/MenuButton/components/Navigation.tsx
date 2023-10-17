@@ -173,15 +173,12 @@ export const Navigation = () => {
 
           if (!hasDocsInside) {
             if (fileCountIndex <= arrDirectories.length) {
-              console.log("arrlength", arrDirectories.length);
-              console.log("filecount", fileCountIndex);
               if (arrDirectories[fileCountIndex] === "/index.md") {
                 pathToUse = "/";
               } else {
                 pathToUse = arrDirectories[fileCountIndex]
                   .replace(".md", "")
                   .replace(/ /g, "");
-                console.log(pathToUse);
               }
             }
             fileCountIndex++;

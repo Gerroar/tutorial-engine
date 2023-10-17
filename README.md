@@ -13,6 +13,7 @@
 |**_$title\<Text\>_** |`<details"><summary>(Text)</summary>"`||This will create two things, the div that contains the whole spoiler and the "title" or what it's always visible for the user|
 |**_$_** |||Jumpline|
 |**_$\<Text\>_** |`(if it's first one after $title)<div class="spoiler-body"><p>(Text)</p>(if it's not)<p>(Text)</p>`||Adds text to the spoiler, if one of this type it's the first to appear after $title \<Text\> it creates the spoiler body and also adds the text|
+|**_BLOCKS OF CODE_**|\`\`\`javascript<br />document.getElementById("demo").innerHTML = "Hello JavaScript";<br/>\`\`\`<br/>(without space)<br />\`\`\`java<br />System.out.println("Hello Java");<br/>\`\`\` ||The only requirement for using blocks of code it's that if you want to have a block with tabs with different languages dont put spaces between the blocks, that will make the engine create that multi tab block, if they have spaces between it will be considered as a single block, to better understand it take a look to the example to the left of this text|
 
 ## NOTES
 

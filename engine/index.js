@@ -21,7 +21,6 @@ let openBlockQuote = false;
 let openCallOut = false;
 let currentCOType = ""; //CallOut type
 let openSpoilerDiv = false;
-let openNavBar = false;
 let backButtonInfoExtracted = false;
 let nextButtonInfoExtracted = false;
 let nextButtonCreated = false;
@@ -38,6 +37,24 @@ let navButtonsMap = new Map([
  * paths start with them ( you can check in the generated App.jsx)
  */
 let rootPath = "/index";
+let arrLanguages = [];
+let arrOfCodeArrays = [];
+let addElementToArrOfArr = false;
+let language = "";
+let extractCode = false;
+let blockHandler = false;
+let codeCollector = "";
+let arrCodeBlocks = [];
+let codeInProcess = false;
+let codeBlockCounter = 0;
+let languageOfElement = "";
+let storedLanguage = "";
+let counterOfCodeBlocks = 0;
+let storeCodeBlocksCounter = 0;
+let counterOfCodeArrElements = 0;
+let foundedCodeBlocks = 0;
+let openCodeBlock = true;
+let formattedLang = "";
 //Regex
 let quoteBlockRegex = /^\>[\s]*?/g;
 let quoteBlockRegexwText = /^>(.*)/;
@@ -57,7 +74,6 @@ function restartVariables() {
     openCallOut = false;
     currentCOType = ""; //CallOut type
     openSpoilerDiv = false;
-    openNavBar = false;
     backButtonInfoExtracted = false;
     nextButtonInfoExtracted = false;
     nextButtonCreated = false;
@@ -65,6 +81,23 @@ function restartVariables() {
     cleanTheLine = false;
     navButtonsMap.set("back", "");
     navButtonsMap.set("next", "");
+    arrOfCodeArrays = [];
+    addElementToArrOfArr = false;
+    language = "";
+    extractCode = false;
+    blockHandler = false;
+    codeCollector = "";
+    arrCodeBlocks = [];
+    codeInProcess = false;
+    codeBlockCounter = 0;
+    languageOfElement = "";
+    storedLanguage = "";
+    counterOfCodeBlocks = 0;
+    counterOfCodeArrElements = 0;
+    storeCodeBlocksCounter = 0;
+    foundedCodeBlocks = 0;
+    openCodeBlock = true;
+    formattedLang = "";
 }
 /**Removes the spaces to check if the first character is the one that was passed, this function it's used for detecting
  * if the line it's part of a nested list or just a line that concides with the characters used for lists
@@ -127,6 +160,12 @@ function checkIfNeedClosingandAddTag(str) {
     if (backButtonCreated) {
         addClosingTag = "</div>";
         backButtonCreated = false;
+    }
+    if (inCode) {
+        inCode = false;
+    }
+    if (languageOfElement !== "") {
+        languageOfElement = "";
     }
     return addClosingTag;
 }
@@ -221,11 +260,64 @@ function fillNavButtonsMap(str) {
             }
         }
         else if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
-            if (!nextButtonCreated) {
+            if (!nextButtonInfoExtracted) {
                 nextButtonInfoExtracted = true;
                 navButtonsMap.set("next", href);
             }
         }
+    }
+}
+function fillArrOfCodeArrays(str) {
+    if (str.startsWith("```")) {
+        if (!extractCode) {
+            languageOfElement = str.replace("```", "");
+        }
+        addElementToArrOfArr = true;
+        extractCode = !extractCode;
+        blockHandler = true;
+    }
+    else if (extractCode) {
+        if (storedLanguage !== languageOfElement) {
+            if (storedLanguage === "sh") {
+                codeCollector = "$ " + codeCollector;
+            }
+            if (storedLanguage !== "") {
+                formattedLang = storedLanguage.replace(storedLanguage[0], storedLanguage[0].toUpperCase());
+                if (!arrLanguages.includes(formattedLang)) {
+                    arrLanguages.push(formattedLang);
+                }
+            }
+            arrCodeBlocks.push(`{
+          language: ${'"' + formattedLang + '"'},
+          code: ${"`" + codeCollector + "`"}
+        }`);
+            storedLanguage = languageOfElement;
+            codeCollector = "";
+        }
+        codeCollector += str + "\n";
+    }
+    else if (blockHandler) {
+        if (storedLanguage === "sh") {
+            codeCollector = "$ " + codeCollector;
+        }
+        if (storedLanguage !== "") {
+            formattedLang = storedLanguage.replace(storedLanguage[0], storedLanguage[0].toUpperCase());
+            if (!arrLanguages.includes(formattedLang)) {
+                arrLanguages.push(formattedLang);
+            }
+        }
+        arrCodeBlocks.push(`{
+      language: ${'"' + formattedLang + '"'},
+      code: ${"`" + codeCollector + "`"}
+    }`);
+        blockHandler = false;
+        codeCollector = "";
+    }
+    else if (addElementToArrOfArr) {
+        arrCodeBlocks = arrCodeBlocks.slice(1);
+        arrOfCodeArrays.push(arrCodeBlocks);
+        addElementToArrOfArr = false;
+        arrCodeBlocks = [];
     }
 }
 function processLine(str) {
@@ -257,7 +349,7 @@ function processLine(str) {
             if (!backButtonCreated) {
                 backButtonCreated = true;
                 openPageContent = false;
-                return `</div><div className="nav-wrapper flex" aria-label="Page Navigation"><Link  className="nav-back flex-none" to={backPath}><FontAwesomeIcon icon={faAngleLeft} size="2x" color="gray"/></Link><div className="flex-initial w-1/2"></div>`;
+                return `</div><div className="nav-wrapper flex" aria-label="Page Navigation"><Link  className="nav-back flex-none" to={backPath}><FontAwesomeIcon icon={faAngleLeft} size="2x" className="nav-icon"/></Link><div className="flex-initial w-1/2"></div>`;
             }
         }
         else if (/(^next$)|(^\-\>$)/gi.test(linkContent)) {
@@ -265,11 +357,11 @@ function processLine(str) {
             if (!nextButtonCreated) {
                 nextButtonCreated = true;
                 if (backButtonCreated) {
-                    return `<Link  className="nav-next flex-none" to={nextPath}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></Link>`;
+                    return `<Link  className="nav-next flex-none" to={nextPath}><FontAwesomeIcon icon={faAngleRight} size="2x" className="nav-icon"/></Link></div>`;
                 }
                 else {
                     openPageContent = false;
-                    return `</div><div className="nav-wrapper flex" aria-label="Page Navigation"><div ></div><div className="flex-initial w-1/2"></div><Link  className="nav-back flex-none" to={nextPath}><FontAwesomeIcon icon={faAngleRight} size="2x" color="gray"/></Link></div>`;
+                    return `</div><div className="nav-wrapper flex" aria-label="Page Navigation"><div ></div><div className="flex-initial w-1/2"></div><Link  className="nav-back flex-none" to={nextPath}><FontAwesomeIcon icon={faAngleRight} size="2x" className="nav-icon"/></Link></div>`;
                 }
             }
         }
@@ -417,7 +509,7 @@ function processLine(str) {
             }
         }
     }
-    else if (urlRegEx.test(str)) {
+    else if (urlRegEx.test(str) && !inCode) {
         str = str.replace(urlRegEx, `<a href="${`$1`}" target="_blank">$1</a>`);
     }
     else if (/([0-9]\.\s)/.test(str)) {
@@ -526,13 +618,186 @@ function processLine(str) {
         }
     }
     else if (str.startsWith("```")) {
-        if (str.endsWith(`sh`))
+        language = "";
+        if (str.endsWith(`sh`)) {
             lastSh = ``;
-        inCode = !inCode;
-        return inCode ? checkIfNeedClosingandAddTag() + "<pre>" : "</pre>";
+        }
+        language = str.replace("```", "");
+        if (counterOfCodeBlocks < arrOfCodeArrays.length) {
+            inCode = !inCode;
+            codeInProcess = !codeInProcess;
+            if (language !== "") {
+                if (foundedCodeBlocks !== 0) {
+                    foundedCodeBlocks--;
+                    return "";
+                }
+                else if (foundedCodeBlocks === 0) {
+                    let classToAdd = "";
+                    if (language.toLowerCase() === "sh")
+                        classToAdd = "bash";
+                    counterOfCodeArrElements = 0;
+                    foundedCodeBlocks = arrOfCodeArrays[counterOfCodeBlocks].length - 1;
+                    counterOfCodeBlocks++;
+                    return `
+<div className="code-window ${classToAdd} mt-10 min-w-[600px] max-w-[700px]">
+  <nav className="lang-nav z-20">
+    <ul className="grid grid-cols-3 gap-x-32 gap-y-6 xl:gap-x-44 w-full">
+          `;
+                }
+                else {
+                    return "";
+                }
+            }
+            else {
+                if (foundedCodeBlocks === 0 && counterOfCodeArrElements <= 1) {
+                    let arrElm = arrOfCodeArrays[counterOfCodeBlocks - 1][counterOfCodeArrElements - 1];
+                    if (arrElm.includes("Sh")) {
+                        return `
+      </ul>
+    </nav>
+    <div>
+        <pre className={"language-bash"}><code className={"hljs language-bash"}>
+        {arrCodeBlocks${counterOfCodeBlocks - 1}[0].code}
+        </code></pre>
+    </div>
+  </div>
+                  `;
+                    }
+                    else {
+                        return `
+      </ul>
+    </nav>
+    <div className="flex flex-row justify-between">
+      <AnimatePresence mode="popLayout">
+          <motion.div 
+          key={selectedTab ? selectedTab : "empty"}
+          initial={{ y: 0, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -30, opacity: 0 }}
+          transition={{ duration: 0.1 }}
+          className="min-w-[400px] max-w-[466px]"
+          >
+            { selectedTab ? (
+              <pre className={\`language-\${selectedTab.replace(selectedTab[0],
+                          selectedTab[0].toLowerCase())}\`}><code className={\`hljs language-\${selectedTab.replace(selectedTab[0],
+                            selectedTab[0].toLowerCase())}\`}>
+              {getCodeFromArray(arrCodeBlocks${counterOfCodeBlocks - 1}, selectedTab)}
+              </code></pre>
+            ) : (
+              "No loaded code"
+            )}
+          </motion.div>
+        </AnimatePresence>
+        {
+          noCopy ? (
+            <div className="copy-block flex flex-col justify-center">
+              <motion.span className="copied-message">Copied!</motion.span>
+              <motion.button 
+                className="copy-button"
+                whileTap={{ y: -6}}
+                onClick={(e) => handleCopyClipboard(e, getCodeFromArray(arrCodeBlocks${counterOfCodeBlocks - 1}, selectedTab))}
+              ><FontAwesomeIcon icon={faCopy} className="copy-icon" size="lg"/></motion.button>
+            </div>
+          ) : (
+            ""
+          )
+        }
+      </div>
+  </div>
+                  `;
+                    }
+                }
+                else {
+                    return "";
+                }
+            }
+        }
+        else {
+            if (openCodeBlock) {
+                openCodeBlock = false;
+            }
+            return "";
+        }
     }
     else if (inCode) {
         lastSh += str + "\n";
+        if (codeInProcess) {
+            let elmOfCodeArrays = arrOfCodeArrays[counterOfCodeBlocks - 1];
+            if (counterOfCodeArrElements < elmOfCodeArrays.length) {
+                let indexTest = elmOfCodeArrays[counterOfCodeArrElements].indexOf("language");
+                let extractedLang = elmOfCodeArrays[counterOfCodeArrElements].substring(indexTest + 11, elmOfCodeArrays[counterOfCodeArrElements].indexOf('"', indexTest + 11));
+                if (extractedLang === "Sh") {
+                    console.log("I enter");
+                    return `
+      <li
+      key={arrCodeBlocks${counterOfCodeBlocks - 1}[${counterOfCodeArrElements++}].language}
+      className={arrCodeBlocks${counterOfCodeBlocks - 1}[${counterOfCodeArrElements - 1}].language === selectedTab ? "selected" : ""}
+      >
+      <div className="flex gap-3"><BashPlain size="30" /><span className="mt-[0.4rem] font-medium">{ arrCodeBlocks${counterOfCodeBlocks - 1}[${counterOfCodeArrElements - 1}].language}</span></div>
+      </li>
+      `;
+                }
+                else {
+                    return `
+      <li
+      key={arrCodeBlocks${counterOfCodeBlocks - 1}[${counterOfCodeArrElements++}].language}
+      className={arrCodeBlocks${counterOfCodeBlocks - 1}[${counterOfCodeArrElements - 1}].language === selectedTab ? "selected" : ""}
+      onClick={() => changeStateAndReRender(arrCodeBlocks${counterOfCodeBlocks - 1}[${counterOfCodeArrElements - 1}].language)}
+      >
+      <div className="flex gap-3"><${extractedLang}Plain size="30" /><span className="mt-[0.4rem] font-medium">{ arrCodeBlocks${counterOfCodeBlocks - 1}[${counterOfCodeArrElements - 1}].language}</span></div>
+                {arrCodeBlocks${counterOfCodeBlocks - 1}[${counterOfCodeArrElements - 1}].language === selectedTab ? (
+        <motion.div className="underline" layoutId="underline${counterOfCodeBlocks - 1}" />
+        ) : null}
+      </li>
+      `;
+                }
+            }
+            else if (counterOfCodeArrElements <= elmOfCodeArrays.length) {
+                /**Inside this conditional we also handle the closing tags of the blocks of
+                 * code that have more than one elements
+                 */
+                counterOfCodeArrElements++;
+                return `
+    </ul>
+  </nav>
+    <div className="flex flex-row justify-between">
+      <AnimatePresence mode="popLayout" >
+        <motion.div
+         key={selectedTab ? selectedTab : "empty"}
+         initial={{ y: 0, opacity: 0 }}
+         animate={{ y: 0, opacity: 1 }}
+         exit={{ y: -30, opacity: 0 }}
+         transition={{ duration: 0.1 }}
+         className="min-w-[400px] max-w-[466px]"
+        >
+          { selectedTab ? (
+            <pre className={\`language-\${selectedTab.replace(selectedTab[0],
+                        selectedTab[0].toLowerCase())}\`}><code className={\`hljs language-\${selectedTab.replace(selectedTab[0],
+                          selectedTab[0].toLowerCase())}\`}>
+            {getCodeFromArray(arrCodeBlocks${counterOfCodeBlocks - 1}, selectedTab)}
+            </code></pre>
+          ) : (
+            "No loaded code"
+          )}
+          
+        </motion.div>
+      </AnimatePresence>
+      <div className="copy-block flex flex-col justify-center">
+        <motion.span className="copied-message">Copied!</motion.span>
+        <motion.button 
+          className="copy-button"
+          whileTap={{ y: -6}}
+          onClick={(e) => handleCopyClipboard(e, getCodeFromArray(arrCodeBlocks${counterOfCodeBlocks - 1}, selectedTab))}
+        ><FontAwesomeIcon icon={faCopy} className="copy-icon" size="lg"/></motion.button>
+      </div>
+    </div>
+</div>
+        `;
+            }
+            else {
+                return "";
+            }
+        }
     }
     else if (str === "[output]") {
         fs_1.default.writeFileSync("tmp/tmp.sh", lastSh);
@@ -550,7 +815,8 @@ function processLine(str) {
         else {
             fs_1.default.writeFileSync("tmp/prevRuns/" + hash, output);
         }
-        return checkIfNeedClosingandAddTag() + `<pre>${output}</pre>`;
+        return (checkIfNeedClosingandAddTag() +
+            `<div className="output mb-10 min-w-[600px] max-w-[700px]"><pre className="min-w-[580px] max-w-[700px] language-plaintext"><code className="language-plaintext">${output.toString("utf-8", 1, output.length - 2)}</code></pre></div>`);
     }
     else if (/^[a-zA-Z0-9]/.test(str)) {
         return `<p>${str}</p>`;
@@ -565,6 +831,9 @@ function processLine(str) {
         else {
             return possibleValue + str;
         }
+    }
+    if (inCode) {
+        return "";
     }
     return str;
 }
@@ -582,7 +851,6 @@ function processFile(root, path) {
     arrDirectories.push(path);
     let filename = path.substring(path.lastIndexOf("/") + 1);
     let filenameWithoutExtension = filename.substring(0, filename.lastIndexOf("."));
-    //filenameWithoutExtension = filenameWithoutExtension.replace(filenameWithoutExtension[0], filenameWithoutExtension[0].toUpperCase);
     let lines = ("" + fs_1.default.readFileSync(`${root}/${pathWithoutExtension}.md`))
         .split("\n")
         .map((x) => x.trimEnd());
@@ -604,6 +872,8 @@ function processFile(root, path) {
     }
     //Fill the map of the component name for back and next
     lines.map((line) => fillNavButtonsMap(line));
+    //Fill the array of code blocks
+    lines.map((line) => fillArrOfCodeArrays(line));
     let backPath = "";
     let nextPath = "";
     if (navButtonsMap.get("back") !== "") {
@@ -612,20 +882,83 @@ function processFile(root, path) {
     if (navButtonsMap.get("next") !== "") {
         nextPath = navButtonsMap.get("next");
     }
-    let headOfFile = `import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-  import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
-  import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
-  import { Link } from "react-router-dom";
-  export default function ${filenameWithoutExtension}(){
+    let headOfFile = `
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleLeft } from "@fortawesome/free-solid-svg-icons";
+import { faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import { faCopy } from '@fortawesome/free-regular-svg-icons';
+import { motion, AnimatePresence} from "framer-motion";
+import { Link } from "react-router-dom";
+import "highlight.js/styles/github.css";
+import hljs from "highlight.js";
+import { useEffect } from "react";
+`;
+    function generateIconsImports(lang) {
+        if (lang === "Sh")
+            lang = "bash";
+        lang = lang.replace(lang[0], lang[0].toUpperCase());
+        return `import { ${lang}Plain } from 'devicons-react'`;
+    }
+    let defaultFunction = `
+type StateProps = {
+  selectedTab: any,
+  setSelectedTab: any
+}
+interface ArrCodeElement {
+  language: string,
+  code: string
+}
 
-  let backPath: string = "${backPath}";
-  let nextPath: string = "${nextPath}";
-  if (backPath === "${rootPath}") {
-    backPath = "/";
-  } else if (nextPath === "${rootPath}") {
-    nextPath = "/";
+function handleCopyClipboard(e: any, code: string) {
+  if (e !== null) {
+    let parent = e.target.parentNode.parentNode.querySelector(".copied-message");
+    parent.style.opacity = 1;
+    setTimeout(() => {
+      parent.style.opacity = 0;
+    }, 500);
   }
-  return(<><div id="page-content" className="pl-40 pr-40">`;
+
+  console.log(code)
+}
+
+export default function ${filenameWithoutExtension}({selectedTab, setSelectedTab}: StateProps){
+  let noCopy: boolean = false;
+let backPath: string = "${backPath}";
+let nextPath: string = "${nextPath}";
+if (backPath === "${rootPath}") {
+  backPath = "/";
+} else if (nextPath === "${rootPath}") {
+  nextPath = "/";
+}`;
+    let getcodeFunctionString = `
+function getCodeFromArray(arr: Array<ArrCodeElement>, lang: string) {
+  let codeToReturn: string = "";
+  arr.map(element => {
+    if (element.language === lang) {
+      codeToReturn = element.code;
+    }
+  })
+  if (codeToReturn === "") {
+    noCopy = false;
+    return "Language not selected";
+  } else {
+    noCopy = true;
+    return codeToReturn;
+  }
+}
+  `;
+    let changeSateAndReRenderString = `
+const changeStateAndReRender = (lang: string) => {
+  setSelectedTab(lang);
+  hljs.highlightAll();
+};
+  `;
+    function generateArraysOfCodes(arr, i) {
+        return `let arrCodeBlocks${i}: Array<ArrCodeElement> = [${arr}]\n`;
+    }
+    let beforeContent = `useEffect(() => {
+    hljs.highlightAll();
+  },[selectedTab]);\nreturn(<><div id="page-content" className="pl-16 pr-16">\n`;
     openPageContent = true;
     function correctTheFooterTags() {
         if (openPageContent) {
@@ -638,8 +971,29 @@ function processFile(root, path) {
     }
     fs_1.default.mkdirSync(`${buildFolder}/${pathWithoutFile}`, { recursive: true });
     fs_1.default.writeFileSync(`${buildFolder}/${pathWithoutExtension}.tsx`, headOfFile +
+        arrLanguages.map((lang) => generateIconsImports(lang)).join("\n") +
+        defaultFunction +
+        getcodeFunctionString +
+        changeSateAndReRenderString +
+        arrOfCodeArrays.map((arr, i) => generateArraysOfCodes(arr, i)).join("") +
+        beforeContent +
         lines.map((line) => processLine(line)).join("\n") +
         correctTheFooterTags());
+    fs_1.default.readFile(`${buildFolder}/${pathWithoutExtension}.tsx`, "utf8", (err, data) => {
+        if (err) {
+            console.error("Error reading file:", err);
+            return;
+        }
+        const lines = data.split("\n");
+        const nonEmptyLines = lines.filter((line) => line.trim() !== "");
+        const modifiedContent = nonEmptyLines.join("\n");
+        fs_1.default.writeFile(`${buildFolder}/${pathWithoutExtension}.tsx`, modifiedContent, "utf8", (err) => {
+            if (err) {
+                console.error("Error writing file:", err);
+                return;
+            }
+        });
+    });
 }
 function processPath(root, path) {
     if (fs_1.default.lstatSync(`${root}/${path}`).isFile()) {
@@ -664,10 +1018,10 @@ let defaultAppContentImports = `import './index.css';
 import { MenuButton } from './components/MenuButton/MenuButton';
 import { Routes, Route, } from "react-router-dom";
 import ErrorPage from "./ErrorPage";
-
+import { useState } from "react";
 `;
 let appContent = `export default function App() {
-
+    const [selectedTab, setSelectedTab] = useState("Java")
     return (
       <>
         <MenuButton />
@@ -675,10 +1029,6 @@ let appContent = `export default function App() {
           <Routes>
             <Route path="/" element={<${generateComponentName(rootPath)} />} />  
        `;
-let appEnd = ` </div>
-  </>
-  )
-}`;
 let routeImports = "";
 let routeElements = "";
 for (let i = 0; i < arrDirectories.length; i++) {
@@ -689,14 +1039,17 @@ for (let i = 0; i < arrDirectories.length; i++) {
     routeImports += correctedFile;
     if (i !== arrDirectories.length - 1) {
         if (routerPath !== rootPath) {
-            routeElements += `<Route path="${routerPath.replace(/ /g, "")}" element={<${componentName} />} />\n`;
+            routeElements += `<Route path="${routerPath.replace(/ /g, "")}" element={<${componentName} selectedTab={selectedTab} setSelectedTab={setSelectedTab} />} />\n`;
         }
     }
     else {
-        routeElements += `<Route path="${routerPath.replace(/ /g, "")}" element={<${componentName} />} />\n</Routes></div></>)};\n`;
+        routeElements += `<Route path="${routerPath.replace(/ /g, "")}" element={<${componentName} selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>} />\n</Routes></div></>)};\n`;
     }
 }
 fs_1.default.writeFileSync(`../frontend/src/App.tsx`, defaultAppContentImports + routeImports + appContent + routeElements);
 fs_1.default.writeFileSync(`../frontend/src/output/directoriesList.ts`, `export const arrDirectories = [\n${arrDirectories
+    .map((x) => `"${x}"`)
+    .join(",\n")}\n];`);
+fs_1.default.writeFileSync(`../frontend/src/output/languagesUtils.ts`, `export const arrLanguages = [\n${arrLanguages
     .map((x) => `"${x}"`)
     .join(",\n")}\n];`);

@@ -10,7 +10,7 @@
     max-width: 1280px;
     margin: 0 auto;
     padding: 2rem;
-    background-color: darkgrey;
+    
 }
 
 /*CSS of the menu*/
@@ -105,6 +105,10 @@ hr {
 
 blockquote {
     font-style: italic;
+}
+
+details {
+     word-wrap: break-word;
 }
 
 details summary {
@@ -220,7 +224,82 @@ details summary>* {
     cursor: pointer;
 }
 
+.nav-icon {
+
+    color: gray;
+}
+
 /*CSS of the content*/
+
+#page-content {
+    display: flex;
+    flex-direction: column;
+}
+
+/*CSS of code blocks*/
+.code-window {
+    border-radius: 10px;
+    padding: 10px;
+    background: white;
+}
+
+
+.bash {
+    border-radius: 10px 10px 0 0;
+}
+
+.output {
+    border-radius: 0 0 10px 10px;
+    padding: 10px;
+    background: white;
+}
+
+.lang-nav {
+    position: static;
+    width: 100%;
+}
+
+.lang-nav ul {
+    padding: 0 0 0 16px;
+}
+
+.underline {
+    position: relative;
+    width: 110%;
+    bottom: -7px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #9f9d9d; 
+}
+
+.copy-block {
+    position: relative;
+    margin-top: 20px;
+    margin-right: 20px;
+}
+.copied-message {
+    opacity: 0;
+    border: 2px solid transparent;
+    padding: 4px 8px 4px 8px;
+    border-radius: 4px;
+    background: linear-gradient(white, white) padding-box,
+              linear-gradient(126deg, #CE126F, #F7C150, #43B7B4, #298AC8, #29B68A, #D6F272) border-box;
+}
+.copy-button {
+  margin-top: 10px;
+  margin-left: 20px;
+  width: 24px;
+}
+
+.copy-icon {
+    color: rgb(77, 77, 77);
+}
+
+.copy-icon:hover {
+    color: rgb(62, 62, 238)
+}
+/*CSS of code blocks*/
 /* Dark mode */
 
 /*@media (prefers-color-scheme: dark) {

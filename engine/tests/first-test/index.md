@@ -1,4 +1,3 @@
-
 # Tutorial Engine
 
 Something a little like https://doc.rust-lang.org/book/
@@ -7,26 +6,105 @@ Something a little like https://doc.rust-lang.org/book/
 
 ## Syntax Highlight
 
-
 ## Auto Output
 
 ```sh
 mist whoami
 ```
-[output]
 
+[output]
 
 ### Besides that
 
 ## Tabs Have Memory
 
 file2.ts
+
 ```typescript
-Other ts
+document.getElementById("demo").innerHTML = "Hello JavaScript";
 ```
+
 file2.java
+
 ```java
-Other java
+class GFG {
+      // main function
+    public static void main(String[] args)
+    {
+        // Declare the variables
+        int num;
+
+        // Input the integer
+        System.out.println("Enter the integer: ");
+
+        // Create Scanner object
+        Scanner s = new Scanner(System.in);
+
+        // Read the next integer from the screen
+        num = s.nextInt();
+
+        // Display the integer
+        System.out.println("Entered integer is: "
+                           + num);
+    }
+}
+```
+```typescript
+alert("whatever");
+```
+```javascript
+alert("whatever");
+```
+
+
+```java
+class GFG {
+      // main function
+    public static void main(String[] args)
+    {
+        System.out.println("Another thing");
+    }
+}
+```
+```typescript
+alert("Another thing");
+```
+```rust
+fn main() {
+    // Statements here are executed when the compiled binary is called.
+
+    // Print text to the console.
+    println!("Hello World!");
+}
+```
+```go
+package funding
+
+type Fund struct {
+    // balance is unexported (private), because it's lowercase
+    balance int
+}
+
+// A regular function returning a pointer to a fund
+func NewFund(initialBalance int) *Fund {
+    // We can return a pointer to a new struct without worrying about
+    // whether it's on the stack or heap: Go figures that out for us.
+    return &Fund{
+        balance: initialBalance,
+    }
+}
+
+// Methods start with a *receiver*, in this case a Fund pointer
+func (f *Fund) Balance() int {
+    return f.balance
+}
+
+func (f *Fund) Withdraw(amount int) {
+    f.balance -= amount
+}
+```
+```javascript
+alert("Another thing");
 ```
 
 ## Various
@@ -38,28 +116,25 @@ Other java
 !warningHr
 !warning text
 
-
 > Quotes
 >
 > de
 >
 > -- Hello
 >
-> -- *Socrates*
+> -- _Socrates_
 >
 > **testing gr**
 >
->Isosceles
-
-
+> Isosceles
 
 Em -- dash
 
-Line *Hello* of *Goodbye*
+Line _Hello_ of _Goodbye_
 
 2^3^
 
-Text formatting *italics* and **bold gfdfd dsad s**.
+Text formatting _italics_ and **bold gfdfd dsad s**.
 
 Spoiler
 $title Spoiler Title One
@@ -72,40 +147,46 @@ $ Duis tristique sollicitudin nibh sit amet commodo nulla. Eu turpis egestas pre
 $title Spoiler Title Two
 $
 
-
 1. Hello
-    1. Bye
-    1. dfs
+   1. Bye
+   1. dfs
 1. there,
 1. Sailor
 
 Unordered list
-* What is up
-  * Nested
-    * Deeply
-      * In your hearth
+
+- What is up
+  - Nested
+    - Deeply
+      - In your hearth
         - Hello
 
 Test with starting tab
-* Test
+
+- Test
 
 More tests
-* a 
-* b
-* c
+
+- a
+- b
+- c
 
 Test of going back in nested lists
-* a
-* b
-  * c
-    * d
-  * e
+
+- a
+- b
+  - c
+    - d
+  - e
 
 List with tab
+
 - Hi
+
 # Good news everyone
 
 More tests
+
 - This
   - Is
 - A
@@ -114,8 +195,8 @@ More tests
       - okay
 
 Todo list
-\todo One 
-\todo Two 
+\todo One
+\todo Two
 \todo Three
 
 Spoiler, collapsable section
@@ -123,13 +204,10 @@ Spoiler, collapsable section
 Links [to other places](https://doc.rust-lang.org/book/#the-rust-programming-language)
 
 ## Menu and Navigation
+
 Menu on the side
 Menu is hidable
 Next button
 Prev button
 
-
 [next](chapter1/index.md)
-
-
-
