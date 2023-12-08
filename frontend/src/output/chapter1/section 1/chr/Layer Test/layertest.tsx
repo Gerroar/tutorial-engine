@@ -43,10 +43,10 @@ function getCodeFromArray(arr: Array<ArrCodeElement>, lang: string) {
     }
   })
   if (codeToReturn === "") {
-    noCopy = false;
+    noCopy = true;
     return "Language not selected";
   } else {
-    noCopy = true;
+    noCopy = false;
     return codeToReturn;
   }
 }
@@ -55,7 +55,10 @@ const changeStateAndReRender = (lang: string) => {
   hljs.highlightAll();
 };
   useEffect(() => {
+    hljs.configure({
+      ignoreUnescapedHTML: true,
+    });
     hljs.highlightAll();
   },[selectedTab]);
 return(<><div id="page-content" className="pl-16 pr-16">
-<h2>Hello everyone</h2><hr/></div></>)}
+<h2>Hello everyone</h2><hr className="hr0"/></div></>)}

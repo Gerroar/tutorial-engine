@@ -1,6 +1,7 @@
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { MenuItem } from "./MenuItem";
 import { arrDirectories } from "../../../output/directoriesList";
+import { useState } from "react";
 
 //Framer motion
 
@@ -13,6 +14,12 @@ const variants = {
     x: -400,
     transition: { staggerChildren: 0.05, staggerDirection: -1 },
   },
+};
+
+const spring = {
+  type: "spring",
+  stiffness: 700,
+  damping: 30,
 };
 
 //Framer motion
@@ -139,9 +146,8 @@ let directoryTree = parseArrayDirectories(arrSplitDir);
 
 flatten(directoryTree, "");
 
-export const Navigation = () => {
+export const Navigation = (rootPath: string) => {
   let fileCountIndex = 0;
-
   if (flattenOutput.length === 0) {
     return (
       <motion.ul variants={variants} className="ul-menu" id="ul-menu">
@@ -164,71 +170,77 @@ export const Navigation = () => {
     let marginR = 0;
 
     return (
-      <motion.ul variants={variants} className="ul-menu" id="ul-menu">
-        {flattenOutput.map((value) => {
-          let index = value.substring(0, value.indexOf(" "));
-          let name = value.substring(value.indexOf(" "));
-          let hasDocsInside = docsInside(name);
-          let pathToUse: string = "";
-
-          if (!hasDocsInside) {
-            if (fileCountIndex <= arrDirectories.length) {
-              if (arrDirectories[fileCountIndex] === "/index.md") {
-                pathToUse = "/";
-              } else {
-                pathToUse = arrDirectories[fileCountIndex]
-                  .replace(".md", "")
-                  .replace(/ /g, "");
+      <>
+        <motion.ul variants={variants} className="ul-menu" id="ul-menu">
+          {flattenOutput.map((value) => {
+            let index = value.substring(0, value.indexOf(" "));
+            let name = value.substring(value.indexOf(" "));
+            let hasDocsInside = docsInside(name);
+            let pathToUse: string = "";
+            if (!hasDocsInside) {
+              if (fileCountIndex <= arrDirectories.length) {
+                /**I think that due to parameters and typescript types i have to do
+                 * a triple rootPath because it treats it like and object with an object and
+                 * inside of that its the rootPath that I want
+                 */
+                let mdPath = rootPath.rootPath.rootPath + ".md";
+                if (arrDirectories[fileCountIndex] === mdPath) {
+                  pathToUse = "/";
+                } else {
+                  pathToUse = arrDirectories[fileCountIndex]
+                    .replace(".md", "")
+                    .replace(/ /g, "");
+                }
               }
-            }
-            fileCountIndex++;
-          }
-
-          if (index.length === depth) {
-            return generateTsx(
-              marginL,
-              marginR,
-              name,
-              index,
-              hasDocsInside,
-              fileCountIndex,
-              pathToUse
-            );
-          } else if (index.length > depth) {
-            depth = index.length;
-            marginL += 2;
-            marginR++;
-            return generateTsx(
-              marginL,
-              marginR,
-              name,
-              index,
-              hasDocsInside,
-              fileCountIndex,
-              pathToUse
-            );
-          } else if (index.length < depth) {
-            let oldDepth = depth;
-            depth = index.length;
-
-            while (oldDepth !== depth) {
-              oldDepth -= 2;
-              marginL -= 2;
-              marginR--;
+              fileCountIndex++;
             }
 
-            return generateTsx(
-              marginL,
-              marginR,
-              name,
-              index,
-              hasDocsInside,
-              fileCountIndex,
-              pathToUse
-            );
-          }
-        })}
-      </motion.ul>
+            if (index.length === depth) {
+              return generateTsx(
+                marginL,
+                marginR,
+                name,
+                index,
+                hasDocsInside,
+                fileCountIndex,
+                pathToUse
+              );
+            } else if (index.length > depth) {
+              depth = index.length;
+              marginL += 2;
+              marginR++;
+              return generateTsx(
+                marginL,
+                marginR,
+                name,
+                index,
+                hasDocsInside,
+                fileCountIndex,
+                pathToUse
+              );
+            } else if (index.length < depth) {
+              let oldDepth = depth;
+              depth = index.length;
+
+              while (oldDepth !== depth) {
+                oldDepth -= 2;
+                marginL -= 2;
+                marginR--;
+              }
+
+              return generateTsx(
+                marginL,
+                marginR,
+                name,
+                index,
+                hasDocsInside,
+                fileCountIndex,
+                pathToUse
+              );
+            }
+          })}
+        </motion.ul>
+      </>
     );
   }
 };

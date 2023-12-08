@@ -43,10 +43,10 @@ function getCodeFromArray(arr: Array<ArrCodeElement>, lang: string) {
     }
   })
   if (codeToReturn === "") {
-    noCopy = false;
+    noCopy = true;
     return "Language not selected";
   } else {
-    noCopy = true;
+    noCopy = false;
     return codeToReturn;
   }
 }
@@ -76,13 +76,16 @@ const changeStateAndReRender = (lang: string) => {
 `
     }]
 useEffect(() => {
+    hljs.configure({
+      ignoreUnescapedHTML: true,
+    });
     hljs.highlightAll();
   },[selectedTab]);
 return(<><div id="page-content" className="pl-16 pr-16">
-<h1>This is chapter 1</h1><hr/>
+<h1>This is chapter 1</h1><hr className="hr0"/>
 <div className="code-window  mt-10 min-w-[600px] max-w-[700px]">
   <nav className="lang-nav z-20">
-    <ul className="grid grid-cols-3 gap-x-32 gap-y-6 xl:gap-x-44 w-full">
+    <ul className="grid grid-cols-3 gap-x-32 gap-y-7 xl:gap-x-44 w-full">
       <li
       key={arrCodeBlocks0[0].language}
       className={arrCodeBlocks0[0].language === selectedTab ? "selected" : ""}
@@ -116,14 +119,14 @@ return(<><div id="page-content" className="pl-16 pr-16">
           )}
         </motion.div>
       </AnimatePresence>
-      <div className="copy-block flex flex-col justify-center">
-        <motion.span className="copied-message">Copied!</motion.span>
-        <motion.button 
-          className="copy-button"
-          whileTap={{ y: -6}}
-          onClick={(e) => handleCopyClipboard(e, getCodeFromArray(arrCodeBlocks0, selectedTab))}
-        ><FontAwesomeIcon icon={faCopy} className="copy-icon" size="lg"/></motion.button>
-      </div>
+      {noCopy ? (""):(<div className="copy-block flex flex-col justify-center">
+      <motion.span className="copied-message">Copied!</motion.span>
+      <motion.button 
+        className="copy-button"
+        whileTap={{ y: -6}}
+        onClick={(e) => handleCopyClipboard(e, getCodeFromArray(arrCodeBlocks0, selectedTab))}
+      ><FontAwesomeIcon icon={faCopy} className="copy-icon" size="lg"/></motion.button>
+    </div>)}
     </div>
 </div>
 </div><div className="nav-wrapper flex" aria-label="Page Navigation"><Link  className="nav-back flex-none" to={backPath}><FontAwesomeIcon icon={faAngleLeft} size="2x" className="nav-icon"/></Link><div className="flex-initial w-1/2"></div>

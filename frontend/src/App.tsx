@@ -14,14 +14,13 @@ export default function App() {
     const [selectedTab, setSelectedTab] = useState("Java")
     return (
       <>
-        <MenuButton />
+        <MenuButton rootPath={"/index"}/>
         <div id="page-wrap" className="ml-64 2xl:ml-0 pr-20 max-w-[1280px]">
           <Routes>
-            <Route path="/" element={<Index selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>} />  
+            <Route path="/" element={<Index selectedTab={selectedTab} setSelectedTab={setSelectedTab} />} />  
        <Route path="/chapter1/index" element={<Chapter1index selectedTab={selectedTab} setSelectedTab={setSelectedTab} />} />
 <Route path="/chapter1/section1/chr/file" element={<Chrfile selectedTab={selectedTab} setSelectedTab={setSelectedTab} />} />
 <Route path="/chapter1/section1/chr/LayerTest/layertest" element={<LayerTestlayertest selectedTab={selectedTab} setSelectedTab={setSelectedTab} />} />
 <Route path="/chapter1/section2/file2" element={<Section2file2 selectedTab={selectedTab} setSelectedTab={setSelectedTab} />} />
 <Route path="/chapter2/section1/file" element={<Section1file selectedTab={selectedTab} setSelectedTab={setSelectedTab} />} />
-<Route path="/other" element={<Other selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>} />
-</Routes></div></>)};
+<Route path="/other" element={<Other selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>} /></Routes></div></>)};

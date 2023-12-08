@@ -48,10 +48,10 @@ function getCodeFromArray(arr: Array<ArrCodeElement>, lang: string) {
     }
   })
   if (codeToReturn === "") {
-    noCopy = false;
+    noCopy = true;
     return "Language not selected";
   } else {
-    noCopy = true;
+    noCopy = false;
     return codeToReturn;
   }
 }
@@ -149,17 +149,20 @@ func (f *Fund) Withdraw(amount int) {
 `
     }]
 useEffect(() => {
+    hljs.configure({
+      ignoreUnescapedHTML: true,
+    });
     hljs.highlightAll();
   },[selectedTab]);
 return(<><div id="page-content" className="pl-16 pr-16">
-<h1>Tutorial Engine</h1><hr/>
+<h1>Tutorial Engine</h1><hr className="hr0"/>
 Something a little like <a href="https://doc.rust-lang.org/book/" target="_blank">https://doc.rust-lang.org/book/</a>
-<h2>Light and Dark theme?</h2><hr/>
-<h2>Syntax Highlight</h2><hr/>
-<h2>Auto Output</h2><hr/>
+<h2>Light and Dark theme?</h2><hr className="hr1"/>
+<h2>Syntax Highlight</h2><hr className="hr2"/>
+<h2>Auto Output</h2><hr className="hr0"/>
 <div className="code-window bash mt-10 min-w-[600px] max-w-[700px]">
   <nav className="lang-nav z-20">
-    <ul className="grid grid-cols-3 gap-x-32 gap-y-6 xl:gap-x-44 w-full">
+    <ul className="grid grid-cols-3 gap-x-32 gap-y-7 xl:gap-x-44 w-full">
       <li
       key={arrCodeBlocks0[0].language}
       className={arrCodeBlocks0[0].language === selectedTab ? "selected" : ""}
@@ -174,13 +177,13 @@ Something a little like <a href="https://doc.rust-lang.org/book/" target="_blank
         </code></pre>
     </div>
   </div>
-<div className="output mb-10 min-w-[600px] max-w-[700px]"><pre className="min-w-[580px] max-w-[700px] language-plaintext"><code className="language-plaintext">"gr@mist-cloud.eu"</code></pre></div>
+<div className="output mb-10 min-w-[600px] max-w-[700px]"><pre className="min-w-[580px] max-w-[700px] language-plaintext"><code className="language-plaintext">"gr@merrymake.eu"</code></pre></div>
 <h3>Besides that</h3>
-<h2>Tabs Have Memory</h2><hr/>
+<h2>Tabs Have Memory</h2><hr className="hr1"/>
 <a href="file2.ts" target="_blank">file2.ts</a>
 <div className="code-window  mt-10 min-w-[600px] max-w-[700px]">
   <nav className="lang-nav z-20">
-    <ul className="grid grid-cols-3 gap-x-32 gap-y-6 xl:gap-x-44 w-full">
+    <ul className="grid grid-cols-3 gap-x-32 gap-y-7 xl:gap-x-44 w-full">
       <li
       key={arrCodeBlocks1[0].language}
       className={arrCodeBlocks1[0].language === selectedTab ? "selected" : ""}
@@ -216,6 +219,8 @@ Something a little like <a href="https://doc.rust-lang.org/book/" target="_blank
         </AnimatePresence>
         {
           noCopy ? (
+            ""
+          ) : (
             <div className="copy-block flex flex-col justify-center">
               <motion.span className="copied-message">Copied!</motion.span>
               <motion.button 
@@ -224,8 +229,6 @@ Something a little like <a href="https://doc.rust-lang.org/book/" target="_blank
                 onClick={(e) => handleCopyClipboard(e, getCodeFromArray(arrCodeBlocks1, selectedTab))}
               ><FontAwesomeIcon icon={faCopy} className="copy-icon" size="lg"/></motion.button>
             </div>
-          ) : (
-            ""
           )
         }
       </div>
@@ -233,7 +236,7 @@ Something a little like <a href="https://doc.rust-lang.org/book/" target="_blank
 <a href="file2.java" target="_blank">file2.java</a>
 <div className="code-window  mt-10 min-w-[600px] max-w-[700px]">
   <nav className="lang-nav z-20">
-    <ul className="grid grid-cols-3 gap-x-32 gap-y-6 xl:gap-x-44 w-full">
+    <ul className="grid grid-cols-3 gap-x-32 gap-y-7 xl:gap-x-44 w-full">
       <li
       key={arrCodeBlocks2[0].language}
       className={arrCodeBlocks2[0].language === selectedTab ? "selected" : ""}
@@ -287,19 +290,19 @@ Something a little like <a href="https://doc.rust-lang.org/book/" target="_blank
           )}
         </motion.div>
       </AnimatePresence>
-      <div className="copy-block flex flex-col justify-center">
-        <motion.span className="copied-message">Copied!</motion.span>
-        <motion.button 
-          className="copy-button"
-          whileTap={{ y: -6}}
-          onClick={(e) => handleCopyClipboard(e, getCodeFromArray(arrCodeBlocks2, selectedTab))}
-        ><FontAwesomeIcon icon={faCopy} className="copy-icon" size="lg"/></motion.button>
-      </div>
+      {noCopy ? (""):(<div className="copy-block flex flex-col justify-center">
+      <motion.span className="copied-message">Copied!</motion.span>
+      <motion.button 
+        className="copy-button"
+        whileTap={{ y: -6}}
+        onClick={(e) => handleCopyClipboard(e, getCodeFromArray(arrCodeBlocks2, selectedTab))}
+      ><FontAwesomeIcon icon={faCopy} className="copy-icon" size="lg"/></motion.button>
+    </div>)}
     </div>
 </div>
 <div className="code-window  mt-10 min-w-[600px] max-w-[700px]">
   <nav className="lang-nav z-20">
-    <ul className="grid grid-cols-3 gap-x-32 gap-y-6 xl:gap-x-44 w-full">
+    <ul className="grid grid-cols-3 gap-x-32 gap-y-7 xl:gap-x-44 w-full">
       <li
       key={arrCodeBlocks3[0].language}
       className={arrCodeBlocks3[0].language === selectedTab ? "selected" : ""}
@@ -373,20 +376,20 @@ Something a little like <a href="https://doc.rust-lang.org/book/" target="_blank
           )}
         </motion.div>
       </AnimatePresence>
-      <div className="copy-block flex flex-col justify-center">
-        <motion.span className="copied-message">Copied!</motion.span>
-        <motion.button 
-          className="copy-button"
-          whileTap={{ y: -6}}
-          onClick={(e) => handleCopyClipboard(e, getCodeFromArray(arrCodeBlocks3, selectedTab))}
-        ><FontAwesomeIcon icon={faCopy} className="copy-icon" size="lg"/></motion.button>
-      </div>
+      {noCopy ? (""):(<div className="copy-block flex flex-col justify-center">
+      <motion.span className="copied-message">Copied!</motion.span>
+      <motion.button 
+        className="copy-button"
+        whileTap={{ y: -6}}
+        onClick={(e) => handleCopyClipboard(e, getCodeFromArray(arrCodeBlocks3, selectedTab))}
+      ><FontAwesomeIcon icon={faCopy} className="copy-icon" size="lg"/></motion.button>
+    </div>)}
     </div>
 </div>
-<h2>Various</h2><hr/>
+<h2>Various</h2><hr className="hr2"/>
 <div className="warning"><h3>Callout</h3>
 <p>fdsfdsfdsfdsfgdsgfdsgfdsgfsgfsgfsgrftrrvfsgrwgfdsgfwrwgfdgrwgrwegrwgrwgrwegrwegrwwwerrgewwwwwwwrgergwerr</p>
-<hr/>
+<hr className="calloutHr"/>
 <p>text</p>
 </div>
 <blockquote><p> Quotes</p>
@@ -438,7 +441,7 @@ Something a little like <a href="https://doc.rust-lang.org/book/" target="_blank
 <p>List with tab</p>
 <ul id="ul-4" className="list-disc list-inside"><li>Hi</li>
 </ul><br/>
-<h1>Good news everyone</h1><hr/>
+<h1>Good news everyone</h1><hr className="hr0"/>
 <p>More tests</p>
 <ul id="ul-5" className="list-disc list-inside"><li>This</li>
   <ul className="list-disc list-inside"><li>Is</li>
@@ -454,7 +457,7 @@ Something a little like <a href="https://doc.rust-lang.org/book/" target="_blank
 </div><br/>
 <p>Spoiler, collapsable section</p>
 Links <a href="https://doc.rust-lang.org/book/#the-rust-programming-language">to other places</a>
-<h2>Menu and Navigation</h2><hr/>
+<h2>Menu and Navigation</h2><hr className="hr1"/>
 <p>Menu on the side</p>
 <p>Menu is hidable</p>
 <p>Next button</p>

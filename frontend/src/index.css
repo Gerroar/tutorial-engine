@@ -3,27 +3,26 @@
 @tailwind utilities;
 
 :root {
-    --content-max-width: 750px;
+  --content-max-width: 750px;
 }
 
 #root {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2rem;
-    
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
 /*CSS of the menu*/
 nav {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 250px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 250px;
 }
 
 #menu-path {
-    stroke: hsl(0, 0%, 18%);
+  stroke: hsl(0, 0%, 18%);
 }
 
 h1,
@@ -32,91 +31,101 @@ h3,
 h4,
 h5,
 h6 {
-    font-size: revert;
-    font-weight: revert;
+  font-size: revert;
+  font-weight: revert;
 }
 
 ol,
 ul,
 li,
 menu {
-
-    padding: revert;
+  padding: revert;
 }
 
 .ul-menu,
 .li-menu {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .ul-menu {
-
-    position: absolute;
-    left: -50px;
-    top: 100px;
-    width: 230px;
-
+  position: absolute;
+  left: -50px;
+  top: 100px;
+  width: 230px;
 }
 
 .li-menu {
-    list-style: none;
-    margin-bottom: 15px;
-    margin-left: 4rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    text-align: left;
-    user-select: none;
+  list-style: none;
+  margin-bottom: 15px;
+  margin-left: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  text-align: left;
+  user-select: none;
 }
 
 .hidden {
-
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .li-menu:hover {
-    color: blue;
+  color: blue;
 }
 
 /*CSS of the menu*/
 
 /*CSS of the content*/
 .content {
-    overflow-y: auto;
-    padding: 0 5px 50px 5px;
-
+  overflow-y: auto;
+  padding: 0 5px 50px 5px;
 }
 
-
 main {
-
-    margin-left: auto;
-    margin-right: auto;
-    max-width: var(--content-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  max-width: var(--content-max-width);
 }
 
 hr {
-    width: 96%;
-    margin: 10px 0 10px 0;
-    border: 1px solid rgb(168, 168, 168);
+  width: 96%;
+  margin: 10px 0 10px 0;
+  height: 2px;
+}
+
+.hr0 {
+  background: linear-gradient(to right, #29b68a, #d6f272);
+}
+
+.hr1 {
+  background: linear-gradient(to right, #f7c150, #ce126f);
+}
+
+.hr2 {
+  background: linear-gradient(to right, #43b7b4, #298ac8);
+}
+
+.calloutHr {
+  height: 1px;
+  border: 1px solid #ccc;
 }
 
 blockquote {
-    font-style: italic;
+  font-style: italic;
 }
 
 details {
-     word-wrap: break-word;
+  word-wrap: break-word;
 }
 
 details summary {
-    cursor: pointer;
+  cursor: pointer;
 }
 
-details summary>* {
-    display: inline;
+details summary > * {
+  display: inline;
 }
 
 /*Classes for CallOuts*/
@@ -124,50 +133,42 @@ details summary>* {
 .good,
 .bad,
 .warning {
-
-    border-style: solid;
-    border-width: 1px;
-    border-radius: 4px;
-    padding: 20px 35px 20px 35px;
-    margin: 20px 0 20px 0;
-    overflow-wrap: break-word;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 4px;
+  padding: 20px 35px 20px 35px;
+  margin: 20px 0 20px 0;
+  overflow-wrap: break-word;
 }
 
 .good {
-
-    border-color: #6FAD6C;
-    background-color: #8FE08B;
-    color: #153b13;
+  border-color: #6fad6c;
+  background-color: #8fe08b;
+  color: #153b13;
 }
 
 .good hr {
-
-    border: 1px solid #6eab6b;
+  border: 1px solid #6eab6b;
 }
 
 .bad {
-
-    border-color: #b04840;
-    background-color: #e77f78;
-    color: #450d09;
+  border-color: #b04840;
+  background-color: #e77f78;
+  color: #450d09;
 }
 
 .bad hr {
-
-    border: 1px solid #bf4f47;
-
+  border: 1px solid #bf4f47;
 }
 
 .warning {
-
-    border-color: #a7a343;
-    background-color: #fffa64;
-    color: #42401a;
+  border-color: #a7a343;
+  background-color: #fffa64;
+  color: #42401a;
 }
 
 .warning hr {
-
-    border: 1px solid #bab64b;
+  border: 1px solid #bab64b;
 }
 
 /*Classes for CallOuts*/
@@ -175,116 +176,124 @@ details summary>* {
 /*Classes for Spoiler*/
 
 .spoiler {
-    border: 1px solid #999;
-    border-radius: 4px;
-    padding: 2px;
-    background: rgb(195, 195, 195);
-    padding: 0 35px 0 35px;
-    margin: 20px 0 20px 0;
-    overflow-wrap: break-word;
+  border: 1px solid #999;
+  border-radius: 4px;
+  padding: 2px;
+  background: rgb(195, 195, 195);
+  padding: 0 35px 0 35px;
+  margin: 20px 0 20px 0;
+  overflow-wrap: break-word;
 }
 
 .spoiler-btn {
-    user-select: none;
-    font-size: 2rem;
+  user-select: none;
+  font-size: 2rem;
 }
 
 .spoiler-btn:hover {
-    cursor: pointer;
-    color: rgb(120, 120, 120);
+  cursor: pointer;
+  color: rgb(120, 120, 120);
 }
 
 .spoiler-btn-bottom {
-    width: 100%;
-    text-align: right;
+  width: 100%;
+  text-align: right;
 }
 
 .spoiler-body {
-    display: none;
-    height: 0;
+  display: none;
+  height: 0;
 }
 
 /*Classes for Spoiler*/
 
 .nav-wrapper {
-
-    margin-top: 5rem;
-    justify-content: space-between;
+  margin-top: 5rem;
+  justify-content: space-between;
 }
 
 .nav-back {
-
-    float: left;
-    cursor: pointer;
+  float: left;
+  cursor: pointer;
 }
 
 .nav-next {
-
-    float: right;
-    cursor: pointer;
+  float: right;
+  cursor: pointer;
 }
 
 .nav-icon {
-
-    color: gray;
+  color: gray;
 }
 
 /*CSS of the content*/
 
 #page-content {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 /*CSS of code blocks*/
 .code-window {
-    border-radius: 10px;
-    padding: 10px;
-    background: white;
+  border-radius: 10px;
+  padding: 10px;
+  background: white;
 }
 
-
 .bash {
-    border-radius: 10px 10px 0 0;
+  border-radius: 10px 10px 0 0;
 }
 
 .output {
-    border-radius: 0 0 10px 10px;
-    padding: 10px;
-    background: white;
+  border-radius: 0 0 10px 10px;
+  padding: 10px;
+  background: white;
 }
 
 .lang-nav {
-    position: static;
-    width: 100%;
+  position: static;
+  width: 100%;
 }
 
 .lang-nav ul {
-    padding: 0 0 0 16px;
+  padding: 0 0 0 16px;
+}
+
+.code-lang {
+  cursor: pointer;
 }
 
 .underline {
-    position: relative;
-    width: 110%;
-    bottom: -7px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: #9f9d9d; 
+  position: relative;
+  width: 110%;
+  bottom: -7px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #9f9d9d;
 }
 
 .copy-block {
-    position: relative;
-    margin-top: 20px;
-    margin-right: 20px;
+  position: relative;
+  margin-top: 20px;
+  margin-right: 20px;
 }
 .copied-message {
-    opacity: 0;
-    border: 2px solid transparent;
-    padding: 4px 8px 4px 8px;
-    border-radius: 4px;
-    background: linear-gradient(white, white) padding-box,
-              linear-gradient(126deg, #CE126F, #F7C150, #43B7B4, #298AC8, #29B68A, #D6F272) border-box;
+  opacity: 0;
+  border: 2px solid transparent;
+  padding: 4px 8px 4px 8px;
+  border-radius: 4px;
+  background: linear-gradient(white, white) padding-box,
+    linear-gradient(
+        126deg,
+        #ce126f,
+        #f7c150,
+        #43b7b4,
+        #298ac8,
+        #29b68a,
+        #d6f272
+      )
+      border-box;
 }
 .copy-button {
   margin-top: 10px;
@@ -293,11 +302,11 @@ details summary>* {
 }
 
 .copy-icon {
-    color: rgb(77, 77, 77);
+  color: rgb(77, 77, 77);
 }
 
 .copy-icon:hover {
-    color: rgb(62, 62, 238)
+  color: rgb(62, 62, 238);
 }
 /*CSS of code blocks*/
 /* Dark mode */

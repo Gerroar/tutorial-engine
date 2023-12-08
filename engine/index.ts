@@ -27,8 +27,9 @@ let navButtonsMap: Map<string, string> = new Map([
   ["back", ""],
   ["next", ""],
 ]);
+let indexOfArrHr: number = 0;
 /**This variable its used to specify which path will be the first to appear in the app, that means that it uses
- * it will the route that it's located in "/" so that means the first route to appear when the page its loaded
+ * it with the route that it's located in "/" so that means the first route to appear when the page its loaded
  * without any specific url, change it at your convinience, the specified path will appear "hardcoded" in the
  * routes and will use "/" instead of for example "/index, always start your path with / because all of the
  * paths start with them ( you can check in the generated App.jsx)
@@ -100,6 +101,15 @@ function restartVariables() {
   foundedCodeBlocks = 0;
   openCodeBlock = true;
   formattedLang = "";
+  indexOfArrHr = 3;
+}
+
+function checkAndIncreaseHrIndex() {
+  indexOfArrHr++;
+  if (indexOfArrHr > 2) {
+    indexOfArrHr = 0;
+  }
+  return indexOfArrHr;
 }
 
 /**Removes the spaces to check if the first character is the one that was passed, this function it's used for detecting
@@ -367,11 +377,17 @@ function fillArrOfCodeArrays(str: string) {
 function processLine(str: string) {
   if (str.startsWith("# ")) {
     return (
-      checkIfNeedClosingandAddTag() + "<h1>" + str.substring(2) + "</h1><hr/>"
+      checkIfNeedClosingandAddTag() +
+      "<h1>" +
+      str.substring(2) +
+      `</h1><hr className="hr${checkAndIncreaseHrIndex()}"/>`
     );
   } else if (str.startsWith("## ")) {
     return (
-      checkIfNeedClosingandAddTag() + "<h2>" + str.substring(3) + "</h2><hr/>"
+      checkIfNeedClosingandAddTag() +
+      "<h2>" +
+      str.substring(3) +
+      `</h2><hr className="hr${checkAndIncreaseHrIndex()}"/>`
     );
   } else if (str.startsWith("### ")) {
     return checkIfNeedClosingandAddTag() + "<h3>" + str.substring(4) + "</h3>";
@@ -498,7 +514,7 @@ function processLine(str: string) {
          */
 
         if (openCallOut) {
-          return `<hr/>`;
+          return `<hr className="calloutHr"/>`;
         } else {
           callOutType = "";
         }
@@ -703,7 +719,7 @@ function processLine(str: string) {
           return `
 <div className="code-window ${classToAdd} mt-10 min-w-[600px] max-w-[700px]">
   <nav className="lang-nav z-20">
-    <ul className="grid grid-cols-3 gap-x-32 gap-y-6 xl:gap-x-44 w-full">
+    <ul className="grid grid-cols-3 gap-x-32 gap-y-7 xl:gap-x-44 w-full">
           `;
         } else {
           return "";
@@ -754,6 +770,8 @@ function processLine(str: string) {
         </AnimatePresence>
         {
           noCopy ? (
+            ""
+          ) : (
             <div className="copy-block flex flex-col justify-center">
               <motion.span className="copied-message">Copied!</motion.span>
               <motion.button 
@@ -764,8 +782,6 @@ function processLine(str: string) {
                 }, selectedTab))}
               ><FontAwesomeIcon icon={faCopy} className="copy-icon" size="lg"/></motion.button>
             </div>
-          ) : (
-            ""
           )
         }
       </div>
@@ -871,16 +887,16 @@ function processLine(str: string) {
           
         </motion.div>
       </AnimatePresence>
-      <div className="copy-block flex flex-col justify-center">
-        <motion.span className="copied-message">Copied!</motion.span>
-        <motion.button 
-          className="copy-button"
-          whileTap={{ y: -6}}
-          onClick={(e) => handleCopyClipboard(e, getCodeFromArray(arrCodeBlocks${
-            counterOfCodeBlocks - 1
-          }, selectedTab))}
-        ><FontAwesomeIcon icon={faCopy} className="copy-icon" size="lg"/></motion.button>
-      </div>
+      {noCopy ? (""):(<div className="copy-block flex flex-col justify-center">
+      <motion.span className="copied-message">Copied!</motion.span>
+      <motion.button 
+        className="copy-button"
+        whileTap={{ y: -6}}
+        onClick={(e) => handleCopyClipboard(e, getCodeFromArray(arrCodeBlocks${
+          counterOfCodeBlocks - 1
+        }, selectedTab))}
+      ><FontAwesomeIcon icon={faCopy} className="copy-icon" size="lg"/></motion.button>
+    </div>)}
     </div>
 </div>
         `;
@@ -1048,10 +1064,10 @@ function getCodeFromArray(arr: Array<ArrCodeElement>, lang: string) {
     }
   })
   if (codeToReturn === "") {
-    noCopy = false;
+    noCopy = true;
     return "Language not selected";
   } else {
-    noCopy = true;
+    noCopy = false;
     return codeToReturn;
   }
 }
@@ -1068,6 +1084,9 @@ const changeStateAndReRender = (lang: string) => {
   }
 
   let beforeContent: string = `useEffect(() => {
+    hljs.configure({
+      ignoreUnescapedHTML: true,
+    });
     hljs.highlightAll();
   },[selectedTab]);\nreturn(<><div id="page-content" className="pl-16 pr-16">\n`;
   openPageContent = true;
@@ -1150,12 +1169,12 @@ let appContent = `export default function App() {
     const [selectedTab, setSelectedTab] = useState("Java")
     return (
       <>
-        <MenuButton />
+        <MenuButton rootPath={"${rootPath}"}/>
         <div id="page-wrap" className="ml-64 2xl:ml-0 pr-20 max-w-[1280px]">
           <Routes>
             <Route path="/" element={<${generateComponentName(
               rootPath
-            )} />} />  
+            )} selectedTab={selectedTab} setSelectedTab={setSelectedTab} />} />  
        `;
 
 let routeImports: string = "";
@@ -1173,12 +1192,19 @@ for (let i = 0; i < arrDirectories.length; i++) {
         / /g,
         ""
       )}" element={<${componentName} selectedTab={selectedTab} setSelectedTab={setSelectedTab} />} />\n`;
+    } else {
+      console.log(rootPath);
     }
   } else {
-    routeElements += `<Route path="${routerPath.replace(
-      / /g,
-      ""
-    )}" element={<${componentName} selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>} />\n</Routes></div></>)};\n`;
+    console.log("routerPath", routerPath, "rootpath", rootPath);
+    if (routerPath !== rootPath) {
+      routeElements += `<Route path="${routerPath.replace(
+        / /g,
+        ""
+      )}" element={<${componentName} selectedTab={selectedTab} setSelectedTab={setSelectedTab}/>} /></Routes></div></>)};`;
+    } else {
+      routeElements += `\n</Routes></div></>)};\n`;
+    }
   }
 }
 
