@@ -37,7 +37,7 @@ It is useful for creating interactive documentation sites with features like che
 Clone the project
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Gerroar/tutorial-engine.git
 cd tutorial-engine-main
 ```
 
