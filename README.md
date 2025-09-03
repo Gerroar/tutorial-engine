@@ -69,6 +69,19 @@ Preview the production build
 npm run preview
 ```
 
+### Configure Markdown input path
+By default, the engine is configured to read Markdown files from a path defined inside `engine/index.ts`.  
+- If you want to keep your `.md` files in a different folder, adjust the path there.  
+- For testing, the repository includes the examples inside `engine/tests`.  
+- For production use, it is recommended to keep your Markdown content inside `engine/` for easier organization.  
+
+### Run the engine manually
+To rebuild the React output after editing or adding Markdown files, run:
+
+```bash
+npx ts-node engine/index.ts
+```
+
 ---
 
 <a id="example-included"></a>
