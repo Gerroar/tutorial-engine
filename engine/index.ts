@@ -1418,18 +1418,57 @@ for (let i = 0; i < arrDirectories.length; i++) {
   }
 }
 
+/**
+ * ===== Frontend file generation phase =====
+ *
+ * After parsing all Markdown files, the engine writes three output files
+ * into the frontend project:
+ *
+ * 1. App.tsx → main React entry point with routes and imports.
+ * 2. directoriesList.ts → list of all discovered directories/files for navigation.
+ * 3. languagesUtils.ts → list of all detected languages for code block rendering.
+ *
+ * These files ensure the frontend dynamically reflects the structure and
+ * content parsed from the Markdown sources.
+ */
+
+/**
+ * Write the main React entry point (App.tsx).
+ *
+ * Combines:
+ * - defaultAppContentImports → base imports needed for the app.
+ * - routeImports → imports for each generated page component.
+ * - appContent → core wrapper/structure of the app.
+ * - routeElements → JSX <Route> definitions for React Router.
+ *
+ * Ensures the frontend automatically reflects the Markdown content tree.
+ */
 fs.writeFileSync(
   `../frontend/src/App.tsx`,
   defaultAppContentImports + routeImports + appContent + routeElements
 );
 
-fs.writeFileSync(
+/**
+ * Write the list of all discovered directories/files into directoriesList.ts.
+ *
+ * - arrDirectories is built while processing Markdown files.
+ * - The resulting TypeScript file exports arrDirectories as an array of strings.
+ * - Used by the frontend to generate menus/navigation.
+ */
+fa.writeFileSync(
   `../frontend/src/output/directoriesList.ts`,
   `export const arrDirectories = [\n${arrDirectories
     .map((x) => `"${x}"`)
     .join(",\n")}\n];`
 );
 
+/**
+ * Write the list of all detected programming languages into languagesUtils.ts.
+ *
+ * - arrLanguages is populated when fenced code blocks are processed.
+ * - Each language is stored only once, ensuring the frontend knows which tabs/icons to render.
+ * - Exported array can be used by utilities to handle highlighting and devicons.
+ */
 fs.writeFileSync(
   `../frontend/src/output/languagesUtils.ts`,
   `export const arrLanguages = [\n${arrLanguages
