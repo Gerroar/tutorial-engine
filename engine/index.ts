@@ -77,8 +77,18 @@ let urlRegEx: RegExp =
 
 //Regex
 
-/**Restart all the vars to the default value */
-
+/**
+ * Reset all global parser state variables to their default values.
+ *
+ * Responsibilities:
+ * - Clear temporary buffers (e.g., codeBuffer) and reset extractedLang.
+ * - Reset flags for open structures such as lists, blockquotes, callouts, and spoilers.
+ * - Reinitialize counters like hrIndex so section separators start fresh.
+ * - Ensure each Markdown file is parsed in a clean state, without leaking
+ *   data or flags from previously processed files.
+ *
+ * This function should be called at the start of processFile().
+ */
 function restartVariables() {
   inCode = false;
   lastSh = ``;
