@@ -12,11 +12,12 @@
 - [📚 What I Learned](#user-content-what-i-learned)
 - [✅ Next Strict Steps](#user-content-next-strict-steps)
 
-
+<a id="description"></a>
 ## 🚀 Description
 Tutorial Engine is a custom parser and generator that transforms **Extended Markdown** into **React components**.  
 It is useful for creating interactive documentation sites with features like checklists, callouts, spoilers, code highlighting and navigation buttons, all generated from Markdown files.
 
+<a id="features"></a>
 ## ✨ Features
 - Parse Extended Markdown with support for headings, lists, blockquotes, callouts, spoilers and to‑dos.
 - Automatic generation of `.tsx` React components from `.md` files.
@@ -26,12 +27,15 @@ It is useful for creating interactive documentation sites with features like che
 - Support for multiple callout styles (`good`, `bad`, `warning`) with titles and dividers.
 - Automatic route discovery and directory tree building.
 
+
+<a id="tech-stack"></a>
 ## 🛠️ Tech Stack
 - **Frontend:** React, TypeScript, Vite, TailwindCSS, Framer Motion
 - **Code Highlighting:** highlight.js
 - **Parser/Engine:** Node.js + TypeScript (custom build pipeline)
 - **Version Control:** Git + GitHub
 
+<a id="run-locally"></a>
 ## 💻 Run Locally
 
 Clone the project
@@ -65,6 +69,21 @@ Preview the production build
 npm run preview
 ```
 
+---
+
+<a id="example-included"></a>
+## 🧪 Example Included
+This repository already includes **multiple example projects** generated automatically.  
+Inside the `engine/tests` folder you will find **three separate test sets**, each representing a different collection of Markdown files and folder structures.  
+When running the engine, **each test set is transformed into its own React project** inside the `frontend` folder.  
+
+This demonstrates how the parser can handle different Markdown sources and produce distinct React applications out of them.  
+
+### Where to write your Markdown files
+- The Markdown files in `engine/tests` are intended only as **examples and tests**.  
+- You can configure the input path to point to any folder where you prefer to keep your `.md` files.  
+- For better organization, it is recommended to keep those Markdown content folders **inside the `engine` directory**, so everything related to parsing and generation stays together.
+  
 ---
 
 <a id="architecture"></a>
@@ -117,6 +136,7 @@ The parser uses global variables to keep track of nested structures:
 
 ---
 
+<a id="supported-syntax"></a>
 ## ✍️ Supported Syntax
 
 This is the **practical specification** of the _Extended Markdown_ understood by `engine/index.ts`. Where possible, input patterns, output JSX and notes are shown.
@@ -163,74 +183,7 @@ This is the **practical specification** of the _Extended Markdown_ understood by
 
 ---
 
-## 🔍 Code Review and Proposed Improvements
-
-> Label: **[Not verified]** for points depending on cases not present in the ZIP. The rest is verified against the included code.
-
-### Strengths
-- Direct conversion from Extended Markdown to TSX with fine control.
-- UI with Framer Motion for clear and fluid side navigation.
-- Separation of `engine` (build-time) and `frontend` (runtime).
-
-### Possible Issues and Recommendations
-
-1. **Dispersed parser state**
-   - Global variables like `openBlockQuote`, `openCallOut`, `ulLayer`, `olLayer`...
-   - **Improvement**: centralize into `interface ParserState` and pass by reference to functions.
-   - Benefits: easier testing, avoids state leakage.
-
-2. **Tag closing**
-   - `checkIfNeedClosingandAddTag()` tries to close structures when switching block types.
-   - **Risk**: combinations callout → list → blockquote may leave tags open.
-   - **Suggested test**: snapshots for transitions between all block types.
-
-3. **Component names and routes**
-   - `generateComponentName()` must normalize spaces, accents and symbols.
-   - **Improvement**: consistent slugify and suffixes for collisions.
-
-4. **Security/escaping**
-   - Some branches inject `str.substring(...)` without escaping.
-   - **Recommendation**: escape textual content by default, allow raw HTML only with explicit whitelist.
-
-5. **Code blocks**
-   - Accumulated in arrays works, but rendering not fully typed.
-   - **Improvement**: `type Language = 'ts' | 'js' | 'bash' | ...` and validate against `hljs.listLanguages()`.
-
-6. **Tests**
-   - **Add**: Jest + ts-jest for `processLine`, covering nested lists, callouts, spoilers and navigation.
-
-7. **Build performance**
-   - Many string concatenations.
-   - **Improvement**: use arrays and `join('')` or large template literals.
-
-8. **Accessibility**
-   - Checkbox labels OK, but missing `aria-expanded` in spoilers and roles in callouts.
-   - **Improvement**: add ARIA attributes and keyboard focus support.
-
-9. **<hr> styles**
-   - `hrN` suggests progressive color scheme.
-   - **Improvement**: document palette and avoid dependency on order if author reorders sections.
-
-10. **Highlight.js**
-    - **[Not verified]** Configure consistent theme and lazy-load if bundle size grows.
-
-### Proposed Roadmap by Stages
-
-- **Phase 1: security and robustness**
-  - Unified `ParserState`.
-  - Default text escaping.
-  - Basic regression tests.
-
-- **Phase 2: DX and cleanup**
-  - Refactor TSX generation with templates.
-  - CLI `engine` with options: input, output, watch.
-
-- **Phase 3: features**
-  - Extend callouts with icons and IDs.
-  - Accessible spoilers using native `<details>/<summary>`.
-
----
-
+<a id="challenges"></a>
 ## 🧩 Challenges
 - Designing a parser with many global states was challenging; a more robust **data tree structure** would simplify nested elements.  
 - Handling transitions between block types (e.g., callout → list → blockquote) required careful tag closing logic.  
@@ -239,6 +192,7 @@ This is the **practical specification** of the _Extended Markdown_ understood by
 
 ---
 
+<a id="what-i-learned"></a>
 ## 📚 What I Learned
 - Building a custom Markdown‑to‑React parser deepened my understanding of parsing strategies and state machines.  
 - Using arrays of code blocks with language metadata provided flexibility for rendering and copy‑to‑clipboard features.  
@@ -248,6 +202,7 @@ This is the **practical specification** of the _Extended Markdown_ understood by
 
 ---
 
+<a id="next-strict-steps"></a>
 ## ✅ Next Strict Steps
 
 1. **Parser tests**
