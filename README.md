@@ -154,8 +154,6 @@ The parser uses global variables to keep track of nested structures:
 
 This is the **practical specification** of the _Extended Markdown_ understood by `engine/index.ts`. Where possible, input patterns, output JSX and notes are shown.
 
-> Source: analyzed directly from the parser code in `engine/index.ts`. Anything not shown here should be considered **[Not verified]**.
-
 ### Headings and Separators
 - `# Title` → `<h1>Title</h1><hr className="hrN" />`
 - `## Subtitle` → `<h2>…</h2><hr className="hrN" />`
@@ -192,7 +190,7 @@ This is the **practical specification** of the _Extended Markdown_ understood by
 
 ### 🔤 HTML Entities
 - `&mdash;` is allowed for em dash.
-- The parser does not escape raw HTML inside normal lines. [Not verified] Use with caution.
+- The parser does not escape raw HTML inside normal lines. Use with caution.
 
 ---
 
