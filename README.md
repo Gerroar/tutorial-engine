@@ -133,7 +133,7 @@ The parser uses global variables to keep track of nested structures:
 - **Routes**: Vite + React Router, generating `<Route>` entries for each file in `output/`.
 
 ### Decisions & Trade-offs
-- Handwritten single-pass parser for performance and fine control. [Not verified] It might benefit from a formal grammar or a Markdown library with extensions, but that would reduce control over the current DSL.
+- Handwritten single-pass parser for performance and fine control. It might benefit from a formal grammar or a Markdown library with extensions, but that would reduce control over the current DSL.
 - Global state vs block-level state stack: simpler, but requires discipline to close tags correctly.
 
 ### Known Risks
