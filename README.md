@@ -67,6 +67,7 @@ npm run preview
 
 ---
 
+<a id="architecture"></a>
 ## 🏗️ Architecture
 
 ### Overview
