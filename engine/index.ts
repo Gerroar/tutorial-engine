@@ -1,7 +1,22 @@
+/**
+ * Tutorial Engine — Inline documentation
+ * This file adds JSDoc comments and inline notes without changing runtime logic.
+ * Purpose: make the parser/generator easier to maintain and review.
+ *
+ * Notes:
+ * - Code blocks: languages are detected and also used to import icons from `devicons-react` (e.g., <JavascriptPlain />).
+ * - Multi-language tabs: place fenced blocks back-to-back with NO blank line to group them; use a double newline to separate groups.
+ * - Input path: see the CLI entry near the bottom — you can pass a root folder via CLI or edit the default test path.
+ */
+
 import { execFileSync, execSync, spawnSync } from "child_process";
 import fs from "fs";
 import crypto from "crypto";
 import hljs from "highlight.js";
+
+/* =========================
+   Parser state & globals
+   ========================= */
 
 const buildFolder = "../frontend/src/output";
 let arrDirectories: string[] = [];
@@ -104,6 +119,11 @@ function restartVariables() {
   indexOfArrHr = 3;
 }
 
+/**
+ * Return the current <hr> class suffix (e.g., "hr3") and then increase the index.
+ * Use this when closing a section and starting a new one so each section can get a different style.
+ * @returns string The class suffix like "hr0", "hr1", ...
+ */
 function checkAndIncreaseHrIndex() {
   indexOfArrHr++;
   if (indexOfArrHr > 2) {
@@ -112,10 +132,13 @@ function checkAndIncreaseHrIndex() {
   return indexOfArrHr;
 }
 
-/**Removes the spaces to check if the first character is the one that was passed, this function it's used for detecting
- * if the line it's part of a nested list or just a line that concides with the characters used for lists
+/**
+ * Check if a given character is the first non-whitespace character on a line.
+ * Useful to quickly detect block starters like '>', '-', '*', or digits for OL.
+ * @param line Full input line (untrimmed)
+ * @param char Target character to look for (e.g., '>', '-', '*')
+ * @returns boolean True if `char` is the first non-space character, false otherwise
  */
-
 function characterIsFirstWithoutSpaces(str: string, character: string) {
   let isFirstCharacter: boolean = false;
   let whiteSpaceRemoved: string = str.replace(/\s/g, "");
@@ -126,6 +149,19 @@ function characterIsFirstWithoutSpaces(str: string, character: string) {
   return isFirstCharacter;
 }
 
+/**
+ * Close any open block-level structures before starting a new one.
+ * This prevents orphan/unterminated tags when switching between different block types
+ * (e.g., callout → list → blockquote → code fence, etc.).
+ *
+ * The function should:
+ * - Check flags/state for: open code fence, open callout, open blockquote,
+ *   open lists (UL/OL and their nesting), open spoiler/collapsible blocks, etc.
+ * - Generate the appropriate closing tags in the correct reverse order of opening.
+ * - Reset the corresponding flags/counters for the structures it closes.
+ *
+ * @returns string Concatenated closing tags to append to the output before opening the new block.
+ */
 function checkIfNeedClosingandAddTag(str?: string) {
   let addClosingTag = "";
   if (ulLayer != 0) {
@@ -191,10 +227,14 @@ function checkIfNeedClosingandAddTag(str?: string) {
   return addClosingTag;
 }
 
-/**Iterates the string looking for more than one of the character type passed,
- * doesn't matter if it's * , ** or *** ( for example, it could be any type accepted
- * for italics, bold or both (***x***, ___x___)), it will check if there is a pair of
- * that amount of symbols.
+/**
+ * Check whether `needle` appears more than once in `haystack`.
+ * Useful for parsing validations where multiple markers on the same line
+ * would change how the line is interpreted (or indicate malformed input).
+ *
+ * @param haystack Full input string to scan.
+ * @param needle Substring to look for.
+ * @returns boolean True if the substring occurs at least twice; otherwise false.
  */
 
 function moreThanOne(str: string, charType: string) {
@@ -253,6 +293,19 @@ function moreThanOne(str: string, charType: string) {
   }
 }
 
+/**
+ * Generate JSX markup for a to-do item composed of a checkbox and a label.
+ *
+ * Responsibilities:
+ * - Create a unique <input type="checkbox"> element with a matching <label>.
+ * - Ensure the input has a stable `id` so the label can be correctly associated.
+ * - Optionally set the checkbox as checked depending on the parsed marker.
+ *
+ * @param id Unique id to link the <input> and <label>.
+ * @param text Label text to display next to the checkbox.
+ * @param checked Optional initial checked state (default: false).
+ * @returns string JSX snippet containing the input and label.
+ */
 function generateCheckBoxAndLabel(id: string, value: string) {
   let checkbox = `<input type="checkbox" id="${id}" name="${id}" value="${value}" className="mr-2" />`;
   let label = `<label htmlFor="${id}">${value}</label><br/>`;
@@ -265,10 +318,17 @@ function generateCheckBoxAndLabel(id: string, value: string) {
   );
 }
 
-/**For friday, create a function that looks for specefic [next]() [back]() links, and extract the route
- * inside of the parentesis , to generate the component name for the setter
+/**
+ * Convert a raw path or file name into a valid React component name.
+ *
+ * Rules:
+ * - Capitalize the first letter of each segment.
+ * - Remove or replace invalid characters (spaces, dashes, special symbols).
+ * - Normalize the result so it is always a valid PascalCase identifier.
+ *
+ * @param raw Source string (usually derived from a Markdown file path).
+ * @returns string Valid React component name (e.g., "IntroGettingStarted").
  */
-
 function generateComponentName(dir: string) {
   let dashPositions: Array<number> = [];
   for (let index = 0; index < dir.length; index++) {
@@ -292,6 +352,17 @@ function generateComponentName(dir: string) {
   return componentName;
 }
 
+/**
+ * Store navigation markers ("back" and "next") found inside a Markdown file.
+ *
+ * Responsibilities:
+ * - Detect and parse custom markers like [back: /intro] or [next: /advanced].
+ * - Register them in a map keyed by the current component/file path.
+ * - Allow the generated page to render navigation buttons at the bottom.
+ *
+ * @param currentPath Route key derived from the Markdown file path.
+ * @param markerLine Raw line containing the navigation marker.
+ */
 function fillNavButtonsMap(str: string) {
   if (/\[.*\]\(.*\)/.test(str)) {
     let linkContent: string = str.substring(
@@ -317,6 +388,18 @@ function fillNavButtonsMap(str: string) {
   }
 }
 
+/**
+ * Save one captured fenced code block into the in-memory arrays for later rendering.
+ *
+ * Responsibilities:
+ * - Store the code block content together with its language id.
+ * - Ensure consistent indexing so multiple code blocks of the same language
+ *   can be retrieved individually.
+ * - Register a devicons-react import so the language tab can show its icon.
+ *
+ * @param language Language id extracted from the fence (e.g., "javascript", "typescript", "bash").
+ * @param code Raw code block content as a single string.
+ */
 function fillArrOfCodeArrays(str: string) {
   if (str.startsWith("```")) {
     if (!extractCode) {
@@ -374,6 +457,25 @@ function fillArrOfCodeArrays(str: string) {
   }
 }
 
+/**
+ * Parse a single Markdown line and update the parser state accordingly.
+ *
+ * Responsibilities:
+ * - Detect headings (#, ##, ###) and generate JSX <h*> tags.
+ * - Handle horizontal rules (---, ***) and increment hrIndex for unique styling.
+ * - Manage unordered and ordered lists, opening/closing <ul>/<ol> depending on nesting.
+ * - Handle blockquotes (>) with proper open/close tags.
+ * - Detect and manage callouts (!good | !bad | !warning), including title and divider handling.
+ * - Manage spoilers/collapsible blocks ($).
+ * - Handle fenced code blocks (```lang):
+ *    - On open: extract language, reset buffer, set openCodeFence = true.
+ *    - On close: call fillArrOfCodeArrays(language, buffer), reset state, and insert code reference.
+ * - Detect navigation markers ([back], [next]) and to-do checkboxes.
+ *
+ * @param str Current line of the Markdown file (trimmed).
+ * @returns string The generated JSX/HTML fragment for this line,
+ *                 or an empty string if the line only mutates parser state.
+ */
 function processLine(str: string) {
   if (str.startsWith("# ")) {
     return (
@@ -949,12 +1051,28 @@ function processLine(str: string) {
   return str;
 }
 
-/**Why arrDirectories inside this function ?
+/**
+ * Process a single Markdown file and convert it into a React (TSX) component.
  *
- * In order to generate a menu with all the directories and files that they are being created,
- * we store the path as a string in the array
+ * Workflow:
+ * 1. Reset all parser state with restartVariables().
+ * 2. Read the file line by line and pass each through processLine().
+ * 3. Collect generated JSX fragments into a component body.
+ * 4. Register code blocks, navigation markers, and other metadata.
+ * 5. Write the final .tsx file under the output directory.
+ * 6. Update arrDirectories so the file is included in the navigation tree.
+ *
+ * Why arrDirectories inside this function?
+ * - In order to generate a menu with all the directories and files being created,
+ *   we store each processed file path as a string inside arrDirectories.
+ *
+ * Notes:
+ * - Each Markdown file becomes its own React component.
+ * - devicons-react imports are generated automatically based on detected code blocks.
+ *
+ * @param root Root directory of the content tree.
+ * @param path Path to the Markdown file relative to the root.
  */
-
 function processFile(root: string, path: string) {
   //Restart all the needed variables
   restartVariables();
@@ -1033,6 +1151,16 @@ interface ArrCodeElement {
   code: string
 }
 
+/**
+ * Provide a copy-to-clipboard action for code blocks.
+ *
+ * Responsibilities:
+ * - Use the Clipboard API (or a fallback) to copy code content to the user's clipboard.
+ * - Optionally provide a visual or console feedback when the copy succeeds or fails.
+ * - Ensure that the elementId corresponds to a valid <pre>/<code> block.
+ *
+ * @param elementId DOM id of the code element to copy content from.
+ */
 function handleCopyClipboard(e: any, code: string) {
   if (e !== null) {
     let parent = e.target.parentNode.parentNode.querySelector(".copied-message");
@@ -1055,6 +1183,18 @@ if (backPath === "${rootPath}") {
   nextPath = "/";
 }`;
 
+/**
+ * Retrieve a code block from the internal arrays by language and index.
+ *
+ * Responsibilities:
+ * - Locate the correct language array that was populated in fillArrOfCodeArrays().
+ * - Return the code snippet stored at the given index.
+ * - Fallback gracefully (e.g., return empty string) if not found.
+ *
+ * @param language Language key (e.g., "javascript", "typescript").
+ * @param index Index of the code block within that language's array (zero-based).
+ * @returns string The requested code snippet or an empty string if unavailable.
+ */
   let getcodeFunctionString = `
 function getCodeFromArray(arr: Array<ArrCodeElement>, lang: string) {
   let codeToReturn: string = "";
@@ -1079,6 +1219,28 @@ const changeStateAndReRender = (lang: string) => {
   hljs.highlightAll();
 };
   `;
+
+  /**
+ * Generate the TypeScript snippet that declares the per-language code arrays
+ * used by the generated TSX components (and by `getCodeFromArray`).
+ *
+ * Responsibilities:
+ * - Emit one array per language (e.g., `const jsCodes = [...]`, `const bashCodes = [...]`).
+ * - Keep the original ordering so tab indices remain stable across renders.
+ * - Include all captured blocks previously stored via `fillArrOfCodeArrays()`.
+ * - Ensure the output is valid TypeScript to be injected into the final component file(s).
+ *
+ * Multi-language tabs:
+ * - When consecutive fenced blocks have NO blank line between them, they are grouped
+ *   as a single multi-tab block; indexes must reflect that grouping consistently.
+ * - Use a double line break to intentionally separate blocks.
+ *
+ * Interop:
+ * - These arrays are consumed by `getCodeFromArray(language, index)` inside the generated TSX.
+ * - Combined with detected languages, tabs can display icons from devicons-react.
+ *
+ * @returns string TypeScript code that declares and exports the language → code arrays.
+ */
   function generateArraysOfCodes(arr: Array<any>, i: number) {
     return `let arrCodeBlocks${i}: Array<ArrCodeElement> = [${arr}]\n`;
   }
@@ -1141,6 +1303,26 @@ const changeStateAndReRender = (lang: string) => {
   );
 }
 
+/**
+ * Recursively walk through a directory tree, processing Markdown files
+ * and copying non-Markdown assets when needed.
+ *
+ * Workflow:
+ * - Start at the given root/path.
+ * - If an entry is a Markdown file (.md), pass it to processFile().
+ * - If an entry is a directory, recursively call processPath() on it.
+ * - If an entry is another type of file (e.g., image), copy it to the output folder.
+ * - Update arrDirectories to include discovered directories for navigation.
+ *
+ * Notes:
+ * - This function is the backbone of the engine: it drives parsing of all content.
+ * - It is also invoked at the bottom of index.ts with either:
+ *   - A CLI argument (`npx ts-node engine/index.ts path/to/md-root`).
+ *   - The default fallback path "tests/first-test".
+ *
+ * @param root The root folder from which traversal begins.
+ * @param path The relative path to start traversal ("" for the root itself).
+ */
 function processPath(root: string, path: string) {
   if (fs.lstatSync(`${root}/${path}`).isFile()) {
     let extension = path.substring(path.lastIndexOf(".") + 1);
@@ -1156,6 +1338,24 @@ function processPath(root: string, path: string) {
 }
 fs.rmSync(buildFolder, { recursive: true, force: true });
 fs.mkdirSync(buildFolder);
+/**
+ * CLI entry point of the engine.
+ *
+ * How it works:
+ * - If you run `npx ts-node engine/index.ts some/path`, the provided path is used as root.
+ * - If no argument is provided, it falls back to "tests/first-test".
+ *
+ * Notes:
+ * - This is the recommended place to adjust the default input folder if you
+ *   want to parse Markdown from another location.
+ * - For development, it is best to keep your Markdown content inside `engine/`
+ *   (e.g., under `engine/tests/`) for easier organization.
+ *
+ * Example:
+ * ```bash
+ * npx ts-node engine/index.ts engine/docs
+ * ```
+ */
 processPath(process.argv[2] || "tests/first-test", "");
 
 let defaultAppContentImports = `import './index.css';
